@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="1" name="DCUNITED_PROD_SANITY" parallel="classes">
+  <listeners>
+    <listener class-name="org.iomedia.galen.common.DataProviderAnnotationTransformerListener"/>
+  </listeners>
+  <test name="Chrome">
+    <parameter name="calendar" value="PROD_SANITY"/>
+    <parameter name="browser" value="CHROME1"/>
+    <classes>
+      <class name="org.iomedia.galen.tests.ProdSanity">
+        <methods>
+          <include name="prodSanityVerification"/>
+          <exclude name="compareScreenshotafterDeployment"/>
+          <exclude name="verifyPrivacyLink"/>
+          <exclude name="verifyCMSLogin"/>
+          <exclude name="takeScreenshotbeforeDeployment"/>
+          <exclude name="verifyBarcodeNumberStateAfterUpgrade"/>
+        </methods>
+      </class> <!-- org.iomedia.galen.tests.ProdSanity -->
+    </classes>
+  </test> <!-- Chrome -->
+</suite> <!-- DCUNITED_PROD_SANITY -->
+

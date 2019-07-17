@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+  <title>TestNG reports</title>
+
+    <link type="text/css" href="testng-reports.css" rel="stylesheet" />  
+    <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="testng-reports.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type='text/javascript'>
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      var suiteTableInitFunctions = new Array();
+      var suiteTableData = new Array();
+    </script>
+    <!--
+      <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+     -->
+  </head>
+
+  <body>
+    <div class="top-banner-root">
+      <span class="top-banner-title-font">Test results</span>
+      <br/>
+      <span class="top-banner-font-1">2 suites, 2 failed tests</span>
+    </div> <!-- top-banner-root -->
+    <div class="navigator-root">
+      <div class="navigator-suite-header">
+        <span>All suites</span>
+        <a href="#" class="collapse-all-link" title="Collapse/expand all the suites">
+          <img class="collapse-all-icon" src="collapseall.gif">
+          </img> <!-- collapse-all-icon -->
+        </a> <!-- collapse-all-link -->
+      </div> <!-- navigator-suite-header -->
+      <div class="suite">
+        <div class="rounded-window">
+          <div class="suite-header light-rounded-window-top">
+            <a href="#" class="navigator-link" panel-name="suite-UNITAS_PROD_SANITY">
+              <span class="suite-name border-failed">UNITAS_PROD_SANITY</span>
+            </a> <!-- navigator-link -->
+          </div> <!-- suite-header light-rounded-window-top -->
+          <div class="navigator-suite-content">
+            <div class="suite-section-title">
+              <span>Info</span>
+            </div> <!-- suite-section-title -->
+            <div class="suite-section-content">
+              <ul>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="test-xml-UNITAS_PROD_SANITY">
+                    <span>UNITAS-PROD_SANITY-testng-customsuite.xml</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="testlist-UNITAS_PROD_SANITY">
+                    <span class="test-stats">1 test</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="group-UNITAS_PROD_SANITY">
+                    <span>7 groups</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="times-UNITAS_PROD_SANITY">
+                    <span>Times</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="reporter-UNITAS_PROD_SANITY">
+                    <span>Reporter output</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="ignored-methods-UNITAS_PROD_SANITY">
+                    <span>Ignored methods</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+                <li>
+                  <a href="#" class="navigator-link " panel-name="chronological-UNITAS_PROD_SANITY">
+                    <span>Chronological view</span>
+                  </a> <!-- navigator-link  -->
+                </li>
+              </ul>
+            </div> <!-- suite-section-content -->
+            <div class="result-section">
+              <div class="suite-section-title">
+                <span>Results</span>
+              </div> <!-- suite-section-title -->
+              <div class="suite-section-content">
+                <ul>
+                  <li>
+                    <span class="method-stats">2 methods, 2 failed,   </span>
+                  </li>
+                  <li>
+                    <span class="method-list-title failed">Failed methods</span>
+                    <span class="show-or-hide-methods failed">
+                      <a href="#" panel-name="suite-UNITAS_PROD_SANITY" class="hide-methods failed suite-UNITAS_PROD_SANITY"> (hide)</a> <!-- hide-methods failed suite-UNITAS_PROD_SANITY -->
+                      <a href="#" panel-name="suite-UNITAS_PROD_SANITY" class="show-methods failed suite-UNITAS_PROD_SANITY"> (show)</a> <!-- show-methods failed suite-UNITAS_PROD_SANITY -->
+                    </span>
+                    <div class="method-list-content failed suite-UNITAS_PROD_SANITY">
+                      <span>
+                        <img width="3%" src="failed.png"/>
+                        <a href="#" class="method navigator-link" panel-name="suite-UNITAS_PROD_SANITY" title="org.iomedia.galen.tests.ProdSanity" hash-for-method="compareScreenshotafterDeployment">compareScreenshotafterDeployment</a> <!-- method navigator-link -->
+                      </span>
+                      <br/>
+                      <span>
+                        <img width="3%" src="failed.png"/>
+                        <a href="#" class="method navigator-link" panel-name="suite-UNITAS_PROD_SANITY" title="org.iomedia.galen.tests.ProdSanity" hash-for-method="prodSanityVerification">prodSanityVerification</a> <!-- method navigator-link -->
+                      </span>
+                      <br/>
+                    </div> <!-- method-list-content failed suite-UNITAS_PROD_SANITY -->
+                  </li>
+                </ul>
+              </div> <!-- suite-section-content -->
+            </div> <!-- result-section -->
+          </div> <!-- navigator-suite-content -->
+        </div> <!-- rounded-window -->
+      </div> <!-- suite -->
+    </div> <!-- navigator-root -->
+    <div class="wrapper">
+      <div class="main-panel-root">
+        <div panel-name="suite-UNITAS_PROD_SANITY" class="panel UNITAS_PROD_SANITY">
+          <div class="suite-UNITAS_PROD_SANITY-class-failed">
+            <div class="main-panel-header rounded-window-top">
+              <img src="failed.png"/>
+              <span class="class-name">org.iomedia.galen.tests.ProdSanity</span>
+            </div> <!-- main-panel-header rounded-window-top -->
+            <div class="main-panel-content rounded-window-bottom">
+              <div class="method">
+                <div class="method-content">
+                  <a name="compareScreenshotafterDeployment">
+                  </a> <!-- compareScreenshotafterDeployment -->
+                  <span class="method-name">compareScreenshotafterDeployment</span>
+                  <div class="stack-trace">org.openqa.selenium.TimeoutException: Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name=&apos;email&apos;] | .//div[@class=&apos;mobile-signin&apos;]//*[text()=&apos;Sign In&apos;] | .//div[@class=&apos;desktop-signin-dashboard&apos;]//a[text()=&apos;Sign In&apos;] (tried for 20 second(s) with 500 MILLISECONDS interval)
+	at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:82)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:231)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at ✽.User is on / Page(features/userJourneys.feature:4)
+Caused by: org.openqa.selenium.NoSuchElementException: Cannot locate an element using By.xpath: .//input[@name=&apos;email&apos;] | .//div[@class=&apos;mobile-signin&apos;]//*[text()=&apos;Sign In&apos;] | .//div[@class=&apos;desktop-signin-dashboard&apos;]//a[text()=&apos;Sign In&apos;]
+For documentation on this error, please visit: http://seleniumhq.org/exceptions/no_such_element.html
+Build info: version: &apos;3.14.0&apos;, revision: &apos;aacccce0&apos;, time: &apos;2018-08-02T20:19:58.91Z&apos;
+System info: host: &apos;IOM-Backup.local&apos;, ip: &apos;fe80:0:0:0:1485:f552:8bbc:1a1b%en0&apos;, os.name: &apos;Mac OS X&apos;, os.arch: &apos;x86_64&apos;, os.version: &apos;10.13.6&apos;, java.version: &apos;1.8.0_111&apos;
+Driver info: driver.version: Driver
+	at org.openqa.selenium.support.ui.ExpectedConditions.lambda$findElement$0(ExpectedConditions.java:882)
+	at java.util.Optional.orElseThrow(Optional.java:290)
+	at org.openqa.selenium.support.ui.ExpectedConditions.findElement(ExpectedConditions.java:881)
+	at org.openqa.selenium.support.ui.ExpectedConditions.access$000(ExpectedConditions.java:43)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:182)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:179)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:208)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at cucumber.runtime.Utils$1.call(Utils.java:40)
+	at cucumber.runtime.Timeout.timeout(Timeout.java:16)
+	at cucumber.runtime.Utils.invoke(Utils.java:34)
+	at cucumber.runtime.java.JavaStepDefinition.execute(JavaStepDefinition.java:37)
+	at cucumber.runtime.StepDefinitionMatch.runStep(StepDefinitionMatch.java:40)
+	at cucumber.api.TestStep.executeStep(TestStep.java:102)
+	at cucumber.api.TestStep.run(TestStep.java:83)
+	at cucumber.api.TestCase.run(TestCase.java:58)
+	at cucumber.runner.Runner.runPickle(Runner.java:80)
+	at cucumber.api.testng.TestNGCucumberRunner.runScenario(TestNGCucumberRunner.java:84)
+	at org.iomedia.framework.Driver.runScenario(Driver.java:2056)
+	at org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment(ProdSanity.java:40)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+... Removed 14 stack frames
+</div> <!-- stack-trace -->
+                </div> <!-- method-content -->
+              </div> <!-- method -->
+              <div class="method">
+                <div class="method-content">
+                  <a name="prodSanityVerification">
+                  </a> <!-- prodSanityVerification -->
+                  <span class="method-name">prodSanityVerification</span>
+                  <div class="stack-trace">org.openqa.selenium.TimeoutException: Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name=&apos;email&apos;] | .//div[@class=&apos;mobile-signin&apos;]//*[text()=&apos;Sign In&apos;] | .//div[@class=&apos;desktop-signin-dashboard&apos;]//a[text()=&apos;Sign In&apos;] (tried for 20 second(s) with 500 MILLISECONDS interval)
+	at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:82)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:231)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at ✽.User is on / Page(features/prodsanity.feature:3)
+Caused by: org.openqa.selenium.NoSuchElementException: Cannot locate an element using By.xpath: .//input[@name=&apos;email&apos;] | .//div[@class=&apos;mobile-signin&apos;]//*[text()=&apos;Sign In&apos;] | .//div[@class=&apos;desktop-signin-dashboard&apos;]//a[text()=&apos;Sign In&apos;]
+For documentation on this error, please visit: http://seleniumhq.org/exceptions/no_such_element.html
+Build info: version: &apos;3.14.0&apos;, revision: &apos;aacccce0&apos;, time: &apos;2018-08-02T20:19:58.91Z&apos;
+System info: host: &apos;IOM-Backup.local&apos;, ip: &apos;fe80:0:0:0:1485:f552:8bbc:1a1b%en0&apos;, os.name: &apos;Mac OS X&apos;, os.arch: &apos;x86_64&apos;, os.version: &apos;10.13.6&apos;, java.version: &apos;1.8.0_111&apos;
+Driver info: driver.version: Driver
+	at org.openqa.selenium.support.ui.ExpectedConditions.lambda$findElement$0(ExpectedConditions.java:882)
+	at java.util.Optional.orElseThrow(Optional.java:290)
+	at org.openqa.selenium.support.ui.ExpectedConditions.findElement(ExpectedConditions.java:881)
+	at org.openqa.selenium.support.ui.ExpectedConditions.access$000(ExpectedConditions.java:43)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:182)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:179)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:208)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at cucumber.runtime.Utils$1.call(Utils.java:40)
+	at cucumber.runtime.Timeout.timeout(Timeout.java:16)
+	at cucumber.runtime.Utils.invoke(Utils.java:34)
+	at cucumber.runtime.java.JavaStepDefinition.execute(JavaStepDefinition.java:37)
+	at cucumber.runtime.StepDefinitionMatch.runStep(StepDefinitionMatch.java:40)
+	at cucumber.api.TestStep.executeStep(TestStep.java:102)
+	at cucumber.api.TestStep.run(TestStep.java:83)
+	at cucumber.api.TestCase.run(TestCase.java:58)
+	at cucumber.runner.Runner.runPickle(Runner.java:80)
+	at cucumber.api.testng.TestNGCucumberRunner.runScenario(TestNGCucumberRunner.java:84)
+	at org.iomedia.framework.Driver.runScenario(Driver.java:2056)
+	at org.iomedia.galen.tests.ProdSanity.prodSanityVerification(ProdSanity.java:20)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+... Removed 14 stack frames
+</div> <!-- stack-trace -->
+                </div> <!-- method-content -->
+              </div> <!-- method -->
+            </div> <!-- main-panel-content rounded-window-bottom -->
+          </div> <!-- suite-UNITAS_PROD_SANITY-class-failed -->
+        </div> <!-- panel UNITAS_PROD_SANITY -->
+        <div panel-name="suite-UNITAS" class="panel UNITAS">
+        </div> <!-- panel UNITAS -->
+        <div panel-name="test-xml-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">/Users/preeti/Documents/Automation Git/nam-automation/testng/UNITAS-PROD_SANITY-testng-customsuite.xml</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE suite SYSTEM &quot;http://testng.org/testng-1.0.dtd&quot;&gt;
+&lt;suite thread-count=&quot;1&quot; name=&quot;UNITAS_PROD_SANITY&quot; parallel=&quot;classes&quot;&gt;
+  &lt;listeners&gt;
+    &lt;listener class-name=&quot;org.iomedia.galen.common.DataProviderAnnotationTransformerListener&quot;/&gt;
+  &lt;/listeners&gt;
+  &lt;test name=&quot;Chrome&quot;&gt;
+    &lt;parameter name=&quot;calendar&quot; value=&quot;PROD_SANITY&quot;/&gt;
+    &lt;parameter name=&quot;browser&quot; value=&quot;CHROME1&quot;/&gt;
+    &lt;classes&gt;
+      &lt;class name=&quot;org.iomedia.galen.tests.ProdSanity&quot;&gt;
+        &lt;methods&gt;
+          &lt;include name=&quot;compareScreenshotafterDeployment&quot;/&gt;
+          &lt;include name=&quot;prodSanityVerification&quot;/&gt;
+          &lt;exclude name=&quot;prodSanityVerificationPart1&quot;/&gt;
+          &lt;exclude name=&quot;verifyPrivacyLink&quot;/&gt;
+          &lt;exclude name=&quot;verifyCMSLogin&quot;/&gt;
+          &lt;exclude name=&quot;takeScreenshotbeforeDeployment&quot;/&gt;
+          &lt;exclude name=&quot;verifyBarcodeNumberStateAfterUpgrade&quot;/&gt;
+        &lt;/methods&gt;
+      &lt;/class&gt; &lt;!-- org.iomedia.galen.tests.ProdSanity --&gt;
+    &lt;/classes&gt;
+  &lt;/test&gt; &lt;!-- Chrome --&gt;
+&lt;/suite&gt; &lt;!-- UNITAS_PROD_SANITY --&gt;
+            </pre>
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="test-xml-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE suite SYSTEM &quot;http://testng.org/testng-1.0.dtd&quot;&gt;
+&lt;suite name=&quot;UNITAS&quot;&gt;
+  &lt;suite-files&gt;
+    &lt;suite-file path=&quot;testng/UNITAS-PROD_SANITY-testng-customsuite.xml&quot;/&gt;
+  &lt;/suite-files&gt;
+&lt;/suite&gt; &lt;!-- UNITAS --&gt;
+            </pre>
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="testlist-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Tests for UNITAS_PROD_SANITY</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <ul>
+              <li>
+                <span class="test-name">Chrome (1 class)</span>
+              </li>
+            </ul>
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="testlist-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Tests for UNITAS</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <ul>
+            </ul>
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="group-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Groups for UNITAS_PROD_SANITY</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="test-group">
+              <span class="test-group-name">criticalbusiness</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">compareScreenshotafterDeployment</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">prod</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">prodSanityVerification</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">regression</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">compareScreenshotafterDeployment</span>
+                <br/>
+              </div> <!-- method-in-group -->
+              <div class="method-in-group">
+                <span class="method-in-group-name">prodSanityVerification</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">smoke</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">compareScreenshotafterDeployment</span>
+                <br/>
+              </div> <!-- method-in-group -->
+              <div class="method-in-group">
+                <span class="method-in-group-name">prodSanityVerification</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">sso</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">prodSanityVerification</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">takescreenshot</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">compareScreenshotafterDeployment</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+            <div class="test-group">
+              <span class="test-group-name">user_journey</span>
+              <br/>
+              <div class="method-in-group">
+                <span class="method-in-group-name">compareScreenshotafterDeployment</span>
+                <br/>
+              </div> <!-- method-in-group -->
+            </div> <!-- test-group -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="group-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Groups for UNITAS</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="times-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Times for UNITAS_PROD_SANITY</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="times-div">
+              <script type="text/javascript">
+suiteTableInitFunctions.push('tableData_UNITAS_PROD_SANITY');
+function tableData_UNITAS_PROD_SANITY() {
+var data = new google.visualization.DataTable();
+data.addColumn('number', 'Number');
+data.addColumn('string', 'Method');
+data.addColumn('string', 'Class');
+data.addColumn('number', 'Time (ms)');
+data.addRows(2);
+data.setCell(0, 0, 0)
+data.setCell(0, 1, 'compareScreenshotafterDeployment')
+data.setCell(0, 2, 'org.iomedia.galen.tests.ProdSanity')
+data.setCell(0, 3, 81957);
+data.setCell(1, 0, 1)
+data.setCell(1, 1, 'prodSanityVerification')
+data.setCell(1, 2, 'org.iomedia.galen.tests.ProdSanity')
+data.setCell(1, 3, 81035);
+window.suiteTableData['UNITAS_PROD_SANITY']= { tableData: data, tableDiv: 'times-div-UNITAS_PROD_SANITY'}
+return data;
+}
+              </script>
+              <span class="suite-total-time">Total running time: 2 minutes</span>
+              <div id="times-div-UNITAS_PROD_SANITY">
+              </div> <!-- times-div-UNITAS_PROD_SANITY -->
+            </div> <!-- times-div -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="times-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Times for UNITAS</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="times-div">
+              <script type="text/javascript">
+suiteTableInitFunctions.push('tableData_UNITAS');
+function tableData_UNITAS() {
+var data = new google.visualization.DataTable();
+data.addColumn('number', 'Number');
+data.addColumn('string', 'Method');
+data.addColumn('string', 'Class');
+data.addColumn('number', 'Time (ms)');
+data.addRows(0);
+window.suiteTableData['UNITAS']= { tableData: data, tableDiv: 'times-div-UNITAS'}
+return data;
+}
+              </script>
+              <div id="times-div-UNITAS">
+              </div> <!-- times-div-UNITAS -->
+            </div> <!-- times-div -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="reporter-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Reporter output for UNITAS_PROD_SANITY</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="reporter-method-div">
+              <span class="reporter-method-name">prodSanityVerification</span>
+              <div class="reporter-method-output-div">
+                <span class="reporter-method-output"><div "result">User is on &#x2F; Page (FAILED : 79s)</div></span>
+                <span class="reporter-method-output"><div "result">User navigates to &#x2F;user&#x2F;login for CMS Login (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User is on &#x2F; Page (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User enters %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User logged in successfully (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Customer details are fetched for %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Verify all tickets section using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User navigates to &#x2F;dashboard from NAM (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Verify invoice Listing page using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User clicks your account (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User logout from CAM (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User navigates to &#x2F;user&#x2F;logout from NAM (SKIPPED)</div></span>
+              </div> <!-- reporter-method-output-div -->
+            </div> <!-- reporter-method-div -->
+            <div class="reporter-method-div">
+              <span class="reporter-method-name">compareScreenshotafterDeployment</span>
+              <div class="reporter-method-output-div">
+                <span class="reporter-method-output"><div "result">User is on &#x2F; Page (FAILED : 80s)</div></span>
+                <span class="reporter-method-output"><div "result">Get client directory (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User take second screenshot of homepage Page at %{GD_FILEPATH} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Compare the screenshot at %{GD_FILEPATH} for Homepage (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User take second screenshot of Claim Page at %{GD_FILEPATH} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Compare the screenshot at %{GD_FILEPATH} for Claim (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User take second screenshot of Interstitial Page at %{GD_FILEPATH} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Compare the screenshot at %{GD_FILEPATH} for Interstitial (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">User take second screenshot of Dashboard Page at %{GD_FILEPATH} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} (SKIPPED)</div></span>
+                <span class="reporter-method-output"><div "result">Compare the screenshot at %{GD_FILEPATH} for Dashboard (SKIPPED)</div></span>
+              </div> <!-- reporter-method-output-div -->
+            </div> <!-- reporter-method-div -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="reporter-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Reporter output for UNITAS</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="ignored-methods-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">5 ignored methods</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="ignored-class-div">
+              <span class="ignored-class-name">org.iomedia.galen.tests.ProdSanity</span>
+              <div class="ignored-methods-div">
+                <span class="ignored-method-name">prodSanityVerificationPart1</span>
+                <br/>
+                <span class="ignored-method-name">verifyPrivacyLink</span>
+                <br/>
+                <span class="ignored-method-name">takeScreenshotbeforeDeployment</span>
+                <br/>
+                <span class="ignored-method-name">verifyCMSLogin</span>
+                <br/>
+                <span class="ignored-method-name">verifyBarcodeNumberStateAfterUpgrade</span>
+                <br/>
+              </div> <!-- ignored-methods-div -->
+            </div> <!-- ignored-class-div -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="ignored-methods-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">0 ignored methods</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="chronological-UNITAS_PROD_SANITY" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Methods in chronological order</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="chronological-class">
+              <div class="chronological-class-name">org.iomedia.galen.tests.ProdSanity</div> <!-- chronological-class-name -->
+              <div class="configuration-suite before">
+                <span class="method-name">setup(org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">0 ms</span>
+              </div> <!-- configuration-suite before -->
+              <div class="configuration-test before">
+                <span class="method-name">getDevices(CHROME1, PROD_SANITY, org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">195 ms</span>
+              </div> <!-- configuration-test before -->
+              <div class="configuration-class before">
+                <span class="method-name">setUpTest(CHROME1, PROD_SANITY, , org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">3133 ms</span>
+              </div> <!-- configuration-class before -->
+              <div class="configuration-method before">
+                <span class="method-name">initDriver(public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.T...)</span>
+                <span class="method-start">3977 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="configuration-method before">
+                <span class="method-name">initReport(public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.T...)</span>
+                <span class="method-start">7969 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="test-method">
+                <img src="failed.png">
+                </img>
+                <span class="method-name">compareScreenshotafterDeployment</span>
+                <span class="method-start">7980 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">provideTestEndDate</span>
+                <span class="method-start">89938 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method after">
+                <span class="method-name">quitDriver([TestResult name=compareScreenshotafterDeployment status=FAILURE method=ProdSanity.compareScreenshot...)</span>
+                <span class="method-start">89938 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method before">
+                <span class="method-name">initDriver(public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable, ...)</span>
+                <span class="method-start">90576 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="configuration-method before">
+                <span class="method-name">initReport(public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable, ...)</span>
+                <span class="method-start">92224 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="test-method">
+                <img src="failed.png">
+                </img>
+                <span class="method-name">prodSanityVerification</span>
+                <span class="method-start">92224 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">provideTestEndDate</span>
+                <span class="method-start">173260 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method after">
+                <span class="method-name">quitDriver([TestResult name=prodSanityVerification status=FAILURE method=ProdSanity.prodSanityVerification()[pr...)</span>
+                <span class="method-start">173260 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-class after">
+                <span class="method-name">closeTestSummary(PROD_SANITY)</span>
+                <span class="method-start">173853 ms</span>
+              </div> <!-- configuration-class after -->
+              <div class="configuration-test after">
+                <span class="method-name">exitTest</span>
+                <span class="method-start">173889 ms</span>
+              </div> <!-- configuration-test after -->
+              <div class="configuration-suite after">
+                <span class="method-name">tearDown(PROD_SANITY)</span>
+                <span class="method-start">174107 ms</span>
+              </div> <!-- configuration-suite after -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+        <div panel-name="chronological-UNITAS" class="panel">
+          <div class="main-panel-header rounded-window-top">
+            <span class="header-content">Methods in chronological order</span>
+          </div> <!-- main-panel-header rounded-window-top -->
+          <div class="main-panel-content rounded-window-bottom">
+            <div class="chronological-class">
+              <div class="chronological-class-name">org.iomedia.galen.tests.ProdSanity</div> <!-- chronological-class-name -->
+              <div class="configuration-suite before">
+                <span class="method-name">setup(org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">0 ms</span>
+              </div> <!-- configuration-suite before -->
+              <div class="configuration-test before">
+                <span class="method-name">getDevices(CHROME1, PROD_SANITY, org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">195 ms</span>
+              </div> <!-- configuration-test before -->
+              <div class="configuration-class before">
+                <span class="method-name">setUpTest(CHROME1, PROD_SANITY, , org.testng.TestRunner@2f058b8a)</span>
+                <span class="method-start">3133 ms</span>
+              </div> <!-- configuration-class before -->
+              <div class="configuration-method before">
+                <span class="method-name">initDriver(public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.T...)</span>
+                <span class="method-start">3977 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="configuration-method before">
+                <span class="method-name">initReport(public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.T...)</span>
+                <span class="method-start">7969 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="test-method">
+                <img src="failed.png">
+                </img>
+                <span class="method-name">compareScreenshotafterDeployment</span>
+                <span class="method-start">7980 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">provideTestEndDate</span>
+                <span class="method-start">89938 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method after">
+                <span class="method-name">quitDriver([TestResult name=compareScreenshotafterDeployment status=FAILURE method=ProdSanity.compareScreenshot...)</span>
+                <span class="method-start">89938 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method before">
+                <span class="method-name">initDriver(public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable, ...)</span>
+                <span class="method-start">90576 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="configuration-method before">
+                <span class="method-name">initReport(public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable, ...)</span>
+                <span class="method-start">92224 ms</span>
+              </div> <!-- configuration-method before -->
+              <div class="test-method">
+                <img src="failed.png">
+                </img>
+                <span class="method-name">prodSanityVerification</span>
+                <span class="method-start">92224 ms</span>
+              </div> <!-- test-method -->
+              <div class="configuration-method after">
+                <span class="method-name">provideTestEndDate</span>
+                <span class="method-start">173260 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-method after">
+                <span class="method-name">quitDriver([TestResult name=prodSanityVerification status=FAILURE method=ProdSanity.prodSanityVerification()[pr...)</span>
+                <span class="method-start">173260 ms</span>
+              </div> <!-- configuration-method after -->
+              <div class="configuration-class after">
+                <span class="method-name">closeTestSummary(PROD_SANITY)</span>
+                <span class="method-start">173853 ms</span>
+              </div> <!-- configuration-class after -->
+              <div class="configuration-test after">
+                <span class="method-name">exitTest</span>
+                <span class="method-start">173889 ms</span>
+              </div> <!-- configuration-test after -->
+              <div class="configuration-suite after">
+                <span class="method-name">tearDown(PROD_SANITY)</span>
+                <span class="method-start">174107 ms</span>
+              </div> <!-- configuration-suite after -->
+          </div> <!-- main-panel-content rounded-window-bottom -->
+        </div> <!-- panel -->
+      </div> <!-- main-panel-root -->
+    </div> <!-- wrapper -->
+  </body>
+</html>

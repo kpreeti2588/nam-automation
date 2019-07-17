@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="1" name="UNITAS_CMS" parallel="classes">
+  <listeners>
+    <listener class-name="org.iomedia.galen.common.DataProviderAnnotationTransformerListener"/>
+  </listeners>
+  <test name="Chrome">
+    <parameter name="calendar" value="CMS"/>
+    <parameter name="browser" value="CHROME1"/>
+    <classes>
+      <class name="org.iomedia.galen.tests.CMS">
+        <methods>
+          <include name="verifyFirstpromotilesBuyTicketsForLoggedInUsers"/>
+          <include name="verifyFirstpromotilesBuyTicketsForPublicUsers"/>
+          <include name="verifySecondpromotilesForLoggedInUsers"/>
+          <include name="verifyFourthPromotilesForLoggedInUsers"/>
+          <include name="verifyThirdPromotilesLoggedInUsers"/>
+          <include name="verifyFourthPromotilesForPublicUsers"/>
+          <include name="verifySecondpromotilesForPublicUsers"/>
+          <include name="verifyThirdpromotilesBuyTicketsForPublicUsers"/>
+          <include name="verifyAddNewContentPage"/>
+          <include name="verifyAddNewHomePage"/>
+          <include name="verifyAddPromotilesForLoggedInUsers"/>
+          <include name="verifyAddPromotilesForPublicUsers"/>
+          <include name="verifyHomepagePageSettings"/>
+          <include name="verifyCreatingPublicMenuDisplayForEndUser"/>
+          <include name="verifyCreatingLoggedInMenuDisplayForEndUser"/>
+          <include name="verifyActivePublicMenuDisplayForEndUser"/>
+          <include name="verifyActiveLoggedInMenuDisplayForEndUser"/>
+          <include name="verifyCreatingHybridMenuDisplayForEndUser"/>
+          <include name="verifyPublicMenuChangeLoggedIN"/>
+          <include name="verifyLoggedInMenuChangeHybrid"/>
+          <include name="verifyChangingMenuInPageSettingShowNewMenu"/>
+          <include name="verifyLanguageInstallation"/>
+          <exclude name="verifyEditContentPageTitleAndText"/>
+          <exclude name="deleteLanguage"/>
+          <exclude name="verifyCKEditor"/>
+        </methods>
+      </class> <!-- org.iomedia.galen.tests.CMS -->
+    </classes>
+  </test> <!-- Chrome -->
+</suite> <!-- UNITAS_CMS -->
+

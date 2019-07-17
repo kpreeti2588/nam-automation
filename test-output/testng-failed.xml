@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="1" name="Failed suite [UNITAS_PROD_SANITY]" parallel="classes">
+  <parameter name="calendar" value="PROD_SANITY"/>
+  <parameter name="browser" value="CHROME1"/>
+  <listeners>
+    <listener class-name="org.iomedia.galen.common.DataProviderAnnotationTransformerListener"/>
+  </listeners>
+  <test name="Chrome(failed)" parallel="classes">
+    <parameter name="calendar" value="PROD_SANITY"/>
+    <parameter name="browser" value="CHROME1"/>
+    <classes>
+      <class name="org.iomedia.galen.tests.ProdSanity">
+        <methods>
+          <include name="exitTest"/>
+          <include name="setUpTest"/>
+          <include name="prodSanityVerification"/>
+          <include name="compareScreenshotafterDeployment"/>
+          <include name="initDriver"/>
+          <include name="tearDown"/>
+          <include name="getDevices"/>
+          <include name="provideTestEndDate"/>
+          <include name="closeTestSummary"/>
+          <include name="initReport"/>
+          <include name="quitDriver"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- org.iomedia.galen.tests.ProdSanity -->
+    </classes>
+  </test> <!-- Chrome(failed) -->
+</suite> <!-- Failed suite [UNITAS_PROD_SANITY] -->

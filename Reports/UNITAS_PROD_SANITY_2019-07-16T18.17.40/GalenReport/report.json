@@ -1,0 +1,31 @@
+{
+  "tests" : [ {
+    "name" : "ProdSanity#compareScreenshotafterDeployment",
+    "startedAt" : 1563281221031,
+    "endedAt" : 1563281221119,
+    "failed" : false,
+    "statistic" : {
+      "passed" : 1,
+      "errors" : 0,
+      "warnings" : 0,
+      "total" : 1
+    },
+    "testId" : "1-prodsanity-comparescreenshotafterdeployment",
+    "duration" : 88,
+    "failed" : false
+  }, {
+    "name" : "ProdSanity#prodSanityVerification",
+    "startedAt" : 1563281221260,
+    "endedAt" : 1563281221277,
+    "failed" : false,
+    "statistic" : {
+      "passed" : 1,
+      "errors" : 0,
+      "warnings" : 0,
+      "total" : 1
+    },
+    "testId" : "2-prodsanity-prodsanityverification",
+    "duration" : 17,
+    "failed" : false
+  } ]
+}

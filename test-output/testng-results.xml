@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="2" total="2" passed="0">
+  <reporter-output>
+    <line>
+      <![CDATA[<div "result">User is on &#x2F; Page (FAILED : 80s)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Get client directory (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User take second screenshot of homepage Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Homepage (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User take second screenshot of Claim Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Claim (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User take second screenshot of Interstitial Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Interstitial (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User take second screenshot of Dashboard Page at %{GD_FILEPATH} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Dashboard (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User is on &#x2F; Page (FAILED : 79s)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User navigates to &#x2F;user&#x2F;login for CMS Login (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User is on &#x2F; Page (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User enters %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User logged in successfully (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Customer details are fetched for %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Verify all tickets section using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User navigates to &#x2F;dashboard from NAM (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Verify invoice Listing page using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User clicks your account (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName} (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User logout from CAM (SKIPPED)</div>]]>
+    </line>
+    <line>
+      <![CDATA[<div "result">User navigates to &#x2F;user&#x2F;logout from NAM (SKIPPED)</div>]]>
+    </line>
+  </reporter-output>
+  <suite name="UNITAS_PROD_SANITY" duration-ms="173695" started-at="2019-07-17T06:52:33Z" finished-at="2019-07-17T06:55:27Z">
+    <groups>
+      <group name="takescreenshot">
+        <method signature="ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- takescreenshot -->
+      <group name="prod">
+        <method signature="ProdSanity.prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="prodSanityVerification" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- prod -->
+      <group name="criticalbusiness">
+        <method signature="ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- criticalbusiness -->
+      <group name="regression">
+        <method signature="ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" class="org.iomedia.galen.tests.ProdSanity"/>
+        <method signature="ProdSanity.prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="prodSanityVerification" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- regression -->
+      <group name="smoke">
+        <method signature="ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" class="org.iomedia.galen.tests.ProdSanity"/>
+        <method signature="ProdSanity.prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="prodSanityVerification" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- smoke -->
+      <group name="user_journey">
+        <method signature="ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- user_journey -->
+      <group name="sso">
+        <method signature="ProdSanity.prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="prodSanityVerification" class="org.iomedia.galen.tests.ProdSanity"/>
+      </group> <!-- sso -->
+    </groups>
+    <test name="Chrome" duration-ms="173695" started-at="2019-07-17T06:52:33Z" finished-at="2019-07-17T06:55:27Z">
+      <class name="org.iomedia.galen.tests.ProdSanity">
+        <test-method status="PASS" signature="setup(org.testng.ITestContext)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="setup" is-config="true" duration-ms="194" started-at="2019-07-17T12:22:33Z" finished-at="2019-07-17T12:22:33Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[org.testng.TestRunner@2f058b8a]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setup -->
+        <test-method status="PASS" signature="getDevices(java.lang.String, java.lang.String, org.testng.ITestContext)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="getDevices" is-config="true" duration-ms="2920" started-at="2019-07-17T12:22:33Z" finished-at="2019-07-17T12:22:36Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[CHROME1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[PROD_SANITY]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[org.testng.TestRunner@2f058b8a]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- getDevices -->
+        <test-method status="PASS" signature="setUpTest(java.lang.String, java.lang.String, java.lang.String, org.testng.ITestContext)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="setUpTest" is-config="true" duration-ms="835" started-at="2019-07-17T12:22:36Z" finished-at="2019-07-17T12:22:37Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[CHROME1]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[PROD_SANITY]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[]]>
+              </value>
+            </param>
+            <param index="3">
+              <value>
+                <![CDATA[org.testng.TestRunner@2f058b8a]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUpTest -->
+        <test-method status="PASS" signature="initDriver(java.lang.reflect.Method, [Ljava.lang.Object;, org.testng.ITestContext)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="initDriver" is-config="true" duration-ms="3992" started-at="2019-07-17T12:22:37Z" finished-at="2019-07-17T12:22:41Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.Throwable]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@756cf158]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[org.testng.TestRunner@2f058b8a]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- initDriver -->
+        <test-method status="PASS" signature="initReport(java.lang.reflect.Method, [Ljava.lang.Object;)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="initReport" is-config="true" duration-ms="11" started-at="2019-07-17T12:22:41Z" finished-at="2019-07-17T12:22:41Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment() throws java.lang.Throwable]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@756cf158]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- initReport -->
+        <test-method status="FAIL" signature="compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="compareScreenshotafterDeployment" duration-ms="81957" started-at="2019-07-17T12:22:41Z" finished-at="2019-07-17T12:24:03Z">
+          <exception class="org.openqa.selenium.TimeoutException">
+            <message>
+              <![CDATA[Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In'] (tried for 20 second(s) with 500 MILLISECONDS interval)]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.openqa.selenium.TimeoutException: Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In'] (tried for 20 second(s) with 500 MILLISECONDS interval)
+	at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:82)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:231)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at ✽.User is on / Page(features/userJourneys.feature:4)
+Caused by: org.openqa.selenium.NoSuchElementException: Cannot locate an element using By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']
+For documentation on this error, please visit: http://seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.14.0', revision: 'aacccce0', time: '2018-08-02T20:19:58.91Z'
+System info: host: 'IOM-Backup.local', ip: 'fe80:0:0:0:1485:f552:8bbc:1a1b%en0', os.name: 'Mac OS X', os.arch: 'x86_64', os.version: '10.13.6', java.version: '1.8.0_111'
+Driver info: driver.version: Driver
+	at org.openqa.selenium.support.ui.ExpectedConditions.lambda$findElement$0(ExpectedConditions.java:882)
+	at java.util.Optional.orElseThrow(Optional.java:290)
+	at org.openqa.selenium.support.ui.ExpectedConditions.findElement(ExpectedConditions.java:881)
+	at org.openqa.selenium.support.ui.ExpectedConditions.access$000(ExpectedConditions.java:43)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:182)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:179)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:208)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at cucumber.runtime.Utils$1.call(Utils.java:40)
+	at cucumber.runtime.Timeout.timeout(Timeout.java:16)
+	at cucumber.runtime.Utils.invoke(Utils.java:34)
+	at cucumber.runtime.java.JavaStepDefinition.execute(JavaStepDefinition.java:37)
+	at cucumber.runtime.StepDefinitionMatch.runStep(StepDefinitionMatch.java:40)
+	at cucumber.api.TestStep.executeStep(TestStep.java:102)
+	at cucumber.api.TestStep.run(TestStep.java:83)
+	at cucumber.api.TestCase.run(TestCase.java:58)
+	at cucumber.runner.Runner.runPickle(Runner.java:80)
+	at cucumber.api.testng.TestNGCucumberRunner.runScenario(TestNGCucumberRunner.java:84)
+	at org.iomedia.framework.Driver.runScenario(Driver.java:2056)
+	at org.iomedia.galen.tests.ProdSanity.compareScreenshotafterDeployment(ProdSanity.java:40)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:85)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:696)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:882)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1189)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:124)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:108)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.openqa.selenium.TimeoutException -->
+          <reporter-output>
+            <line>
+              <![CDATA[<div "result">User is on &#x2F; Page (FAILED : 80s)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Get client directory (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User take second screenshot of homepage Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Homepage (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User take second screenshot of Claim Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Claim (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User take second screenshot of Interstitial Page at %{GD_FILEPATH} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Interstitial (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User take second screenshot of Dashboard Page at %{GD_FILEPATH} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Compare the screenshot at %{GD_FILEPATH} for Dashboard (SKIPPED)</div>]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- compareScreenshotafterDeployment -->
+        <test-method status="PASS" signature="provideTestEndDate()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="provideTestEndDate" is-config="true" duration-ms="0" started-at="2019-07-17T12:24:03Z" finished-at="2019-07-17T12:24:03Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- provideTestEndDate -->
+        <test-method status="PASS" signature="quitDriver(org.testng.ITestResult, [Ljava.lang.Object;)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="quitDriver" is-config="true" duration-ms="638" started-at="2019-07-17T12:24:03Z" finished-at="2019-07-17T12:24:03Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=compareScreenshotafterDeployment status=FAILURE method=ProdSanity.compareScreenshotafterDeployment()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6] output=<div "result">User is on &#x2F; Page (FAILED : 80s)</div>]]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@756cf158]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- quitDriver -->
+        <test-method status="PASS" signature="initDriver(java.lang.reflect.Method, [Ljava.lang.Object;, org.testng.ITestContext)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="initDriver" is-config="true" duration-ms="1648" started-at="2019-07-17T12:24:03Z" finished-at="2019-07-17T12:24:05Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@76c7beb3]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[org.testng.TestRunner@2f058b8a]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- initDriver -->
+        <test-method status="FAIL" signature="prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="prodSanityVerification" duration-ms="81035" started-at="2019-07-17T12:24:05Z" finished-at="2019-07-17T12:25:26Z">
+          <exception class="org.openqa.selenium.TimeoutException">
+            <message>
+              <![CDATA[Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In'] (tried for 20 second(s) with 500 MILLISECONDS interval)]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.openqa.selenium.TimeoutException: Expected condition failed: waiting for presence of element located by: By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In'] (tried for 20 second(s) with 500 MILLISECONDS interval)
+	at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:82)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:231)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at ✽.User is on / Page(features/prodsanity.feature:3)
+Caused by: org.openqa.selenium.NoSuchElementException: Cannot locate an element using By.xpath: .//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']
+For documentation on this error, please visit: http://seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.14.0', revision: 'aacccce0', time: '2018-08-02T20:19:58.91Z'
+System info: host: 'IOM-Backup.local', ip: 'fe80:0:0:0:1485:f552:8bbc:1a1b%en0', os.name: 'Mac OS X', os.arch: 'x86_64', os.version: '10.13.6', java.version: '1.8.0_111'
+Driver info: driver.version: Driver
+	at org.openqa.selenium.support.ui.ExpectedConditions.lambda$findElement$0(ExpectedConditions.java:882)
+	at java.util.Optional.orElseThrow(Optional.java:290)
+	at org.openqa.selenium.support.ui.ExpectedConditions.findElement(ExpectedConditions.java:881)
+	at org.openqa.selenium.support.ui.ExpectedConditions.access$000(ExpectedConditions.java:43)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:182)
+	at org.openqa.selenium.support.ui.ExpectedConditions$6.apply(ExpectedConditions.java:179)
+	at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:208)
+	at org.iomedia.common.BaseUtil.getElementWhenPresent(BaseUtil.java:3000)
+	at org.iomedia.galen.pages.Homepage.get(Homepage.java:684)
+	at org.iomedia.galen.steps.HomepageSteps.user_is_on_Page(HomepageSteps.java:64)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at cucumber.runtime.Utils$1.call(Utils.java:40)
+	at cucumber.runtime.Timeout.timeout(Timeout.java:16)
+	at cucumber.runtime.Utils.invoke(Utils.java:34)
+	at cucumber.runtime.java.JavaStepDefinition.execute(JavaStepDefinition.java:37)
+	at cucumber.runtime.StepDefinitionMatch.runStep(StepDefinitionMatch.java:40)
+	at cucumber.api.TestStep.executeStep(TestStep.java:102)
+	at cucumber.api.TestStep.run(TestStep.java:83)
+	at cucumber.api.TestCase.run(TestCase.java:58)
+	at cucumber.runner.Runner.runPickle(Runner.java:80)
+	at cucumber.api.testng.TestNGCucumberRunner.runScenario(TestNGCucumberRunner.java:84)
+	at org.iomedia.framework.Driver.runScenario(Driver.java:2056)
+	at org.iomedia.galen.tests.ProdSanity.prodSanityVerification(ProdSanity.java:20)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:85)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:696)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:882)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1189)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:124)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:108)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.openqa.selenium.TimeoutException -->
+          <reporter-output>
+            <line>
+              <![CDATA[<div "result">User is on &#x2F; Page (FAILED : 79s)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User navigates to &#x2F;user&#x2F;login for CMS Login (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User is on &#x2F; Page (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User enters %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User logged in successfully (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Customer details are fetched for %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Verify all tickets section using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User navigates to &#x2F;dashboard from NAM (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Verify invoice Listing page using %{GD_ProdEmailAddress} and %{GD_ProdPassword} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User clicks your account (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName} (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User logout from CAM (SKIPPED)</div>]]>
+            </line>
+            <line>
+              <![CDATA[<div "result">User navigates to &#x2F;user&#x2F;logout from NAM (SKIPPED)</div>]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- prodSanityVerification -->
+        <test-method status="PASS" signature="initReport(java.lang.reflect.Method, [Ljava.lang.Object;)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="initReport" is-config="true" duration-ms="0" started-at="2019-07-17T12:24:05Z" finished-at="2019-07-17T12:24:05Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void org.iomedia.galen.tests.ProdSanity.prodSanityVerification() throws java.lang.Throwable]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@76c7beb3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- initReport -->
+        <test-method status="PASS" signature="quitDriver(org.testng.ITestResult, [Ljava.lang.Object;)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="quitDriver" is-config="true" duration-ms="593" started-at="2019-07-17T12:25:26Z" finished-at="2019-07-17T12:25:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[[TestResult name=prodSanityVerification status=FAILURE method=ProdSanity.prodSanityVerification()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6] output=<div "result">User is on &#x2F; Page (FAILED : 79s)</div>]]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[[Ljava.lang.Object;@76c7beb3]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- quitDriver -->
+        <test-method status="PASS" signature="provideTestEndDate()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="provideTestEndDate" is-config="true" duration-ms="0" started-at="2019-07-17T12:25:26Z" finished-at="2019-07-17T12:25:26Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- provideTestEndDate -->
+        <test-method status="PASS" signature="closeTestSummary(java.lang.String)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="closeTestSummary" is-config="true" duration-ms="35" started-at="2019-07-17T12:25:27Z" finished-at="2019-07-17T12:25:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[PROD_SANITY]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- closeTestSummary -->
+        <test-method status="PASS" signature="exitTest()[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="exitTest" is-config="true" duration-ms="0" started-at="2019-07-17T12:25:27Z" finished-at="2019-07-17T12:25:27Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- exitTest -->
+        <test-method status="PASS" signature="tearDown(java.lang.String)[pri:0, instance:org.iomedia.galen.tests.ProdSanity@46271dd6]" name="tearDown" is-config="true" duration-ms="20" started-at="2019-07-17T12:25:27Z" finished-at="2019-07-17T12:25:27Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[PROD_SANITY]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- org.iomedia.galen.tests.ProdSanity -->
+    </test> <!-- Chrome -->
+  </suite> <!-- UNITAS_PROD_SANITY -->
+  <suite name="UNITAS" duration-ms="0" started-at="2019-07-17T06:55:27Z" finished-at="2019-07-17T06:55:27Z">
+    <groups>
+    </groups>
+  </suite> <!-- UNITAS -->
+</testng-results>
