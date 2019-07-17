@@ -327,7 +327,7 @@
 				<adminUserName>admin</adminUserName>
 				<adminPassword>Jl7%q1*K</adminPassword>
 				<cam_Event>EIOMED01</cam_Event>
-				<kibanaUrl>http://elk-nam-us-east-1qa.nonprod-tmaws.io:80/_plugin/kibana/app/kibana#/discover?_g=</kibanaUrl>
+				<kibanaUrl>https://vpc-prd214-dev-nam-hvzmhkedkeig3chsiacyjyo6ba.us-east-1.es.amazonaws.com/_plugin/kibana/app/kibana#/discover?_g=</kibanaUrl>
 	      	</COMMON>
 		</VER_JUNE_2017>
 	</UNITAS>

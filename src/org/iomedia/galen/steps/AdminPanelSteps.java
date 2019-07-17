@@ -26,7 +26,7 @@ public class AdminPanelSteps {
 		base.load("/user/login");
 		String url = base.Environment.get("APP_URL").trim();
 		String userName = "admin";
-		String password = "Admin@1234";
+		String password = "123456";
 		String tm_oauth_url = base.Environment.get("TM_OAUTH_URL").trim();
 		System.out.println(userName);
 		System.out.println(password);

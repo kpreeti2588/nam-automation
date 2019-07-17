@@ -1,6 +1,7 @@
 package org.iomedia.galen.steps;
 
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -449,7 +450,7 @@ public class TicketNewSteps {
 	public void getTicketWithPriceAndValueId(String email, String pass) throws Exception {
 		email = (String) base.getGDValue(email);
 		pass = (String) base.getGDValue(pass);
-		System.out.println(email + "EMAIL YE HI");
+		System.out.println("EMAIL " + email);
 		// String[] Tkt = api.getTransferDetails(emailaddress, password, true, "event",
 		// false, false, false);
 		String[] Tkt = api.getPriceCurrencyAndValue(email, pass, true, "event", false, false, false);
@@ -468,6 +469,7 @@ public class TicketNewSteps {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
 		String xpath = ticketNew.scrollToTicketAfterReload(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
+		System.out.println(xpath);
 		By ticketDetails;
 		By purchasePrice;
 		By iosAppLocator = null;
@@ -485,12 +487,12 @@ public class TicketNewSteps {
 					ticketDetails = By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]");
 				}
 			}
-			iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS']");
+			iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS'] | //XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='Ticket Details']");
 			purchasePrice = By.xpath("(" + xpath + "/..//*[contains(@class,'ticket-back')]//*[text()='Purchase Price']/..//span//span)[1]");
 		} else {
 			try {
-				base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]"));
-				ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]");
+				base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]"));
+				ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]");
 			}
 			catch(Exception E) {
 				base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]"));
@@ -541,7 +543,6 @@ public class TicketNewSteps {
 		tick2 = (String) base.getGDValue(tick2);
 		String[] tkt1 = tick1.split("\\.");
 
-		System.out.println(tick1);
 		System.out.println(tick1);
 		System.out.println(tick2);
 
@@ -693,7 +694,9 @@ public class TicketNewSteps {
 		String time1, time2;
 
 		List<String> dateTime = ticket.getListOfDateAndTime();
+		System.out.println(dateTime);
 		List<String> eventName = ticket.getListOfEventNames();
+		System.out.println(eventName);
 
 		for (int i = 0; i < _events.size(); i++) {
 			if (_events.get(i).getDate() == null || _events.get(i).getDate().toString() == "") {
@@ -955,6 +958,8 @@ public class TicketNewSteps {
 	public void click_view_all() {
 		//ticketNew.clickViewAll();
 		utils.navigateTo("/myevents");
+		homepage.popUpEventsComingUp();
+		
 	}
 
 	@Then("^Verify multiselect icon by default state  at event list page$")
@@ -1024,8 +1029,26 @@ public class TicketNewSteps {
 		String notes=RandomStringUtils.randomAlphabetic(20);
 	    ticketNew.enterParticulars(fname, lname, email, notes);
         base.Dictionary.put("RecipientName", fname+" "+lname);
+        base.Dictionary.put("RecipientLastName",  lname);
         base.Dictionary.put("Notes",notes);
     }
+
+	@And ("^User types new users's mail id for recipient and clicks Send$")
+	public void enterParticularsNewuserandSend() {
+
+		java.util.Date today = new java.util.Date();
+		Timestamp now = new java.sql.Timestamp(today.getTime());
+		String tempNow[] = now.toString().split("\\.");
+		final String sStartTime = tempNow[0].replaceAll(":", "").replaceAll(" ", "").replaceAll("-", "");
+		String email = "test" + sStartTime + "@example.com";
+		String fname = "NAMAutomation";
+		String lname=RandomStringUtils.randomAlphabetic(8);
+		String notes=RandomStringUtils.randomAlphabetic(20);
+		ticketNew.enterParticulars(fname, lname, email, notes);
+		base.Dictionary.put("RecipientName", fname+" "+lname);
+		base.Dictionary.put("Notes",notes);
+		base.Dictionary.put("NEWEMAIL",email);
+	}
 
 	@And ("User types following details for recipient and clicks Cancel: (.+) (.+) (.+)")
 	public void enterParticularsandCancel(String fname, String lname, String email) {
@@ -1042,7 +1065,7 @@ public class TicketNewSteps {
 		ticketNew.verifyTransferComplete();
 	}
 
-	@And("Ticket Transfer request is completed at backend")
+	/*@And("Ticket Transfer request is completed at backend")
 	public void transferCompleteBackend() {
 		try {
 			ticketNew.verifyTransferCompleteBackend(aapi.getTransferID());
@@ -1050,7 +1073,7 @@ public class TicketNewSteps {
 			e.printStackTrace();
 		}
 
-	}
+	}*/
 
 	@And ("User is able to close subpop of adding new user via cross icon")
 	public void closeAddRecipient() {
@@ -1078,6 +1101,7 @@ public class TicketNewSteps {
     @Then("User navigates to Manage tickets page by clicking event name")
     public void navigateManageTickets() {
 		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer"));
+		ticket.verifyMyEventsPage();
     }
 
 	@Then("User navigates to Manage tickets pages by clicking event names one by one and Transferred tickets are shown for two events as Pending with CANCEL TRANSFER")

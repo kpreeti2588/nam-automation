@@ -20,7 +20,7 @@ public class DashboardHeader extends BaseUtil {
 	
 	private By dashboardheader = By.cssSelector(".sub-header section");
 	private By header = By.cssSelector(".sub-header section, div[class*='events-subHeader']");
-	private By accountName = By.cssSelector(".react-root-dashboard-header > div > div > div:first-child > h3 > span , .react-root-dashboard-header > div > div:first-child > div:first-child >div:first-child > h3 > span");
+	private By accountName = By.cssSelector(".react-root-dashboard-header > div > div > div:first-child > div > h3 > span , .react-root-dashboard-header > div > div:first-child > div:first-child >div:first-child > h3 > span");
 	private By accountId = By.cssSelector(".react-root-dashboard-header > div > div > div:first-child > p:last-child , .react-root-dashboard-header > div > div:first-child > div:first-child >div:first-child > p:last-child");
 	private By totalDue = By.cssSelector(".react-root-dashboard-header > div > div > div:last-child > h3 > span , .react-root-dashboard-header > div > div:first-child > div:first-child >div:last-child > h3 > span");
 	private By AMGRAccntName = By.cssSelector("div.text18px.alt_fontface");
@@ -62,7 +62,7 @@ public class DashboardHeader extends BaseUtil {
 	public boolean waitForDasboardHeader(){
 		if(!getDriver().getCurrentUrl().contains("dashboard"))
 			getDriver().navigate().to(Environment.get("APP_URL")+"/dashboard");
-		getElementWhenVisible(dashboardheader, 5);
+		getElementWhenVisible(dashboardheader, 10);
 		return true;
 	}
 	
@@ -83,9 +83,9 @@ public class DashboardHeader extends BaseUtil {
 	}
 	
 	public void clickAMGRLogout(){
-		click(AMGRLogout, "Logout");
+		click(AMGRLogout, "Logout",10);
 		try {
-			getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"), 5);
+			getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"), 10);
 		} catch(Exception ex) {
 			// Do Nothing
 		}

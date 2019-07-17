@@ -95,23 +95,23 @@ public class TicketsApiSteps {
 		base.Dictionary.put("EventId", Tkt[0].split("\\.")[0]);
 	}
 	
-//	@Given("^Save ticket flags for ticket Id (.+) using (.+) and (.+)$")
-//	public void save_ticket_flags(String ticketId, String emailaddress, String password) throws Exception {
-//		emailaddress = (String) base.getGDValue(emailaddress);
-//		password = (String) base.getGDValue(password);
-//		ticketId = (String) base.getGDValue(ticketId);
-//		String[] ticket = ticketId.split("\\.");
-//		base.Dictionary.put("Event_Id", ticket[0]);
-//		base.Dictionary.put("EventId", ticket[0]);
-//		Boolean[] flags = api.getTicketFlags(ticketId, emailaddress , password);
-//		CAN_TRANSFER = flags[0];
-//		CAN_RESALE = flags[1];
-//		CAN_RENDER = flags[2];
-//		CAN_RENDER_FILE = flags[3];
-//		CAN_RENDER_BARCODE = flags[4];
-//		CAN_RENDER_PASSBOOK = flags[5];
-//		CAN_DONATE_CHARITY = flags[6];
-//	}
+	/*@Given("^Save ticket flags for ticket Id (.+) using (.+) and (.+)$")
+	public void save_ticket_flags(String ticketId, String emailaddress, String password) throws Exception {
+	emailaddress = (String) base.getGDValue(emailaddress);
+	password = (String) base.getGDValue(password);
+	ticketId = (String) base.getGDValue(ticketId);
+	String[] ticket = ticketId.split("\\.");
+	base.Dictionary.put("Event_Id", ticket[0]);
+	base.Dictionary.put("EventId", ticket[0]);
+	Boolean[] flags = api.getTicketFlags(ticketId, emailaddress , password);
+	CAN_TRANSFER = flags[0];
+	CAN_RESALE = flags[1];
+	CAN_RENDER = flags[2];
+	CAN_RENDER_FILE = flags[3];
+	CAN_RENDER_BARCODE = flags[4];
+	CAN_RENDER_PASSBOOK = flags[5];
+	CAN_DONATE_CHARITY = flags[6];
+	}*/
 	
 	@Given("^Save ticket flags for ticket Id (.+) using (.+) and (.+)$")
 	public void save_ticket_flags(String ticketId, String emailaddress, String password) throws Exception {
@@ -240,6 +240,7 @@ public class TicketsApiSteps {
 		password = (String) base.getGDValue(password);
 		
 		HashMap<Integer, ManageticketsAPI.Event> events = api.getSingleEventIdWithTktsDetails(emailaddress, password);
+	//	System.out.println("vdfdfvvf   "+events.size());
 		if (events.size()>0) {
 			  List<Event> eventsByTktCount = new ArrayList<Event>(events.values());
 			  Event event = eventsByTktCount.get(0);
@@ -248,7 +249,7 @@ public class TicketsApiSteps {
 			  String accessToken= api.getAccessToken(emailaddress, password);
 			  int TicketCount = api.getTicketsCount(event.getId(), accessToken);
 			  String count = Integer.toString(ticket.getTicketCountText());
-     		  if(TicketCount>1)
+			  if(TicketCount>1)
 			  Assert.assertEquals(count+" Tickets", TicketCount+" Tickets", "Total Ticket counts are correctly displayed");
 			  else
 			  Assert.assertEquals(count+" Ticket", TicketCount+" Ticket", "Total Ticket counts are correctly displayed");
@@ -270,7 +271,6 @@ public class TicketsApiSteps {
 				eventId = api.getEventIdWithMaxTktsHavingRenderBarcode(events);
 			else 
 				eventId = api.getEventIdWithMaxTkts(events);
-			
 			Assert.assertNotEquals(eventId, -1);
 		} else {
 			eventId = Integer.valueOf(base.Dictionary.get("RENDER_TICKET_EVENT_ID").trim());

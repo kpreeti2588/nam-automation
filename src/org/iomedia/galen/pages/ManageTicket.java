@@ -1,17 +1,20 @@
 package org.iomedia.galen.pages;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
 
+import io.appium.java_client.ios.IOSDriver;
 import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.Driver.HashMapNew;
 import org.iomedia.framework.Driver.TestDevice;
 import org.iomedia.framework.Reporting;
 import org.iomedia.framework.WebDriverFactory;
-import org.iomedia.galen.common.ManageticketsAAPI;
 import org.iomedia.galen.common.ManageticketsAPI;
 import org.iomedia.galen.common.Utils;
 import org.openqa.selenium.By;
@@ -20,6 +23,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.SkipException;
+
+import com.google.common.base.Verify;
 
 public class ManageTicket extends BaseUtil {
 
@@ -40,7 +45,7 @@ public class ManageTicket extends BaseUtil {
 	
 	
 	private By confirm = By.xpath("//section[contains(@class,'theme-body')]//button[text()='CONFIRM']");
-	private By reclaimDone= By.xpath("//section[contains(@class,'theme-body')]//button[text()='GO TO TICKETS'] | //button[contains(@class,'reclaim-successBtn') and @type='button']")   ;
+	private By reclaimDone= By.xpath("//section[contains(@class,'theme-body')]//button[text()='GO TO TICKETS'] | //button[contains(@class,'reclaim-successBtn') and @type='button']| //button[@type='submit']")   ;
 	private By successTextUpdated=By.xpath("//div[contains(@class,'reclaim-message')]//strong");
 	private By popUpEventName = By.xpath("//section[contains(@class,'theme-body')]//div[contains(@class,'ticketInfo')]//h5");
 	private By mobilepopUpEventName = By.cssSelector("div[class*='ticket-team']");
@@ -124,11 +129,12 @@ public class ManageTicket extends BaseUtil {
 	private By mobileDownloadSectionName = By.xpath("(.//div[contains(@class, 'ticket-barDetails')]//span)[1]/../strong");
 	private By mobileDownloadRowName = By.xpath("(.//div[contains(@class, 'ticket-barDetails')]//span)[2]/../strong");
 	private By mobileDownloadSeatName = By.xpath("(.//div[contains(@class, 'ticket-barDetails')]//span)[3]/../strong");
-	private By barIcon = By.xpath("//div[contains(@class, 'ticket-qrIcon')]//img");
+	private By barIcon = By.xpath("//div[contains(@class, 'ticket-qrIcon')]//img | //div[contains(@class, 'ticket-qr')]//img");
 	private By addToAppleWalletIcon = By.cssSelector("span[class*='viewbarcodeAddAppleWallet']");
 	private By androidBarCodeLink = By.xpath("//span[contains(@class, 'ticket-nonIosDevice')]");;
 	private By gateNumber = By.cssSelector("div[class*='ticket-entryFrom']");
 	private By BuyTickets = By.xpath("//div[@class='container']//div[2]//button");
+	private By viewbarcodebutton = By.xpath("(//span[contains(@class,'viewBarcode')])");
 
 	private Homepage homepage = new Homepage(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	private By cancelPosting= By.cssSelector("div[class*='sell-buttonStack'] :nth-child(2) div button");
@@ -149,6 +155,7 @@ public class ManageTicket extends BaseUtil {
 	private By viewAllDropDown = By.cssSelector("div[data-react-toolbox='dropdown'] div input");
 	private By selectPending = By.xpath("//div[@data-react-toolbox='dropdown']/ul/li[contains(.,'Pending')]");
 	private By selectCompleted = By.xpath("//div[@data-react-toolbox='dropdown']/ul/li[contains(.,'Completed')]");
+	private By selectActive = By.xpath("//div[@data-react-toolbox='dropdown']/ul/li[contains(.,'Active')]");
 	private By transfreeName = By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[1]");
 	private By cancelTransfer = By.xpath("//div[contains(@class, 'ticket-ticketStatus')]/div/div[contains(@class, 'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
 	private By completedTransfer = By.xpath("//div[contains(@class, 'ticket-ticketStatus')]/div/div[contains(.,'Ticket Sent')]");
@@ -158,6 +165,10 @@ public class ManageTicket extends BaseUtil {
     private By seatsReclaimDialogue = By.cssSelector("div[class*='style-eventDetailsHolder']  div div[class*='style-eventDetails']");
     private By reclaimButton = By.cssSelector("div[class*='reclaim-buttonBox'] div button:nth-child(2)");
     private By reclaimButtonDone = By.cssSelector("div[class*='reclaim-buttonBox'] div button");
+    private By manageTicketButton = By.cssSelector("div[class*='ticket-twoButtons'] button");
+	private By ticketCount = By.cssSelector("div[class*='ticket-totalTicketCounts'] span small");
+	private By submitBtn = By.xpath(".//button[@type='submit']");
+	
 
 
 
@@ -281,7 +292,8 @@ public class ManageTicket extends BaseUtil {
 		} else {
 			barcode = androidBarCodeLink;
 		}
-		return checkIfElementPresent(barcode, 40);
+		//return checkIfElementPresent(barcode, 60);
+		return utils.checkIfElementClickable(barcode, 60);
 	}
 
 	public boolean isViewButtonEnable(){
@@ -514,7 +526,7 @@ public class ManageTicket extends BaseUtil {
 					ticketDetails = By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]");
 				}
 			}
-			iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS']");
+			iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS'] | //XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='Ticket Details']");
 		} else {
 			try {
 				getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]"));
@@ -537,19 +549,38 @@ public class ManageTicket extends BaseUtil {
 	}
 
 	public boolean isBulkTicketDisplayedActive(String section, String row, String seat) {
-		  By xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+section+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-eventName')]/span[contains(.,'TICKET DETAILS')]");
-		  return getDriver().findElement(xpath).isDisplayed();
+		By xpath=null;
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			xpath = By.xpath("//div[contains(@class, 'react-root-event')]//div[@class='slick-list']//div[@class='slick-track']//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'" + section + "')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + row + "']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + seat + "']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-mobileStatus')]/div[contains(@class,'ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Ticket Details')]");
+			return scrollandFindTicket(xpath);
+		}else {
+			xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'" + section + "')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + row + "']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + seat + "']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-eventName')]/span[contains(.,'Ticket Details')]");
+			return getDriver().findElement(xpath).isDisplayed();
+		}
 	}
 
 
 	public boolean isBulkTicketDisplayedCompleted(String section, String row, String seat) {
-		By xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+section+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus') and contains(.,'Ticket Sent')]");
-		return getDriver().findElement(xpath).isDisplayed();
+		By xpath=null;
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			xpath =  By.xpath("//div[contains(@class, 'react-root-event')]//div[@class='slick-list']//div[@class='slick-track']//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-mobileStatus')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus') and contains(.,'Ticket Sent')]");
+			System.out.println(xpath);
+			return scrollandFindTicket(xpath);
+		} else {
+			xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'" + section + "')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + row + "']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='" + seat + "']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus') and contains(.,'Ticket Sent')]");
+			return getDriver().findElement(xpath).isDisplayed();
+		}
 	}
 
 	public boolean isBulkTicketDisplayedPending(String section, String row, String seat) {
-		By xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+section+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
-		return getDriver().findElement(xpath).isDisplayed();
+		By xpath=null;
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			xpath = By.xpath("//div[contains(@class,'react-root-event')]//div[@class='slick-list']//div[@class='slick-track']//div[contains(@class,'slick-active')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-mobileStatus')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
+			return scrollandFindTicket(xpath);
+		} else {
+			xpath = By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seat+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
+			return getDriver().findElement(xpath).isDisplayed();
+		}
 	}
 
 
@@ -779,7 +810,7 @@ public class ManageTicket extends BaseUtil {
 	}
 
 	public void swipe(String direction, String index) {
-		swipe(By.xpath(".//div[contains(@class, 'ticket-barCodeDialog')]//div[contains(@class, 'slick-list')]//div[contains(@class, 'slick-slide') and @data-index='" + index.trim() + "']//div[contains(@class, 'ticket-qrIcon')]/div"), direction.trim(), null);
+		swipe(By.xpath(".//div[contains(@class, 'ticket-barCodeDialog')]//div[contains(@class, 'slick-list')]//div[contains(@class, 'slick-slide') and @data-index='" + index.trim() + "']//div[contains(@class, 'ticket-qr')]/div"), direction.trim(), null);
 	}
 
 	public void clickEditCancelTicket(String eventId, String Section, String Row, String Seat, String ticketId){
@@ -796,7 +827,7 @@ public class ManageTicket extends BaseUtil {
 		String xpath = ticketsNew.scrollToTicketAfterReload(eventId, Section, Row, Seat, ticketId);
 		if(driverType.trim().toUpperCase().contains("IOS")) {
 			By ticketDetails = By.xpath("(" + xpath + "//*[contains(@class, 'ticket-completedStatus')])[1]");
-			By iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='VIEW BARCODE']");
+			By iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='VIEW BARCODE'] | //XCUIElementTypeStaticText[@value='" + Section + "']/../../..//XCUIElementTypeStaticText[@value='" + Row + "']/../../..//XCUIElementTypeStaticText[@value='" + Seat + "']/../../..//XCUIElementTypeStaticText[@value='View Barcode']");
 			click(ticketDetails, "Scan Barcode", null, iosAppLocator, "Scan Barcode", false);
 		} else {
 			By viewBarcode = androidBarCodeLink;
@@ -984,11 +1015,12 @@ public class ManageTicket extends BaseUtil {
 		}
 
 		if(!sectionLabel.trim().equalsIgnoreCase("[S]") && (sectionName.trim().equalsIgnoreCase("") || rowName.trim().equalsIgnoreCase(""))) {
-			click(By.xpath("//*[contains(@class,'tickets-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionLabel + " " + Section + " | " + rowName + "')]/..//li//strong[contains(text(), '" + SeatNum + "')]/../label | //*[contains(@class,'seat-selection-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionLabel + " " + Section + " | " + rowName + "')]/..//li//strong[contains(text(), '" + SeatNum + "')]/../label"), "Select seat");
+			click(By.xpath("//*[contains(@class,'selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionLabel + " " + Section + " | " + rowName + "')]/..//li//strong[contains(text(), '" + SeatNum + "')]/../label | //*[contains(@class,'seat-selection-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionLabel + " " + Section + " | " + rowName + "')]/..//li//strong[contains(text(), '" + SeatNum + "')]/../label"), "Select seat");
 		} else if(!sectionLabel.trim().equalsIgnoreCase("[S]")) {
-			click(By.xpath("//*[contains(@class,'tickets-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionName + " | " + rowName + "')]/..//li//strong[text()='" + seatName + "']/../label | //*[contains(@class,'seat-selection-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionName + " | " + rowName + "')]/..//li//strong[text()='" + seatName + "']/../label"), "Select seat");
+			//click(By.xpath("//*[contains(@class,'selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionName +" | " + rowName + "')]/..//li//strong[text()='" + seatName + "']/../label | //*[contains(@class,'selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + sectionName + " | " + rowName + "')]/..//li//strong[text()='" + seatName + "']/../label"), "Select seat");
+			click(By.xpath("//*[contains(@class,'selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'"+ sectionName +"')]/..//li//strong[text()='" + seatName + "']/../label"),"Select seat");
 		} else {
-			click(By.xpath("//*[contains(@class,'tickets-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + rowName.trim() + "')]/..//li//strong[text()='" + seatName + "']/../label | //*[contains(@class,'seat-selection-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + rowName.trim() + "')]/..//li//strong[text()='" + seatName + "']/../label"), "Select seat");
+			click(By.xpath("//*[contains(@class,'selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + rowName.trim() + "')]/..//li//strong[text()='" + seatName + "']/../label | //*[contains(@class,'seat-selection-selectionInner')]//*[contains(@class,'ticketsBlock')]/strong[contains(text(),'" + rowName.trim() + "')]/..//li//strong[text()='" + seatName + "']/../label"), "Select seat");
 		}
 	}
 
@@ -1003,6 +1035,9 @@ public class ManageTicket extends BaseUtil {
 		utils.navigateTo("/user/logout");
 		utils.navigateTo(uri);
 		homepage.login(emailaddress, password, null, true);
+		if (utils.checkIfElementClickable(submitBtn, 3)) {
+			homepage.login(emailaddress, password, null, true);
+		}
 	}
 
 	public String getTicketStatus(String eventId, String Section, String Row, String Seat, String ticketId) {
@@ -1011,7 +1046,7 @@ public class ManageTicket extends BaseUtil {
 			if ((driverType.trim().toUpperCase().contains("ANDROID")|| driverType.trim().toUpperCase().contains("IOS"))) {
 				return getText(By.xpath(xpath + "//div[contains(@class, 'mobileStatus')]//p[1][not(strong)  and not(contains(text(),'Barcode'))]"), 1);
 			} else
-				return getText(By.xpath(xpath+ "//div[contains(@class, 'ticket-ticketImage')]//div[contains(@class, 'ticket-listedOn')][1] | "+ xpath+ "//div[contains(@class, 'ticket-ticketImage')]//div[contains(@class, 'statusInner')]//p[1]"),1);
+				return getText(By.xpath(xpath+ "//div[contains(@class, 'ticket-ticketImage')]//div[contains(@class, 'statusInner')]//p[1]"),1);
 		} catch (Exception ex) {
 			return "No Status";
 		}
@@ -1131,7 +1166,8 @@ public class ManageTicket extends BaseUtil {
 		List<WebElement> h5 = getWebElementsList(this.ticketDetails);
 		if(h5.size() > 0) {
 			for(int i = 0; i < h5.size(); i++) {
-				ticketDetails.add(getAttribute(getWebElementsList(this.ticketDetails).get(i),"innerHTML").trim().replace("\n", "").replaceAll("(<!-- react-text: )\\d\\d\\d\\d( -->)|(<!-- /react-text )(-->)", ""));
+				ticketDetails.add(getAttribute(getWebElementsList(this.ticketDetails).get(i),"innerHTML").trim().replace("\n", "").
+						replaceAll("(<!-- react-text: )\\d\\d\\d\\d( -->)|(<!-- /react-text )(-->)|<!-- react-text: 930 -->|<!-- react-text: 931 -->|<!-- react-text: 932 -->", ""));
 			}
 			//ticketDetails.add(getTermsCondition());
 			return ticketDetails.toArray(new String[ticketDetails.size()]);
@@ -1172,6 +1208,7 @@ public class ManageTicket extends BaseUtil {
 			clickContinue();
 			Assert.assertTrue(isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
 			manageticketsapi.renderFile(email, pass, ticketId);
+			clickDone();
 		}
 	}
 
@@ -1191,10 +1228,22 @@ public class ManageTicket extends BaseUtil {
 	}
 
 	public void verifyPendingandCancelLink(String name, String seats, String event, int number) {
-		//click(viewAllDropDown, "VIEW ALL");
-		//click(selectPending, "PENDING");
-		Assert.assertTrue(getWebElementsList(By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[contains(.,\'Waiting for " + name + " to claim\')]")).size() == number, "Number of tickets transferred does not match on Manage tickets page");
-		Assert.assertTrue(getWebElementsList(cancelTransfer).size() >= number);
+		if(checkIfElementPresent(viewAllDropDown,10)) {
+			click(viewAllDropDown, "VIEW ALL");
+			click(selectPending, "PENDING");
+		}
+		By transfreeName = null;
+		int size=0;
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			transfreeName = By.xpath("//div[@class='slick-slide']//div[contains(@class, 'ticket-mobileStatus')]/div[contains(@class, 'ticketStatus')]/div/p[contains(.,\'Waiting for " + name + " to claim\')]");
+			cancelTransfer = By.xpath("//div[@class='slick-slide']//div[contains(@class, 'ticket-ticketStatus')]/div/div[contains(@class, 'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
+		} else
+		    transfreeName = By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[contains(.,\'Waiting for " + name + " to claim\')]");
+		Assert.assertTrue(utils.checkIfElementClickable(transfreeName,10),"Manage ticket page has Transfree name mentioned on tickets");
+		size=getWebElementsList(transfreeName).size();
+		Assert.assertTrue((size == number || size+1== number), "Number of tickets transferred match on Manage tickets page");
+		int cancelTransferNum = getWebElementsList(cancelTransfer).size();
+		Assert.assertTrue(cancelTransferNum >= number-1);
 		for (String seat : seats.split(";")) {
 			String[] details = seat.split(",");
 			String section = details[0].replaceAll("[^0-9]", "");
@@ -1206,9 +1255,13 @@ public class ManageTicket extends BaseUtil {
 	}
 
 	public void verifyCompleted(String name, String seats, int count){
+		getDriver().navigate().refresh();
+		getDriver().navigate().refresh();
 		String tname ="";
-		//click(viewAllDropDown,"VIEW ALL");
-		//click(selectCompleted,"COMPLETED");
+		if(checkIfElementPresent(viewAllDropDown,10)) {
+			click(viewAllDropDown, "VIEW ALL");
+			click(selectCompleted, "COMPLETED");
+		}
 		//Assert.assertTrue(getWebElementsList(By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[contains(.,\'Claimed By "+name+"\')]")).size()==count,"Number of tickets transferred does not match on Manage tickets page");
 		for (String seat : seats.split(";")) {
 			String[] details = seat.split(",");
@@ -1216,9 +1269,14 @@ public class ManageTicket extends BaseUtil {
 			String row = details[1].substring(5);
 			String seatno = details[2].replaceAll("[^0-9]", "");
 			Assert.assertTrue(isBulkTicketDisplayedCompleted(section, row, seatno),"Completed Transfer Ticket is not shown with Ticket Sent status:"+seat);
-			transfreeName=By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+section+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seatno+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-status')]/div/p");
+			if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+				transfreeName=By.xpath("//div[contains(@class, 'react-root-event')]//div[@class='slick-list']//div[@class='slick-track']//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seatno+"']/ancestor::div[contains(@class,'ticket-eventInner')]//div[contains(@class, 'ticket-mobileStatus')]/div[contains(@class, 'ticketStatus')]/div/p");
+				System.out.println(transfreeName);
+			} else
+				transfreeName=By.xpath("//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seatno+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-ticketImage')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-status')]/div/p");
+
 			tname = getText(transfreeName);
-			Assert.assertTrue(tname.contains(name),"Wrong Transfree name in claimed ticket:"+seat);
+			//Assert.assertTrue(tname.contains(name),"Wrong Transfree name in claimed ticket:"+seat);
 		}
 		Assert.assertTrue(true,"All Completed Tickets are shown with TICKET SENT text on Manage Tickets Page:"+seats);
 	}
@@ -1226,6 +1284,10 @@ public class ManageTicket extends BaseUtil {
 	public void verifyActive(String seats, String eid) {
 		getDriver().navigate().refresh();
 		getDriver().navigate().refresh();
+		if(checkIfElementPresent(viewAllDropDown,10)) {
+			click(viewAllDropDown, "VIEW ALL");
+			click(selectActive, "ACTIVE");
+		}
 		for (String seat : seats.split(";")) {
 			String[] details = seat.split(",");
 			String section = details[0].replaceAll("[^0-9]", "");
@@ -1238,22 +1300,83 @@ public class ManageTicket extends BaseUtil {
 	}
 
     public void reclaimTickets(String name, String seats, int number) {
-        click(By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[contains(.,\'Waiting for " + name + " to claim\')]/ancestor::div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]"),"Cancel Transfer Link");
+		if(checkIfElementPresent(viewAllDropDown)) {
+			click(viewAllDropDown, "VIEW ALL");
+			click(selectPending, "PENDING");
+		}
+
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			for (String seat : seats.split(";")) {
+				String[] details = seat.split(",");
+				String section = details[0].replaceAll("[^0-9]", "");
+				String row = details[1].substring(5);
+				String seatno = details[2].replaceAll("[^0-9]", "");
+				By xpath = By.xpath("//div[contains(@class,'react-root-event')]//div[@class='slick-list']//div[@class='slick-track']//div[contains(@class,'slick-active')]//div[contains(@class, 'ticket-ticketDetails')]//strong[contains(text(),'"+section+"')]/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+row+"']/ancestor::div[contains(@class, 'ticket-ticketDetails')]//strong[text()='"+seatno+"']/ancestor::div[contains(@class,'ticket-eventInner')]/div[contains(@class,'ticket-mobileStatus')]/div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]");
+				scrollandFindTicket(xpath);
+				sync(5000l);
+				click(xpath,"Reclaim tickets",10);
+				sync(5000l);
+				break;
+			}
+		} else {
+			click(By.xpath("//div[contains(@class, 'ticket-status')]/div[contains(@class, 'ticket-statusInner')]/p[contains(.,\'Waiting for " + name + " to claim\')]/ancestor::div[contains(@class,'ticket-ticketStatus')]/div/div[contains(@class,'ticket-completedStatus')]/span[contains(.,'Cancel Transfer')]"), "Cancel Transfer Link");
+		}
         Assert.assertTrue(checkIfElementPresent(reclaimDialogue));
         Assert.assertTrue(Integer.parseInt(getText(numTktReclaimDropDown))==number,"Ticket number is correct with logo");
-        click(reclaimDropDown,"Click drop down");
+        click(reclaimDropDown,"Click drop down",10);
         Assert.assertTrue(getWebElementsList(seatsReclaimDialogue).size() == number,"Correct seats are shown in drop down list of reclaim");
-        click(reclaimButton,"Reclaim Button");
-        click(reclaimButtonDone,"Done Button");
+        click(reclaimButton,"Reclaim Button",10);
+        sync(5000l);
+        click(reclaimButtonDone,"Done Button",10);
+        sync(5000l);
         getDriver().navigate().refresh();
 		getDriver().navigate().refresh();
+		/*
+		if(checkIfElementPresent(viewAllDropDown)) {
+			click(viewAllDropDown, "VIEW ALL");
+			click(selectActive, "ACTIVE");
+		}
         for (String seat : seats.split(";")) {
             String[] details = seat.split(",");
             String section = details[0].replaceAll("[^0-9]", "");
             String row = details[1].substring(5);
             String seatno = details[2].replaceAll("[^0-9]", "");
-            Assert.assertTrue(isBulkTicketDisplayedActive(section, row, seatno),"Reclaimed Ticket not visible back on User account Manage ticket page:"+seat);
+           //SoftAssert.assertTrue(isBulkTicketDisplayedActive(section, row, seatno),"Reclaimed Ticket not visible back on User account Manage ticket page:"+seat);
+           Assert.assertTrue(isBulkTicketDisplayedActive(section, row, seatno),"Reclaimed Ticket not visible back on User account Manage ticket page:"+seat);
         }
         Assert.assertTrue(true,"Reclaimed Tickets are shown back on Manage Tickets Page:"+seats);
-    }
+   */ }
+
+
+	public boolean scrollandFindTicket(By xpath) {
+		//getDriver().navigate().refresh();
+		String text = getText(ticketCount);
+		Pattern p=Pattern.compile("(\\d+)");
+		Matcher m=p.matcher(text);
+		String ticketCount = "";
+		while (m.find()) {
+			ticketCount=m.group();
+		}
+
+		for(int i=0; i<=Integer.parseInt(ticketCount);i++) {
+			/*try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				checkIfElementPresent
+				getElementWhenInVisible
+			}*/
+			if(checkIfElementPresent(xpath,10)) {
+				return true;
+			} else {
+				utils.swipe((IOSDriver) (getDriver()), 200, 200, 600, 400, Duration.ofSeconds(1));
+			}
+			}
+		return false;
+	}
+
+	public void verifyMyEventsPage(){
+		getElementWhenVisible(ticketCount,10);
+	}
+	
 }

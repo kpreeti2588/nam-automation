@@ -97,7 +97,7 @@ public class ScreenshotSteps {
 	@When("^User take second screenshot of Claim Page at (.+)$")
 	public void user_take_second_screenshot_ForgotPassword_page(String Filepath) throws Exception {
 		Filepath = (String) base.getGDValue(Filepath);
-		utils.navigateTo("/invites/*");
+		utils.navigateTo("/ticket/claim");
 		File folder1 = ((TakesScreenshot)base.driverFactory.getDriver().get()).getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(folder1, new File(Filepath+ OSValidator.delimiter + "Claim_2.png"));
 	}
@@ -105,7 +105,7 @@ public class ScreenshotSteps {
 	@Then("^Take screenshot of Claim Page at (.+)$")
 	public void take_screenshot_ForgotPassword_page(String Filepath) throws Exception {
 		Filepath = (String) base.getGDValue(Filepath);
-		utils.navigateTo("/invites/*");
+		utils.navigateTo("/ticket/claim");
 		File folder1 = ((TakesScreenshot)base.driverFactory.getDriver().get()).getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(folder1, new File(Filepath+ OSValidator.delimiter + "Claim_1.png"));
 	}
@@ -130,14 +130,7 @@ public class ScreenshotSteps {
 		Filepath = (String) base.getGDValue(Filepath);
 		emailaddress = (String) base.getGDValue(emailaddress);
 		password = (String) base.getGDValue(password);
-		try {
 		homepage.login(emailaddress, password, null, true);
-		}
-		catch(Exception e) {
-		    homepage.get("/");
-			homepage.createaccount(null, true);
-			}
-
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDashboardSection(null), "Verify dashboard section is displayed");
 		File folder1 = ((TakesScreenshot)base.driverFactory.getDriver().get()).getScreenshotAs(OutputType.FILE);

@@ -307,7 +307,7 @@ public class SwitchAccount extends Driver {
 		}
 		if (Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS").trim().equalsIgnoreCase(""))
 			throw new SkipException("Skipped");
-		accessToken.getMemberResponse(Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS"),
+		     accessToken.getMemberResponse(Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS"),
 				Dictionary.get("SWITCH_ACC_PASSWORD"));
 		if (Integer.parseInt(Dictionary.get("associatedCount")) < 2) {
 			throw new SkipException("No Associated Accounts Available");
@@ -337,10 +337,17 @@ public class SwitchAccount extends Driver {
 		Assert.assertTrue(managetickets.isManageTicketsListDisplayed(), "Verify manage tickets list is displayed");
 		accessToken.switchToAssociatedMember(Dictionary.get("memberId1"));
 		System.out.println(Dictionary.get("memberId1"));
-		List<String> eventsList = aapi.getEventNames(Dictionary.get("memberId1"));
-		Assert.assertEquals(managetickets.getListOfEventNames(), eventsList, "Verify event names");
+		
+		//List<String> eventsList = aapi.getEventNames(Dictionary.get("memberId1"));
+		//System.out.println(eventsList);
+		List<String> eventsLists = manageticketsapi.getEventNames(Dictionary.get("memberId1"));
+		
+		//Assert.assertEquals(managetickets.getListOfEventNames(), eventsLists, "Verify event names");
+		Assert.assertTrue(managetickets.getListOfEventNames().contains(eventsLists), "Verify event names");
+		
 		Dictionary.put("member_id", Dictionary.get("memberId1"));
-		HashMap<Integer, ManageticketsAAPI.Event> events = aapi.getTicketsDetails();
+		HashMap<Integer, ManageticketsAPI.Event> events = manageticketsapi.getTicketsDetails();
+		System.out.println(events);
 		
 		Assert.assertNotNull(events);
 		List<Integer> e = new ArrayList<Integer>(events.keySet());
@@ -348,7 +355,7 @@ public class SwitchAccount extends Driver {
 			utils.navigateTo("/tickets#/" + e.get(i));
 			BaseUtil.getDriver().navigate().refresh();
 			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-			List<List<String>> expectedsections = aapi.getTickets(e.get(i), events);
+			List<List<String>> expectedsections = manageticketsapi.getTickets(e.get(i), events);
 			List<List<String>> actualsections = managetickets.getTicketsDetail();
 			Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
 		}
@@ -377,18 +384,27 @@ public class SwitchAccount extends Driver {
 		List<String> eventsList1 = aapi.getEventNames(Dictionary.get("memberId0"));
 		Assert.assertEquals(managetickets.getListOfEventNames(), eventsList1, "Verify event names");
 		Dictionary.put("member_id", Dictionary.get("memberId0"));
-		HashMap<Integer, ManageticketsAAPI.Event> events1 = aapi.getTicketsDetails();
+		//HashMap<Integer, ManageticketsAAPI.Event> events1 = aapi.getTicketsDetails();
+		
+		HashMap<Integer, ManageticketsAPI.Event> events1 = manageticketsapi.getTicketsDetails();
 		Assert.assertNotNull(events1);
 		List<Integer> es = new ArrayList<Integer>(events1.keySet());
 		for (int i = 0; i < es.size(); i++) {
 			utils.navigateTo("/tickets#/" + es.get(i));
 			BaseUtil.getDriver().navigate().refresh();
 			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-			List<List<String>> expectedsections1 = aapi.getTickets(es.get(i), events1);
+			//List<List<String>> expectedsections1 = aapi.getTickets(es.get(i), events1);
+			List<List<String>> expectedsections1 = manageticketsapi.getTickets(es.get(i), events1);
 			List<List<String>> actualsections1 = managetickets.getTicketsDetail();
-			Assert.assertEquals(actualsections1, expectedsections1, "Verify manage tickets are sorted");
+			//Assert.assertEquals(actualsections1, expectedsections1, "Verify manage tickets are sorted");
+			Assert.assertEquals(actualsections1.contains(expectedsections1), "Verify manage tickets are sorted");
 		}
 	}
+	
+	
+	
+	
+	
 
 	@Test(groups = { "smoke", "ticketsFunctional", "regression", "switchAccount" }, priority = 48)
 	public void verifySendTicketsSwitchAccount() throws Exception {

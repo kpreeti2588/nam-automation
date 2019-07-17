@@ -1,5 +1,6 @@
 package org.iomedia.galen.pages;
 
+import java.awt.AWTException;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,8 +27,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 
 import bsh.ParseException;
@@ -40,6 +44,8 @@ public class Invoice extends BaseUtil {
 	public Invoice(WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew> sTestDetails) {
 		super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		driverType = driverFactory.getDriverType().get();
+		
+		
 	}
 
 	private By firstInvoiceLink = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a/..");
@@ -63,7 +69,7 @@ public class Invoice extends BaseUtil {
     private By paymentPlansDropdown = By.xpath(".//input[@type='radio' and @value='selectPaymentPlan']/..//span//ul | .//label[@value='selectPaymentPlan']//span//ul");
 
 	private By cardinfo=By.xpath(".//div[contains(@class, 'accordionCard')]//h2");
-	private By continueButton = By.cssSelector("button[class*='invoice-buttonBlock']");
+	private By continueButton = By.cssSelector("button[class*='invoice-buttonBlock-2A66BN']");
 	private By paymentPlanBreakage = By.cssSelector("table[class*='paymentBreakageTable'] tbody");
 	private By paymentPlanBreakageDates = By.cssSelector("table[class*='paymentBreakageTable'] tbody tr td:nth-child(2)");
 	private By paymentPlanBreakageAmount = By.cssSelector("table[class*='paymentBreakageTable'] tbody tr td:last-child");
@@ -78,7 +84,7 @@ public class Invoice extends BaseUtil {
 	private By secondCVV= By.xpath("//*[contains(@class,'invoice-invoiceCard')]/div/div[2]/div[2]/div/input");
 	private By rightarrow= By.xpath(".//*[contains(@class,'invoice-sliderButtonConatiner')]/span[contains(., 'right')]/i");
 //	private By enterAmount= By.xpath("//input[@name='userEnteredAmount' and @type='tel']");
-	private By amount_Due=By.xpath("((.//div[contains(@class, 'invoice-amountTableContainer')]//tbody//tr)[last()]//td)[2]/span | (//div[contains(@class,'amountDue')]//span)[1]");
+	private By amount_Due=By.xpath("(.//div[contains(@class, 'invoice-amountTableContainer')])[1]//div[3]/div[2]/span | (//div[contains(@class,'amountDue')]//span)[1]");
 	private By continuePlan = By.xpath(".//*[contains(@class, 'accordionPayment')]//button[text()='CONTINUE']");
 	private By continueCard = By.xpath(".//*[contains(@class, 'accordionCard')]//button[text()='CONTINUE']");
 	private By continueBilling = By.xpath("//*[contains(@class,'invoiceBilling')]//button[text()='CONTINUE']");
@@ -142,10 +148,162 @@ public class Invoice extends BaseUtil {
 	private By savedCardList = By.cssSelector("span[class*='invoice-bankCardLabelText']");
 	private By surveyBlockSelected = By.cssSelector(".accordionSurvey:not([class*='invoice-hide'])");
 	private By surveyBlock = By.cssSelector(".accordionSurvey");
-	private By surveyText = By.cssSelector(".accordionSurvey h2");
-	
+   private By surveyText = By.cssSelector(".accordionSurvey h2 span:nth-child(2)");
+	//private By surveyText = By.className("invoice-headerlabelText-3zD39m");
+	//public By surveyText=By.xpath("//*[@id=\"wrap-container\"]/div/div[2]/div/div/div/div/div/div/div[2]/div[2]/form/div[2]/h2/span[2]");
 	Utils utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	ManageticketsAPI manageticketsAPI = new ManageticketsAPI(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+	
+// Typeform buttons	
+	//public By Iframe_xpath=By.className("invoice_typeform");
+	public By Iframe_xpath=By.xpath("//iframe[@class='invoice_typeform'] | //iframe[@data-qa='iframe']");
+	
+	public By Yes_xpath=By.xpath("//div[contains(@id,'yes')] | (//div[text()='Yes'])[2]");
+	public By submit_xpath= By.xpath("(.//div[text()='Submit'])");
+	
+	public By ok = By.cssSelector("#typeform li div[class*='button'] span:first-child");
+	//By submit = By.cssSelector("#typeform #unfixed-footer div[class*='submit']");
+	public By textBox = By.cssSelector("#typeform li input[type='text']");
+	public By radioButton = By.cssSelector("#typeform li input[type='radio']");
+	public By checkBox = By.cssSelector("#typeform li input[type='checkbox']");
+	public By dropDown = By.cssSelector("#typeform li select[name*='question']");
+	public By choiceButton = By.xpath(".//*[@id='typeform']//li//input[@value='Yes']/..//div[@class='bd']");
+	
+	
+	public void submit_Typeform() throws AWTException
+	{
+		System.out.println("user entered into question frame");
+		
+		boolean flag= false;
+		WebDriverWait wait= new WebDriverWait(getDriver(), 60);
+		JavascriptExecutor obj = (JavascriptExecutor)getDriver();
+		
+		try
+		{
+			WebElement typeform_iframe= getDriver().findElement(Iframe_xpath);
+			getDriver().switchTo().frame(typeform_iframe);
+
+			if(utils.checkIfElementPresent(Yes_xpath, 30))
+			{
+				WebElement yes_button= getDriver().findElement(Yes_xpath);
+				wait.until(ExpectedConditions.elementToBeClickable(yes_button));
+				obj.executeScript("arguments[0].click();", yes_button);
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					//getDriver().findElement(submit_xpath).click();
+					getDriver().switchTo().defaultContent();
+				}
+				
+			}
+			
+			if(utils.checkIfElementPresent(dropDown, 30))
+			{
+				WebElement dropDown_button= getDriver().findElement(dropDown);
+				wait.until(ExpectedConditions.elementToBeClickable(dropDown_button));
+				obj.executeScript("arguments[0].click();", dropDown_button);
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					//getDriver().findElement(submit_xpath).click();
+					getDriver().switchTo().defaultContent();
+				}
+			}
+			
+			if(utils.checkIfElementPresent(checkBox, 30))
+			{
+				WebElement checkBox_button= getDriver().findElement(checkBox);
+				wait.until(ExpectedConditions.elementToBeClickable(checkBox_button));
+				//obj.executeScript("arguments[0].click();", checkBox_button);
+				obj.executeScript("document.querySelector(checkBox_button).checked=false;");
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					//getDriver().findElement(submit_xpath).click();
+					getDriver().switchTo().defaultContent();
+				}
+			}
+			
+			if(utils.checkIfElementPresent(radioButton, 30))
+			{
+				WebElement radioButton_button= getDriver().findElement(radioButton);
+				wait.until(ExpectedConditions.elementToBeClickable(radioButton_button));
+				obj.executeScript("arguments[0].click();", radioButton_button);
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					//getDriver().findElement(submit_xpath).click();
+					getDriver().switchTo().defaultContent();
+				}
+			}
+			
+			if(utils.checkIfElementPresent(ok, 30))
+			{
+				WebElement ok_button= getDriver().findElement(ok);
+				wait.until(ExpectedConditions.elementToBeClickable(ok_button));
+				obj.executeScript("arguments[0].click();", ok_button);
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					//getDriver().findElement(submit_xpath).click();
+					getDriver().switchTo().defaultContent();
+				}
+			}
+			
+			if(utils.checkIfElementPresent(textBox, 30))
+			{
+				WebElement ok_textBox= getDriver().findElement(textBox);
+				wait.until(ExpectedConditions.elementToBeClickable(ok_textBox));
+				obj.executeScript("document.querySelector(ok_textBox).value='ashish';");
+				flag=true;
+				
+				if(flag==true)
+				{
+					WebElement submit_button=getDriver().findElement(submit_xpath);
+					wait.until(ExpectedConditions.elementToBeClickable(submit_button));	
+					click(submit_button, "Submit button");
+					getDriver().switchTo().defaultContent();
+					
+				}
+			}
+
+		
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		finally 
+		{
+			System.out.println("user is getting logout from nam");
+			getDriver().switchTo().defaultContent();
+	
+		}
+	}
+	
+	
+	
 	
 	public boolean verifyNewCardSaved(String text1, String text2, String text3) {
 		getElementWhenVisible(savedCardList);
@@ -294,7 +452,25 @@ public class Invoice extends BaseUtil {
 		return true;
 	}
 	
+	// verify survey and then submit under payment
+	public void verify_surveytab_display_payment() throws InterruptedException, AWTException 
+	{
+		System.out.println("Typeform submission displaying....");
+		//Assert.assertTrue(isSurveyDisplayPayment().trim().contains("Questions"),"Survey tab is not found");
+		submit_Typeform();
+		System.out.println(".....user submitted typeform");
+		
+	}
+	// survey displayed under review tab
+	public By surveyText_payment=By.xpath("");
+	public String isSurveyDisplayPayment()
+	{
+		System.out.println("invoice class : survey value"+ getText(surveyText_payment));
+		return getText(surveyText);
+	}
+	
 	public String isSurveyDisplay() {
+		System.out.println("invoice class : survey value"+ getText(surveyText));
 		return getText(surveyText);
 	}
 	

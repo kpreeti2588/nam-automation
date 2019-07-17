@@ -1,22 +1,53 @@
 package org.iomedia.galen.pages;
 
 
+
+
+import java.util.List;
+
 import org.iomedia.common.BaseUtil;
+
 import org.iomedia.framework.Driver.HashMapNew;
+import org.iomedia.galen.common.Utils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.remote.server.handler.SwitchToParentFrame;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.iomedia.framework.Reporting;
 import org.iomedia.framework.WebDriverFactory;
 
 public class CMS extends BaseUtil {
 
-	public CMS(WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew>[] sTestDetails) {
+	public CMS(Utils base, WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew>[] sTestDetails) {
 		super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+		
 	}
 	
 	private By invoices = By.xpath("//p[text()='Invoices']");
 	private By setting = By.xpath("//p[text()='Settings']");
+	private By ticketmanagement = By.xpath("//p[text()='Ticket Management']");
+	private By donation = By.xpath("//p[text()='Donation']");
+	private By quickdonation = By.xpath("//p[text()='Quick Donation']");
+	private By quickdonationenabled = By.cssSelector("#edit-box-donation-enable[checked='checked']");
+	private By quickdonationenablecb = By.cssSelector("#edit-box-donation-enable + span");
+	private By ticketoptions = By.xpath("//p[text()='Ticket Options']");
+	private By bulktoggle = By.cssSelector("label[title='Enable this to show bulk transfer option'] span[class='toggle']");
+	private By editsubmit = By.cssSelector("#edit-submit");
+	
+	private By addpage =By.xpath("//a[@title='Add a new page']");
+	private By videopform = By.xpath("//form[@class='add-content-videotakeover']");
+	private By formchekbox = By.xpath("(//span[@class='checkbox-material'])[2]");
+	private By closeX = By.xpath("//span[contains(@class,'ui-icon-closethick')]");
+	private By homepage =By.xpath("Home Pages");
+	private By selectbutton = By.xpath("(//li[@class='content-type-options']/a//div[text()='Select'])[1]");
+	private By ticketsalesverification = By.xpath("//div[@class='panel-title' and text()='Ticket Sales']");
+	private By pagemanager= By.xpath("//p[text()='Page Manager']");
+	private By ticketsalespage =By.xpath("//div[@id='edit-ticket-sales']");
+	private By formpresent =By.xpath("//div[@id='edit-ticket-sales']/div");
+	private By ticketsalestext =By.xpath("//p[@id='edit-ticket-sales-wrapper--description']");
+ 
 	private By signInComponent = By.xpath("//p[text()='Sign In Component']");
 	private By addNewInvoice = By.xpath("//p[text()='Add New Invoice']");
 	private By viewInvoices = By.xpath("//*[@class='view-invoices']");
@@ -51,7 +82,7 @@ public class CMS extends BaseUtil {
 	private By claimTicketGear = By.xpath("//td[contains(text(),'Claim')]/..//a");
 	
 	private By toggle = By.xpath("(//input[@class='iom-checkbox-ajax form-checkbox iom-processed'])[1]/..//span");
-	private By submit = By.xpath("//button[text()='Submit']");
+	private By submit = By.xpath("//button[text()='Submit']| //button[@type='submit' and text()='Save']");
 	
 	private By createAccountInput = By.xpath("//input[@id='edit-settings-userentry-signup-title-label']");
 	private By signUpInput = By.xpath("//input[@id='edit-settings-userentry-signup-submit-btn-label']");
@@ -97,10 +128,96 @@ public class CMS extends BaseUtil {
 	private By lastNameSignUpUI = By.xpath("//input[contains(@name,'last_name')]/..//label");
 	private By componentSubHeading = By.xpath("//div[contains(@class,'componentSubHeading')]");
 	
+	// CMS - settings 
+	public By cmssetting = By.xpath("//*[@id=\"block-editornavigation\"]/ul/li[6]/a/p");
+	public By dashboardconfig = By.xpath("//*[@id=\"editor-navigation--6-1\"]/li[1]/a/p");
+	
+	//cms- manage ticket dash board header elements...cleaning this method2
+	public By welcomelabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-welcome-label-label\"]");
+	public By accountidlabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-account-id-label-label\"]");
+	public By clientnamelabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-team-name-label\"]");
+	public By manageticketlabel= By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-manage-ticket-label-label\"]");
+	public By totalticketslabel= By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-ticket-total-label-label\"]");
+	public By accountbalancelabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-account-balance-label-label\"]");
+	public By outstandinginvoiceslabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-ticket-dashboard-header-outstanding-invoice-label-label\"]");
+	
+	public By dashboardconfigsave=By.id("edit-submit");
+	
+	//cms- manage ticket 
+	public By ticketlabel=By.xpath("//*[@id=\"edit-manage-dashboard-manage-tickets-ticket-label-label\"]");
+
+	//cms - manage invoices
+	public By invoicelabel= By.xpath("//*[@id=\"edit-manage-dashboard-manage-invoices-invoice-label-label\"]");
+	
+	//cms - quicklinkslabel
+	public By quicklinkslabels=By.xpath("//*[@id=\"edit-manage-dashboard-manage-quick-links-quick-link-label-label\"]");
+	
+	//frontend dashboard locators
+	public By f_welcome=By.xpath("//*[@id=\"block-manage-ticket-dashboard-header-block\"]/div/div/div[1]/div/div[1]/p[1]");
+	public By f_accountid=By.xpath("//*[@id=\"block-manage-ticket-dashboard-header-block\"]/div/div/div[1]/div/div[1]/p[2]");
+	public By f_clientname=By.xpath("//*[@id=\"block-manage-ticket-dashboard-header-block\"]/div/div/div[1]/div/div[1]/h3/span");
+	
+	public By f_accountbalance=By.xpath("//*[@id=\"block-manage-ticket-dashboard-header-block\"]/div/div/div[1]/div/div[3]/p[1]");
+	public By f_outstandinginvoices=By.xpath("//*[@id=\"block-manage-ticket-dashboard-header-block\"]/div/div/div[1]/div/div[3]/p[2]/a");
+	public By f_ticket=By.xpath("//*[@id=\"block-manage-ticket-dashboard-block\"]/div/div[1]/div/div[1]/h3");
+	public By f_manageinvoice= By.xpath("//*[@id=\"block-invoicedashboardblock\"]/div/div[1]/div/div[1]/h3");
+	public By f_quicklinks=By.xpath("//*[@id=\"block-views-block-promo-tile-block-3\"]/h2");
+	public By f_logedin=By.xpath("//*[@id=\"block-userentrycomponentblock\"]/div/div/div/div/form/div[4]");
+	
 	private By changePasswordCurrentVerify = By.xpath("//input[@name='temp_pass']/..//label");
 	private By changePasswordNewVerify = By.xpath("//input[@name='password']/..//label");
 	private By changePasswordConfirmVerify = By.xpath("//input[@name='confirm_pass']/..//label");
 	private By changePasswordSubmitVerify = By.xpath("//button[@type='submit']");
+	
+	public By typeformworkspaceid = By.cssSelector("input[name*='typeform_workspace_id'][id*='edit-typeform-workspace-id']");
+	public By saveconfigurationid = By.id("edit-submit");
+	public By enabletypeformcheckbox = By.cssSelector("span[class*='check']");
+	private By invoice_active = By.cssSelector("div[class*='togglebutton'] label[class*='toggle-color']");
+	public By checkbox = By.cssSelector("input[checked*='checked']");
+	
+	public String cmsuser="//*[@id=\"block-iom-admin-account-menu\"]/div/div/div[2]/i";
+	public String cmslogout="//*[@id=\"amgr-user-menu\"]/li[2]/a";
+	public String flogin="//*[@id=\"invoke-signin-modal\"]";
+	
+	//typeform locators
+	public String superadminsetup = "//*[@id=\"block-editornavigation\"]/ul/li[8]/a/p";
+	public String cmstypeform= "//*[@id=\"editor-navigation--8-1\"]/li[3]/a/p";
+	public String work_space="cfER3z";
+
+	public String cmsinvoice ="//*[@id=\"block-editornavigation\"]/ul/li[5]/a/p";
+	public String viewinvoice="//*[@id=\"editor-navigation--5-1\"]/li[1]/a/p";
+	public String invoicesetting="//*[@id=\"search_default\"]/tbody/tr/td[7]/span/a/i";
+	public String questions="//*[@id=\"add-invoices\"]/div[3]/div/ul/li[7]/a";
+	public String selecttypeform="openPopup";
+	public String type_save="typeform-accepted";
+	public String typeform_submit="edit-submit";
+	
+	public String cmstoggle="//*[@id=\"search_default\"]/tbody/tr/td[6]/div/label/span";
+	String firsttypeform="//*[@id=\"typeform-list\"]/div/div/div[2]/div[2]/div[1]/div[2]/a";
+	
+	
+	public String fname="email";
+	public String fpwd="password";
+
+	public String f_manageticket="";
+	public String f_totalticket="";
+	
+	//declare cms variables dashboard config page 
+	public String welcome = "welcome_custom"; 
+	public String accountid = "accountid_custom";
+	public String clientname = "clientname_custom";
+	public String manageticket ="manageticket_custom"; 
+	public String totaltickets = "tickets_custom";
+	public String accountbalance = "accountbalance_custom";
+	public String outstandinginvoices="outstandinginvoices_custom";
+	
+	public String ticket="ticket_cistom";
+	public String manageinvoice="manageinvoice_custom";
+	public String quicklinks="quicklinks_custom";
+	
+	boolean allowMultipleSubmission=true;
+	String showAfter="Invoice Summary";
+	String payment="Payment";
 	
 	public String invoiceName = "Invoice Test";
 	public String invoiceSummaryMessage = "Test Invoice Summary";
@@ -149,7 +266,6 @@ public class CMS extends BaseUtil {
 	public String forgotPasswordDescriptionTextHome = "AutoForgotDescriptionHome";
 	public String forgotPasswordEmailTextHome = "AutoForgotEmailHome";
 	
-	
 	public String createHeaderTextHome = "AutoCreateHome";
 	public String signUpTextHome = "AutoSignUpHome";
 	public String firstNameSignUpTextHome = "AutoFirstSignUpHome";
@@ -182,10 +298,377 @@ public class CMS extends BaseUtil {
 	public String changePasswordCurrentPasswordText = "AutoChangePasswordCurrent";
 	public String changePasswordNewPasswordText = "AutoChangePasswordNew";
 	public String changePasswordConfirmPasswordText = "AutoChangePasswordConfirm";
-//	public String city = "AutoCity";
-//	public String zip = "AutoZip";
 	
 	
+	public Utils utils;
+	
+	//typeform selected under review tab
+		public void typeform_selection_payment() throws InterruptedException
+		{
+			WebDriverWait wait= new WebDriverWait(getDriver(), 20);
+			JavascriptExecutor ex = (JavascriptExecutor)getDriver();
+			WebElement active_toggle=getDriver().findElement(By.xpath(cmstoggle));
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(cmstoggle)));
+			
+			if(!checkIfElementPresent(invoice_active, 5))
+			{
+				active_toggle.click();
+			
+			}
+			
+			utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+			utils.navigateTo("/admin/invoice/1/edit?destination=admin/invoice/list");	
+			ex.executeScript("history.go(0)");
+			
+			WebElement questiontab=getDriver().findElement(By.xpath(questions));
+			questiontab.click();
+		
+		
+			By save = By.id("typeform-accepted");
+			By dropDown = By.cssSelector("div[class*='typeform'] input[class*='select-dropdown']");
+			
+			if(checkIfElementPresent(selecttext, 3))
+			{
+				try {
+							
+				By questionsTab = By.xpath(".//span[text()='QUESTIONS']");
+				By embedTypeform = By.xpath(".//*[@id='openPopup']/span[text()='EMBED TYPEFORM'] | .//*[@id='openPopup']/span[text()='SELECT TYPEFORM']");
+				//
+				ex.executeScript("arguments[0].click();", getDriver().findElement(questionsTab));
+				
+				if(checkIfElementPresent(embedTypeform))
+				
+				{
+					WebElement we = getElementWhenVisible(embedTypeform);
+					click(we, "Select Typeform");
+					By typeform_automation = By.cssSelector("a[title='Automation']");
+					WebElement wtypeform_automation = getElementWhenVisible(typeform_automation);
+					scrollingToElementofAPage(wtypeform_automation); //scrolling not working
+					wtypeform_automation.click();
+
+					ex.executeScript("arguments[0].click();", getDriver().findElement(save));
+				
+				}
+				
+				WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 2);
+				
+				//controlling position of typeform for client
+				if(wdropDown.getAttribute("value").trim().equalsIgnoreCase(showAfter.trim())) {
+
+					ex.executeScript("arguments[0].click();", wdropDown);
+					By locator = By.xpath(".//div[contains(@class, 'typeform')]//ul//li[2]//span[1]");
+					wait.until(ExpectedConditions.elementToBeClickable(locator));
+					WebElement pay=getDriver().findElement(locator);
+				
+					ex.executeScript("arguments[0].click();", pay);
+					
+				
+				}
+				
+				By allow_multiple_submissions = By.cssSelector("label[for*='typeform-allow-multiple-submission'] input");
+				WebElement wallow_multiple_submissions = getDriver().findElement(allow_multiple_submissions);
+				
+				if(allowMultipleSubmission && wallow_multiple_submissions.getAttribute("checked") == null)
+				{
+					ex.executeScript("arguments[0].click();", wallow_multiple_submissions);
+				} 
+				else if(!allowMultipleSubmission && wallow_multiple_submissions.getAttribute("checked") != null) 
+				{
+					ex.executeScript("arguments[0].click();", wallow_multiple_submissions);
+				}
+				
+				getDriver().findElement(dashboardconfigsave).click();
+				ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
+				
+				By alert = By.cssSelector("div[role='alert']");
+				getElementWhenVisible(alert, 5);
+				}
+				
+				finally {
+					
+					//getDriver().navigate().to("https://stg1-am.ticketmaster.com/namautomation/user/logout");
+					getDriver().navigate().to(Environment.get("APP_URL")+"/user/logout");
+					getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
+				}
+			}
+			else
+				{
+				System.out.println("typeform already selected ... Now changing its poition");
+				WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 2);
+
+				if(wdropDown.getAttribute("value").trim().equalsIgnoreCase(showAfter.trim())) {
+					ex.executeScript("arguments[0].click();", wdropDown);
+					By locator = By.xpath(".//div[contains(@class, 'typeform')]//ul//li[2]//span[1]");
+					WebElement pay=getDriver().findElement(locator);
+					
+					wait.until(ExpectedConditions.elementToBeClickable(locator));
+					
+					ex.executeScript("arguments[0].click();", pay);
+				
+					//getDriver().findElement(dashboardconfigsave).click();
+					ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
+			
+					
+				}
+				
+				//getDriver().navigate().to("https://stg1-am.ticketmaster.com/namautomation/user/logout");
+				
+				//utils.navigateTo("/user/logout");
+				getDriver().navigate().to(Environment.get("APP_URL")+"/user/logout");
+				getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
+				}
+		}
+		
+	
+	
+	
+		public void verifiesCustomiseDashboard()
+		{
+	//remove takeover
+			((JavascriptExecutor) getDriver()).executeScript("$('.theme-dialog-3SJ5Op').remove()");
+			
+			Assert.assertTrue(getText(f_welcome).contains(welcome));
+			Assert.assertTrue(getText(f_accountid).contains(accountid));
+			Assert.assertTrue(getText(f_accountbalance).contains(accountbalance));
+			Assert.assertTrue(getText(f_outstandinginvoices).contains(outstandinginvoices));
+			Assert.assertTrue(getText(f_ticket).contains(ticket));
+			Assert.assertTrue(getText(f_quicklinks).contains(quicklinks));
+			Assert.assertTrue(getText(f_manageinvoice).contains(manageinvoice));
+				
+		}
+		
+	
+	public void ViewDashboardconfig()
+	{
+	click(cmssetting, "cms setting", 3);
+	click(dashboardconfig, "cms Dashboard config", 3);
+	}
+	
+	public void enterManageTicketDashboard()
+	{
+		getElementWhenClickable(welcomelabel, 3).clear();
+		getElementWhenClickable(welcomelabel, 3).sendKeys(welcome);
+		
+		getElementWhenClickable(accountidlabel, 3).clear();
+		getElementWhenClickable(accountidlabel, 3).sendKeys(accountid);
+		
+		getElementWhenClickable(clientnamelabel, 3).clear();
+		getElementWhenClickable(clientnamelabel, 3).sendKeys(clientname);
+		
+		getElementWhenClickable(manageticketlabel, 3).clear();
+		getElementWhenClickable(manageticketlabel, 3).sendKeys(manageticket);
+		
+		getElementWhenClickable(totalticketslabel, 3).clear();
+		getElementWhenClickable(totalticketslabel, 3).sendKeys(totaltickets);
+
+		getElementWhenClickable(accountbalancelabel, 3).clear();
+		getElementWhenClickable(accountbalancelabel, 3).sendKeys(accountbalance);
+		
+		getElementWhenClickable(outstandinginvoiceslabel, 3).clear();
+		getElementWhenClickable(outstandinginvoiceslabel, 3).sendKeys(outstandinginvoices);
+	}
+	
+	
+	public void EnterTicketLabel()
+	{
+
+		getElementWhenClickable(ticketlabel, 3).clear();
+		getElementWhenClickable(ticketlabel, 3).sendKeys(ticket);
+	}
+	
+	public void EnterInvoiceLabel()
+	{
+
+		getElementWhenClickable(invoicelabel, 3).clear();
+		getElementWhenClickable(invoicelabel, 3).sendKeys(manageinvoice);
+	}
+	
+	public void EnterQuickLinkLabel()
+	{
+
+		getElementWhenClickable(quicklinkslabels, 3).clear();
+		getElementWhenClickable(quicklinkslabels, 3).sendKeys(quicklinks);
+	}
+	
+	public void DashboardConfigSaveButton()
+	{
+		getElementWhenClickable(dashboardconfigsave, 3).click();
+		
+	}
+	
+	
+	//enable typeform via cms and configured its work space if not already
+	
+	public void verifiestypeformadminsetup()
+	{	
+			try {
+				if(checkIfElementPresent(checkbox, 2)==false)
+				{
+					click(enabletypeformcheckbox, "enable typeform", 2);
+				
+					click(saveconfigurationid, "Save Configuration",2);	
+				}
+				
+				if(getDriver().findElement(typeformworkspaceid).getAttribute("typeform_workspace_id")=="" || getDriver().findElement(typeformworkspaceid).getAttribute("typeform_workspace_id")==null)
+				{
+					getDriver().findElement(typeformworkspaceid).clear();	
+				type(typeformworkspaceid, "workspaceid", "cfER3z", 2);
+				click(saveconfigurationid, "Save Configuration",2);	
+				}
+			
+			    } 
+			catch (Exception e) {
+				e.printStackTrace();
+								}
+			finally
+			{
+				click(saveconfigurationid, "Save Configuration",2);	
+			}
+		}
+		
+	public By selecttext=By.xpath(".//*[@id='openPopup']/span[text()='SELECT TYPEFORM']");
+
+	public void typeform_selection() throws InterruptedException
+	{
+		WebDriverWait wait= new WebDriverWait(getDriver(), 20);
+		JavascriptExecutor ex = (JavascriptExecutor)getDriver();
+		WebElement active_toggle=getDriver().findElement(By.xpath(cmstoggle));
+		wait.until(ExpectedConditions.elementToBeClickable(By.xpath(cmstoggle)));
+		boolean status = false;
+		int counter = 3;
+		WebElement typeform_summary;
+		utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+		By submit = By.id("edit-submit");
+		
+		
+		if(!checkIfElementPresent(invoice_active, 5))
+		{
+			active_toggle.click();
+		
+		}
+		
+		
+		utils.navigateTo("/admin/invoice/1/edit?destination=admin/invoice/list");	
+		//ex.executeScript("history.go(0)");
+		
+		WebElement questiontab=getDriver().findElement(By.xpath(questions));
+		questiontab.click();
+		
+		if(checkIfElementPresent(selecttext, 3))
+		{
+			try {
+						
+			By questionsTab = By.xpath(".//span[text()='QUESTIONS']");
+			By embedTypeform = By.xpath(".//*[@id='openPopup']/span[text()='EMBED TYPEFORM'] | .//*[@id='openPopup']/span[text()='SELECT TYPEFORM']");
+			//
+			ex.executeScript("arguments[0].click();", getDriver().findElement(questionsTab));
+			
+			if(checkIfElementPresent(embedTypeform))
+			
+			{
+				WebElement we = getElementWhenVisible(embedTypeform);
+				click(we, "Select Typeform");
+				
+				By typeform_automation = By.cssSelector("a[title='Automation']");
+			
+				//refreshing typeform	
+				do {
+					status = checkIfElementPresent(typeform_automation);
+					if (!status) {
+						getDriver().navigate().refresh();
+						sync(500L);
+						questiontab.click();
+						click(we, "Select Typeform");
+						
+					}
+					counter--;
+				} while (counter > 0 && status == false);
+				
+				
+				WebElement wtypeform_automation = getElementWhenVisible(typeform_automation);
+				
+				scrollingToElementofAPage(wtypeform_automation); //scrolling not working
+				wtypeform_automation.click();
+				By save = By.id("typeform-accepted");
+				ex.executeScript("arguments[0].click();", getDriver().findElement(save));
+			
+			}
+			
+			By dropDown = By.cssSelector("div[class*='typeform'] input[class*='select-dropdown']");
+			WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 2);
+			
+			//controlling summary  position of typeform for client 
+			if(!wdropDown.getAttribute("value").trim().equalsIgnoreCase(showAfter.trim())) {
+				ex.executeScript("arguments[0].click();", wdropDown);
+				By locator = By.xpath(".//div[contains(@class, 'typeform')]//ul//li//span[text()='" + showAfter.trim() + "']");
+				//ex.executeScript("arguments[0].click();", getDriver().findElement(locator));
+				wait.until(ExpectedConditions.elementToBeClickable(locator));
+				typeform_summary=getDriver().findElement(locator);
+				typeform_summary.click();	
+			}
+			
+			By allow_multiple_submissions = By.cssSelector("label[for*='typeform-allow-multiple-submission'] input");
+			WebElement wallow_multiple_submissions = getDriver().findElement(allow_multiple_submissions);
+			
+			if(allowMultipleSubmission && wallow_multiple_submissions.getAttribute("checked") == null) 
+			{
+				ex.executeScript("arguments[0].click();", wallow_multiple_submissions);
+			} 
+			
+			else if(!allowMultipleSubmission && wallow_multiple_submissions.getAttribute("checked") != null) {
+				ex.executeScript("arguments[0].click();", wallow_multiple_submissions);
+			}
+			
+			ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
+			ex.executeScript("arguments[0].click();", getDriver().findElement(submit));
+			
+			By alert = By.cssSelector("div[role='alert']");
+			getElementWhenVisible(alert, 5);
+			}
+			
+		catch(Exception e)	
+			{
+			e.printStackTrace();
+			}
+			
+			finally 
+			{	
+		 	System.out.println("user is getting logs out");
+		 	
+		 
+		 //	getDriver().navigate().to("https://stg1-am.ticketmaster.com/namautomation/user/logout");
+			
+		 	getDriver().navigate().to(Environment.get("APP_URL")+"/user/logout");
+		 	
+			getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
+			}
+		}
+		else
+			{
+			System.out.println("typeform already selected");
+			By dropDown = By.cssSelector("div[class*='typeform'] input[class*='select-dropdown']");
+			WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 2);
+			
+			if(!wdropDown.getAttribute("value").trim().equalsIgnoreCase(showAfter.trim())) 
+			{
+				ex.executeScript("arguments[0].click();", wdropDown);
+				By locator = By.xpath(".//div[contains(@class, 'typeform')]//ul//li//span[text()='" + showAfter.trim() + "']");
+				//ex.executeScript("arguments[0].click();", getDriver().findElement(locator));
+				wait.until(ExpectedConditions.elementToBeClickable(locator));
+				typeform_summary=getDriver().findElement(locator);
+				typeform_summary.click();
+				ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
+				//ex.executeScript("arguments[0].click();", getDriver().findElement(submit));
+				
+			}
+			
+			getDriver().navigate().to(Environment.get("APP_URL")+"/user/logout");
+			 //	getDriver().navigate().to("https://stg1-am.ticketmaster.com/namautomation/user/logout");
+			//utils.navigateTo("/user/logout");
+			getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
+			
+			}
+	}
 	
 	public void clickInvoices() {
 		click(invoices,"Invoices");
@@ -477,6 +960,61 @@ public class CMS extends BaseUtil {
 		Assert.assertTrue(getText(changePasswordConfirmVerify).contains(changePasswordConfirmPasswordText));
 		Assert.assertTrue(getText(changePasswordSubmitVerify).contains(changePasswordSubmitButtonText));
 	}
+
+	public void enableBulk() {
+		click(ticketmanagement, "TICKET MANAGEMENT");
+		click(ticketoptions, "TICKET OPTIONS");
+		click(bulktoggle,"BULK TOGGLE");
+		click(editsubmit,"SUBMIT changes");
+	}
+
+	public boolean checkBulkEnabled() {
+		try {
+			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.componentConfigData.siteconfig.manage_ticket_configuration.bulk_transfer_enabled");
+			if(value==1)
+				return true;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+
+	public boolean checkQDEnabled() {
+		try {
+			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.componentConfigData.siteconfig.manage_ticket_configuration.donate");
+			if(value==1)
+				return true;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+
+	public void enableQD() {
+		click(donation, "DONATION");
+		click(quickdonation, "Quick Donation");
+		if(!checkIfElementPresent(quickdonationenabled,5))
+			click(quickdonationenablecb,"Quick Donation CB");
+		click(editsubmit,"SUBMIT changes");
+	}
 	
-	
+	public void clickAddPageButton() {
+		click(pagemanager,"Page Manager",5);
+		click(addpage, "Add Page",5);
+		Assert.assertTrue(getDriver().getCurrentUrl().contains("page-manager"));
+	}
+	public void selectHomePageButton() {
+		click(selectbutton,"Select",5);
+		Assert.assertTrue(getText(ticketsalesverification).contains("Ticket Sales"));
+		Assert.assertTrue(getDriver().getCurrentUrl().contains("hybrid_home_page"));
+	}
+
+	public void verifyTicketsSalespage() {
+		Assert.assertTrue(getText(ticketsalestext).contains("Ticket Sales layouts are designed around ticket on-sales including new season tickets"));
+		List<WebElement> element = getDriver().findElements(formpresent);
+		for(int i=1; i<=element.size();i++) {
+	    	  By form = By.xpath("//div[@id='edit-ticket-sales']/div["+i+"]/label//div[2]");	
+	    	  Assert.assertTrue((getText(form, 0)!=""),getText(form, 0));
+	      }
+	}   
 }

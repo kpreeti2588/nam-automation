@@ -3,7 +3,6 @@ package org.iomedia.galen.pages;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Time;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
 import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.Reporting;
 import org.iomedia.framework.WebDriverFactory;
@@ -26,9 +25,8 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
-
-import bsh.commands.dir;
 import io.appium.java_client.AppiumDriver;
+
 
 public class InvoiceNew extends BaseUtil {
 	private String driverType;
@@ -45,7 +43,7 @@ public class InvoiceNew extends BaseUtil {
 	private By firstPlanInvoiceLink = By.xpath("(//li[contains(@class,'list-item')]//span[contains(text(),'Plan')]/../../..)[1]");
 	private By invoiceMsgBox = By.xpath("//*[contains(@class,'invoice-msgBox')]");
 	private By invoiceList = By.xpath(".//div[contains(@class, 'invoiceListing')]//li[starts-with(@class, 'list-item')]");
-	
+
 	private By addOnContinue = By.xpath("//*[contains(@class,'invoiceAdd')]//button[@type='button']");
 	private By headerAmount = By.cssSelector(".react-root-dashboard-header div div div div:last-child span");
 	//private By headerAmount = By.cssSelector(".react-root-dashboard-header div div div:last-child span");
@@ -90,7 +88,7 @@ public class InvoiceNew extends BaseUtil {
 	private By payOther = By.xpath("//ul[contains(@class,'value')]//li[contains(text(),'ther')]");
 	private By payFull = By.xpath("//ul[contains(@class,'value')]//li[contains(text(),'ull')]");
 	private By amountInputPaymentSection = By.xpath("//input[contains(@name,'payment.cardDetail')]");
-	private By firstAmountInputPaymentSection = By.xpath("(//input[contains(@name,'payment.cardDetail')])[1]");
+	private By firstAmountInputPaymentSection = By.xpath("(//input[contains(@name,'payment.cardDetail')])[1] | //input[contains(@name,'payment.cardDetail')]");
 	private By amountDueInvoicePaymentSection = By.xpath("//div[contains(@class,'amountTablePaymentOption')]//div[contains(@class,'amountDue')]//span");
 	private By payTodayAmountPaymentSection = By.xpath("//div[contains(@class,'PaymentOption')]//div[contains(@class,'payTodayAmount')]//span");
 	private By continuePlan = By.xpath(".//*[contains(@class, 'accordionPayment')]//button[text()='CONTINUE' or text()='Continue']");
@@ -117,7 +115,8 @@ public class InvoiceNew extends BaseUtil {
 	private By saveButton = By.xpath("//button[text()='SAVE'] | //button[text()='Save']");
 	private By Qty = By.xpath("//div[contains(@class,'invoice-perticular')]//div[contains(text(),'QTY')]");
 	private By termsHeader = By.xpath("//div[contains(@class,'termsHeader')]");
-	private By termsLink = By.xpath("//div[@data-react-toolbox='check']/../..//a");
+	//private By termsLink = By.xpath("//div[@data-react-toolbox='check']/../..//a");
+	private By termsLink = By.xpath("//div[@data-react-toolbox='check']/../../p/a");
 	private By confirmPay = By.xpath("//button[text()='CONFIRM'] | //button[text()='Confirm']");
 	private By savedCardList = By.cssSelector("span[class*='invoice-bankCardLabelText']");
 
@@ -127,6 +126,7 @@ public class InvoiceNew extends BaseUtil {
 	private By continueAddNewCard = By.xpath("//button[contains(@class,'invoice_addCardContinue')]");
 
 	private By saveToAccount = By.xpath("(//div[@data-react-toolbox='check'])[1]");
+	private By billingaddress = By.xpath("(//div[@data-react-toolbox='check'])[2]");
 	private By paymentPlanOption = By.xpath("(//div[contains(@class,'paymentPlanDropDown') ]//li[not(contains(text(),'Pay In Full') or contains(text(),'Pay Other'))])[2]");
 	private By removeButton = By.xpath("(//button[text()='Remove' or text()='REMOVE'])");
 	private By addButton = By.xpath("(//button[text()='Add' or text()='ADD'])[1]");
@@ -140,7 +140,7 @@ public class InvoiceNew extends BaseUtil {
 
 	private By oopsErrorMessage = By.xpath("//p[contains(@class,'reviewTitleError') and contains(text(),'Oops')]");
 	private By reloadButton = By.xpath("//button[contains(text(),'Reload')]");		
-	
+
 	private By summaryTitle = By.xpath("//*[contains(@class,'Summary')]//span[contains(@class,'header')]");
 	private By paymentTitle = By.xpath("//*[contains(@class,'Payment')]//span[contains(@class,'header')]");
 	private By reviewTitle = By.xpath("//*[contains(@class,'Review')]//span[contains(@class,'header')]");
@@ -148,24 +148,30 @@ public class InvoiceNew extends BaseUtil {
 	private By subtotalTitle = By.xpath("(//div[contains(@class,'amountTable-')]//div//div)[1]"); 
 	private By fieldTitle = By.xpath("(//div[contains(@class,'amountTable-')]//div[2]//div)[1]"); 
 	private By summaryTextSummary = By.xpath("//*[contains(@class,'renderHtmlWrapper')]");
-	
+
 	private By fieldTitlePayment = By.xpath("(//*[contains(@class,'amountTablePaymentOption')]//div//div)[3]");
 	private By amountDueTitlePayment = By.xpath("//div[contains(@class,'payment')]//*[contains(@class,'amountDue')]//div[1]");
 	private By payTodayPaymentTitle = By.xpath("//div[contains(@class,'payment')]//*[contains(@class,'payToday')]//div[1]");
-	
+
 	private By subtotalTitleReview = By.xpath("(//div[contains(@class,'reviewTableContainer')]//div[contains(@class,'amount')]//div[1]//div//div)[1]"); 
 	private By fieldTitlePaymentReview = By.xpath("(//div[contains(@class,'reviewTableContainer')]//div[contains(@class,'amount')]//div[1]//div//div)[3]");
 	private By amountDueTitlePaymentReview = By.xpath("(//div[contains(@class,'reviewTableContainer')]//div[contains(@class,'amount')]//div[1]//div//div)[5]");
 	private By payTodayPaymentTitleReview = By.xpath("(//div[contains(@class,'reviewTableContainer')]//div[contains(@class,'amount')]//div[1]//div//div)[7]");
 	private By SummaryLabelText = By.cssSelector("h2[class*='invoice-accordionTitle']");
-	private By SummaryHeaderText = By.xpath("//span[contains(@class,'invoice-headerlabelText')]");
 	private By PrintbuttonText = By.cssSelector("button[class*='invoice-printButton']");
-
+	private By EmailbuttonText = By.cssSelector("button[class*='invoice-emailButton']");
 	private By InvoicePlaceholder = By.cssSelector("div[class*=invoice-placeholder] div div div p");
-	
-	
+	//---------------------------------------Edit Payment method----------------------
+	public By editpaymentmethoddesktop= By.xpath("//button[contains(@class,'invoice_paymentEditPayment')]//span[contains(@class,'invoice-isDesktop') and text()='Edit Payment Method']");
+	public By editpaymentmethodmobile = By.xpath("//button[contains(@class,'invoice_paymentEditPayment')]//span[contains(@class,'invoice-isMobile') and text()='Edit']");
+	public By selectpaymentpopup =By.xpath("//div[contains(@class,'theme-dialog')]/section/h6");
+	public By addnewcardbutton = By.xpath("//div[contains(@class,'invoice-paymentType')]");
+	public By activeinvoice= By.xpath("//div[contains(@class,'invoice-cardInfo')]//p/span[2]");
+	public By activecvv =By.xpath("//input[@type='password' and @value='']");
+	public By cancelbutton = By.xpath("//button[contains(@class,'addCardCancel')]");
+
 	//---------------------------------------Upsells----------------------
-	
+
 	private By eventName = By.xpath("//div[contains(@class, 'nameOnly')]");
 	private By eventDropDown = By.xpath("//div[contains(@class, 'eventNameDrop')]//div[contains(@class,'field')]");
 	private By eventDropDownValues = By.xpath("//ul[contains(@class,'values')]//li//div[contains(@class,'eventName')]");
@@ -180,12 +186,12 @@ public class InvoiceNew extends BaseUtil {
 	private By priceCodeDisplayed = By.xpath("//div[contains(@class,'eventDescription')]//h3//div[contains(@class,'eventNameAndAmount')]");
 	private By invoiceTitle = By.xpath("//div[contains(@class,'invoiceDetails')]//div[contains(@class,'invoiceSectionsTitle')]");
 	private By timeLeftAddOn = By.xpath("//*[contains(@class,'accordionAddOns')]//*[contains(@class,'timeLeft')]//span");
-	
-	
+
+
 	String addOnRemoveButton = "(//button[text()='Remove'])";
 	String selectedAddOns = "(//*[contains(@class,'selectedAddOns')])";
-	
-	
+
+
 	//--------------------------------------------------------------------
 
 	String cvv;
@@ -225,25 +231,19 @@ public class InvoiceNew extends BaseUtil {
 		String invoiceNumber = getText(By.xpath("//em[text()='"+invTitle+"']/..//span[contains(@class,'invoiceNumber')]"));
 		return Integer.parseInt(invoiceNumber.substring(invoiceNumber.indexOf("#")+1));
 	}
-	
-	public boolean IsInvoiceSummaryDisplayed() {
+
+	public boolean IsInvoiceButtonDisplayed() {
 		boolean val= false;
-		val =checkElementPresent(SummaryHeaderText, 20);
-		return val;
-	}
-	
-	public boolean IsInvoicePrintButtonDisplayed() {
-		boolean val= false;
-		val = checkElementPresent(PrintbuttonText,30);
-		return val;
+		val = checkIfElementPresent(PrintbuttonText);
+		val = checkIfElementPresent(EmailbuttonText);	
+		return val;	
 	}
 
-	
 	public String getInvoicePlaceholder() {
 		return getText(InvoicePlaceholder);
 	}
 
-	
+
 	public boolean verifyNewCardSaved(String text1, String text2, String text3) {
 		getElementWhenVisible(savedCardList);
 		List<WebElement> savedcards = getWebElementsList(savedCardList);
@@ -256,13 +256,13 @@ public class InvoiceNew extends BaseUtil {
 	}
 
 	// Updated
-	
-	
+
+
 	public String getInvoiceSummaryDueAmt() {
 		getElementWhenInVisible(continueButton);
 		return getText(amountDueSummarySection).replaceAll("[$A-Za-z" + Environment.get("currency") + ",]", "").trim();
 	}
-	
+
 	public String getSummaryTextHeader() {
 		return getText(SummaryLabelText);
 	}
@@ -275,6 +275,7 @@ public class InvoiceNew extends BaseUtil {
 	}
 
 	public void loadInvoice(int invoice) {
+
 		utils.navigateTo("/invoice#/" + invoice + "/1");
 	}
 
@@ -301,7 +302,7 @@ public class InvoiceNew extends BaseUtil {
 
 		return "";
 	}
-	
+
 	public String getSelectedInvoiceBal() {
 		String selectedInvoiceXpath = getXpath(selectedInvoice, "Selected invoice", "", -1);
 		WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//ul/li[1]/span"), "", "Invoice balance");
@@ -330,9 +331,11 @@ public class InvoiceNew extends BaseUtil {
 		} else {
 			if (checkIfElementPresent(selectedInvoice)) {
 				String selectedInvoiceXpath = getXpath(selectedInvoice, "Selected invoice", "", -1);
-				WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath,
-						By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+				//WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath,By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+				WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath,By.xpath("//div[2]//div[1]/span[not(@class='undefined')]"), "", "Invoice balance");
+				System.out.println(selectedInvoiceBalance);
 				String selInvoiceBalance = selectedInvoiceBalance.getText();
+				System.out.println(selInvoiceBalance);
 				try {
 					getElementWhenRefreshed(amountDueSummarySection, "innerHTML", selInvoiceBalance);
 				} catch (Exception ex) {
@@ -353,7 +356,11 @@ public class InvoiceNew extends BaseUtil {
 
 	public void clickTnCLink() throws Exception {
 		scrollingToElementofAPage(termsLink);
-		click(termsLink, "Terms & Conditions", null, By.xpath(".//XCUIElementTypeLink[contains(@name,'Conditions')]"), "Terms & Conditions", false);
+		if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")))) {
+			getDriver().navigate().to(Environment.get("APP_URL")+"/terms/");
+		}else {
+		click(termsLink, "Terms & Conditions", null, By.xpath(".//XCUIElementTypeStaticText[contains(@name,'Conditions')]"), "Terms & Conditions",false);
+		}
 	}
 
 	public void switchWindowContextHandles() {
@@ -409,12 +416,12 @@ public class InvoiceNew extends BaseUtil {
 		getElementWhenPresent(unPaidTab);
 		click(unPaidTab, "Unpaid Tab");
 	}
-	
+
 	public void verifyNoInvoiceMessageUnpaid() {
 		getElementWhenPresent(invoiceMsgBox);
 		Assert.assertTrue(getText(invoiceMsgBox).contains("no invoices"));
 	}
-	
+
 	public void verifyNoInvoiceMessagePaid() {
 		getElementWhenPresent(invoiceMsgBox);
 		Assert.assertTrue(getText(invoiceMsgBox).contains("no paid"));
@@ -422,9 +429,7 @@ public class InvoiceNew extends BaseUtil {
 
 	public void clickPaidTab() {
 		getElementWhenPresent(paidTab);
-
-		click(paidTab, "Paid Tab");
-
+		click(paidTab, "Paid Tab",30);
 		Assert.assertTrue(getAttribute(paidTab, "class").contains("active"), "Paid Tab is active");
 
 	}
@@ -606,11 +611,11 @@ public class InvoiceNew extends BaseUtil {
 	}
 
 	public void clickContinuePopUp() {
-		click(continueButtonPopUp, "Continue Button");
+		click(continueButtonPopUp, "Continue Button",10);
 	}
 
 	public void clickConfirmButton() {
-		click(confirmPay, "Confirm Button");
+		click(confirmPay, "Confirm Button",10);
 	}
 
 	public void amountFieldDisplayed() {
@@ -672,7 +677,7 @@ public class InvoiceNew extends BaseUtil {
 			payToday = getText(payTodayAmountPaymentSection);
 			Assert.assertEquals(amount, Double.parseDouble(payToday.replaceAll("[^0-9.]", "")), "Pay Today in Payment Section and Amount displayed are equal");
 		}
-		
+
 		Assert.assertTrue(getElementWhenClickable(continuePlan).isDisplayed(),
 				"Continue button in Payment Option displayed");
 
@@ -853,29 +858,29 @@ public class InvoiceNew extends BaseUtil {
 
 		if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))) {
 			try 
-				{
-					Assert.assertTrue(getElementWhenPresent(completed).isDisplayed(),"Completed Box displayed. Payment Successfull");
-				}
+			{
+				Assert.assertTrue(getElementWhenPresent(completed).isDisplayed(),"Completed Box displayed. Payment Successfull");
+			}
 			catch(Exception e)
-				{
-					Assert.assertTrue(getElementWhenPresent(oopsErrorMessage).isDisplayed(),"Oops Message displayed, reloading");
-					click(getElementWhenClickable(reloadButton), "Reload Button");
-				}
+			{
+				Assert.assertTrue(getElementWhenPresent(oopsErrorMessage).isDisplayed(),"Oops Message displayed, reloading");
+				click(getElementWhenClickable(reloadButton), "Reload Button");
+			}
 		} else {
 			try 
-				{
-					Assert.assertTrue(getElementWhenPresent(completed).isDisplayed(),"Completed Box displayed. Payment Successfull");
-				}
+			{
+				Assert.assertTrue(getElementWhenPresent(completed).isDisplayed(),"Completed Box displayed. Payment Successfull");
+			}
 			catch(Exception e)
-				{
-					Assert.assertTrue(getElementWhenPresent(oopsErrorMessage).isDisplayed(),"Oops Message displayed, reloading");
-					click(getElementWhenClickable(reloadButton), "Reload Button");
-				}
-		
-		
+			{
+				Assert.assertTrue(getElementWhenPresent(oopsErrorMessage).isDisplayed(),"Oops Message displayed, reloading");
+				click(getElementWhenClickable(reloadButton), "Reload Button");
+			}
+
+
 			System.out.println(Double.parseDouble(previousAccountBalance.replaceAll("[^0-9.]", "")) + " "+ (Double.parseDouble(previousAccountBalance.replaceAll("[^0-9.]", "")) - amount) + " " + amount);
 			System.out.println(getHeaderAmountWhenRefreshed(Double.parseDouble(previousAccountBalance.replaceAll("[^0-9.]", "")) - amount));
-	
+
 		}
 		return amount;
 	}
@@ -887,7 +892,7 @@ public class InvoiceNew extends BaseUtil {
 		getElementWhenRefreshed(headerAmount, "innerHTML", newamt);
 		return getText(headerAmount).replaceAll("[$A-Za-z" + Environment.get("currency") + ",]", "").trim();
 	}
-
+	//fetching amount
 	public void enterAmount(String amountGiven) {
 		getElementWhenClickable(firstAmountInputPaymentSection);
 		String payToday = getText(payTodayAmountPaymentSection);
@@ -898,16 +903,16 @@ public class InvoiceNew extends BaseUtil {
 		}
 		else
 		{
-		Double _payToday = Double.parseDouble(payToday.replaceAll("[^0-9.]", ""));
-		Double _amountDue = Double.parseDouble(amountDue.replaceAll("[^0-9.]", ""));
-		Double _amountGiven = Double.parseDouble(amountGiven.replaceAll("[^0-9.]", ""));
-		if(_payToday > _amountGiven) {
-			amountGiven = String.valueOf(_payToday);
-		} else if(_amountDue < _amountGiven) {
-			amountGiven = String.valueOf(_amountDue);
-		} else {
-			amountGiven = String.valueOf(_amountGiven);
-		}
+			Double _payToday = Double.parseDouble(payToday.replaceAll("[^0-9.]", ""));
+			Double _amountDue = Double.parseDouble(amountDue.replaceAll("[^0-9.]", ""));
+			Double _amountGiven = Double.parseDouble(amountGiven.replaceAll("[^0-9.]", ""));
+			if(_payToday > _amountGiven) {
+				amountGiven = String.valueOf(_payToday);
+			} else if(_amountDue < _amountGiven) {
+				amountGiven = String.valueOf(_amountDue);
+			} else {
+				amountGiven = String.valueOf(_amountGiven);
+			}
 		}
 		amountToCharge = getDriver().findElements(amountInputPaymentSection);
 
@@ -915,6 +920,7 @@ public class InvoiceNew extends BaseUtil {
 			for (int i = 0; i < amountToCharge.size(); i++) {
 				clear(amountToCharge.get(i));
 				type(amountToCharge.get(i), "Enter Partial Amt", Environment.get("currency") + amountGiven, false,By.xpath("(//XCUIElementTypeTextField)[" + (i + 1) + "]"));
+
 			}
 
 			// getElementWhenClickable(amountInputPaymentSection).clear();
@@ -930,7 +936,7 @@ public class InvoiceNew extends BaseUtil {
 		amount = 0;
 		for (int i = 0; i < amountToCharge.size(); i++) {
 			amount = amount + Double.parseDouble(amountToCharge.get(i).getAttribute("value").replaceAll("[^0-9.]", ""));
-			System.out.println("AMOUNTT" + amount);
+			System.out.println("AMOUNTT " + amount);
 		}
 		this.payToday = getText(payTodayAmountPaymentSection);
 	}
@@ -952,7 +958,7 @@ public class InvoiceNew extends BaseUtil {
 
 	public void addNewCard(String saveCard, String gdCardFirstName, String gdCardLastName, String gdCardNum,
 			String gdCardExpiry, String gdZipCode, String gdAddress) throws Exception {
-		click(addNewPaymentButtonSelectPaymentPopUp, "Add New Payment");
+		click(addnewcardbutton, "Add New Payment");
 		getElementWhenClickable(cardNameFirst);
 		clear(getDriver().findElement(cardNameFirst));
 
@@ -982,6 +988,34 @@ public class InvoiceNew extends BaseUtil {
 		}
 	}
 
+	public void addNewCardNegative(String saveCard, String gdCardFirstName, String gdCardLastName, String gdCardNum,
+			String gdCardExpiry) throws Exception {
+		click(addnewcardbutton, "Add New Payment");
+		getElementWhenClickable(cardNameFirst);
+		clear(getDriver().findElement(cardNameFirst));
+
+		type(cardNameFirst, "First Name", gdCardFirstName, true, By.xpath("(//XCUIElementTypeTextField)[2]"));
+		clear(getDriver().findElement(cardNameLast));
+		type(cardNameLast, "Last Name", gdCardLastName, true, By.xpath("(//XCUIElementTypeTextField)[3]"));
+		clear(getDriver().findElement(cardNumber));
+		type(cardNumber, "Card Number", gdCardNum, true, By.xpath("(//XCUIElementTypeSecureTextField)[1]"));
+		clear(getDriver().findElement(cardExpiry));
+		type(cardExpiry, "Card Expiry", gdCardExpiry, true, By.xpath("(//XCUIElementTypeTextField)[4]"));
+
+		click(billingaddress, "Billing Address",2);
+		Assert.assertTrue(getElementWhenPresent(cardNameFirstError).isDisplayed(),
+				"Error message displayed for invalid card first name");
+		Assert.assertTrue(getElementWhenPresent(cardNameLastError).isDisplayed(),
+				"Error message displayed for invalid card last name");
+		Assert.assertTrue(getElementWhenPresent(cardNumberError).isDisplayed(),
+				"Error message displayed for invalid card number");
+		Assert.assertTrue(getElementWhenPresent(cardExpiryError).isDisplayed(),
+				"Error message displayed for invalid expiry");
+        
+		Assert.assertEquals(getAttribute(continueAddNewCard, "disabled"), "true", "verify Continue Button disabled");
+		
+		
+	}
 	public void addWrongNewCard() throws Exception {
 		click(addNewPaymentButtonSelectPaymentPopUp, "Add New Payment");
 		getElementWhenClickable(cardNameFirst);
@@ -1105,12 +1139,12 @@ public class InvoiceNew extends BaseUtil {
 		System.out.println(invAmt);
 		return invAmt;
 	}
-	
+
 	public void getCCQuery(String cookies) throws Exception {
 		Object[] obj = utils.get(Environment.get("APP_URL") + "/api/invoice/cc?_format=json", new String[] { "accept", "accept-encoding", "accept-language", "user-agent", "cookie", "content-type" }, new String[] { "application/json, text/plain, */*", "gzip, deflate, br", "en-GB,en-US;q=0.8,en;q=0.6", "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1", cookies, "application/json" });
 		InputStream is = (InputStream) obj[0];
 		JSONArray jsonArray = utils.convertToJSONArray(new BufferedReader(new InputStreamReader(is, "UTF-8")));
-		
+
 		for(int i = 0; i < jsonArray.length(); i++) {
 			JSONObject creditcard = jsonArray.getJSONObject(i);
 			String dataMask = creditcard.getString("data_mask");
@@ -1122,16 +1156,16 @@ public class InvoiceNew extends BaseUtil {
 			Dictionary.put(dataMask + "_cc_card_uid", creditcard.getString("cc_card_uid"));
 		}
 	}
-	
+
 	public void paymentsPlanInvoiceAPI(int invoiceid, String cookies, String token, String planid, String accountId, String invoicestatus, String[] invoice_conf_ids) throws Exception {
 		String pre = "{\"acct_id\":\"" + accountId + "\",\"invoice_conf_id\":[\"1\", \"2\"],\"credit_card\":";
 		String after = ",\"payment_plan_id\":\"" + planid + "\"}";
-		
+
 		Double _amountGiven = 0.1; 
 		Double _payToday = Double.parseDouble(Dictionary.get("amount_due_today"));
 		Double _amountDue = Double.parseDouble(Dictionary.get(invoicestatus.trim().toUpperCase() + "balances"));
 		String amountGiven;
-		
+
 		if(_payToday > _amountGiven) {
 			amountGiven = String.valueOf(_payToday);
 		} else if(_amountDue < _amountGiven) {
@@ -1139,7 +1173,7 @@ public class InvoiceNew extends BaseUtil {
 		} else {
 			amountGiven = String.valueOf(_amountGiven);
 		}
-		
+
 		JSONArray ja = new JSONArray();
 		int i = 0;
 		JSONObject jo = new JSONObject();
@@ -1237,17 +1271,17 @@ public class InvoiceNew extends BaseUtil {
 		{
 			click(addOnMore, "More");
 		}
-		
+
 		for(int j =0; j<Integer.parseInt(Dictionary.get("TotalUpsell"));j++)
 		{
 			if(Dictionary.get("TotalPriceCodes"+j).equalsIgnoreCase("1"))
 			{
-				
+
 				NumberFormat in=NumberFormat.getCurrencyInstance(Locale.US);
-					double payment = Double.valueOf(Dictionary.get("Price" +j));
-					String newamt = in.format(payment).replace("$", Environment.get("currency"));
-					Assert.assertEquals(getText(getDriver().findElements(priceCodeDisplayed).get(j)), Dictionary.get("UpsellEventName" +j) + newamt);
-				
+				double payment = Double.valueOf(Dictionary.get("Price" +j));
+				String newamt = in.format(payment).replace("$", Environment.get("currency"));
+				Assert.assertEquals(getText(getDriver().findElements(priceCodeDisplayed).get(j)), Dictionary.get("UpsellEventName" +j) + newamt);
+
 			}
 			else
 			{
@@ -1264,7 +1298,7 @@ public class InvoiceNew extends BaseUtil {
 					Assert.assertEquals(getText(allValuesUpsellDropdown.get(i)), Dictionary.get("Description" +j + i) + newamt);
 				}
 				click(allValuesUpsellDropdown.get(0), "Select First Value");
-				
+
 			}
 		}
 	}
@@ -1273,7 +1307,7 @@ public class InvoiceNew extends BaseUtil {
 		int count =0;
 		addOnAmount=0;
 		for(int i=0;i<2;i++)
-			{
+		{
 			if(Dictionary.get("TotalPriceCodes"+i).equalsIgnoreCase("1"))
 			{
 				click(getDriver().findElements(addUpsellButton).get(i), "Add Button "+i);
@@ -1290,7 +1324,7 @@ public class InvoiceNew extends BaseUtil {
 				getElementWhenPresent(By.xpath(addOnRemoveButton+"["+(i+1)+"]"));
 				addOnAmount= addOnAmount+Double.valueOf(Dictionary.get("Price"+i+count));
 			}
-			}
+		}
 		Assert.assertEquals(Double.parseDouble(getText(addOnAmountDue).replaceAll("[^0-9.]", "")), addOnAmount);
 		System.out.println();
 	}
@@ -1325,41 +1359,42 @@ public class InvoiceNew extends BaseUtil {
 			click(getDriver().findElements(addUpsellButton).get(0), "Add Button");
 		}
 	}
-	
+
 	public int drupal(String cookies) throws Exception {
-		
-	 Object[] obj = utils.get(Environment.get("APP_URL") + "/api/invoice/add-ons/5256?_format=json", new String[]{"accept", "accept-encoding", "accept-language", "user-agent", "cookie"}, new String[]{"application/json, text/plain, */*", "utf-8", "en-GB,en-US;q=0.8,en;q=0.6", "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1", cookies});
-	   InputStream is = (InputStream) obj[0];
-	   JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
-	   System.out.println(jsonObject);
-	   int orderExpire =Integer.parseInt(jsonObject.toString().substring(jsonObject.toString().indexOf("order_expire\":")+14,jsonObject.toString().indexOf("order_expire\":")+17));
-	   
-	   return orderExpire;
+
+		Object[] obj = utils.get(Environment.get("APP_URL") + "/api/invoice/add-ons/5256?_format=json", new String[]{"accept", "accept-encoding", "accept-language", "user-agent", "cookie"}, new String[]{"application/json, text/plain, */*", "utf-8", "en-GB,en-US;q=0.8,en;q=0.6", "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1", cookies});
+		InputStream is = (InputStream) obj[0];
+		JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
+		System.out.println(jsonObject);
+		int orderExpire =Integer.parseInt(jsonObject.toString().substring(jsonObject.toString().indexOf("order_expire\":")+14,jsonObject.toString().indexOf("order_expire\":")+17));
+
+		return orderExpire;
 	}
 
 	public void verifyTimer(String timer) throws ParseException {
 		Date d = new SimpleDateFormat("mm:ss").parse(getText(timeLeftAddOn));
 		Calendar calendar1 = Calendar.getInstance();
-	    calendar1.setTime(d);
-	    calendar1.add(Calendar.DATE, 1);
-	    
-	    Date d2 = new SimpleDateFormat("mm").parse(timer);
+		calendar1.setTime(d);
+		calendar1.add(Calendar.DATE, 1);
+
+		Date d2 = new SimpleDateFormat("mm").parse(timer);
 		Calendar calendar2 = Calendar.getInstance();
-	    calendar2.setTime(d2);
-	    calendar2.add(Calendar.DATE, 1);
-	    System.out.println(calendar2.getTime());
-	    
-	    Date d3 = new SimpleDateFormat("mm").parse(String.valueOf(Integer.parseInt(timer)-1));
+		calendar2.setTime(d2);
+		calendar2.add(Calendar.DATE, 1);
+		System.out.println(calendar2.getTime());
+
+		Date d3 = new SimpleDateFormat("mm").parse(String.valueOf(Integer.parseInt(timer)-1));
 		Calendar calendar3 = Calendar.getInstance();
-	    calendar3.setTime(d3);
-	    calendar3.add(Calendar.DATE, 1);
-	    System.out.println(calendar3.getTime());
-	    
-	    Date x = calendar1.getTime();
-	    
-	    Assert.assertTrue(x.after(calendar3.getTime()) && x.before(calendar2.getTime()),"Timer on UI verified from drupal");
+		calendar3.setTime(d3);
+		calendar3.add(Calendar.DATE, 1);
+		System.out.println(calendar3.getTime());
+
+		Date x = calendar1.getTime();
+
+		Assert.assertTrue(x.after(calendar3.getTime()) && x.before(calendar2.getTime()),"Timer on UI verified from drupal");
 	}
-	
+
+
 	public void verifySummaryTab(String summaryText, String summaryInSummary, String subtotal, String field, String amountDue) {
 		Assert.assertTrue(getText(summaryTitle).contains(summaryText));
 		Assert.assertTrue(getText(summaryTextSummary).contains(summaryInSummary));
@@ -1377,7 +1412,7 @@ public class InvoiceNew extends BaseUtil {
 		Assert.assertTrue(getText(amountDueTitlePayment).contains(amountDue.toUpperCase()));
 		Assert.assertTrue(getText(payTodayPaymentTitle).contains(payToday.toUpperCase()));
 	}
-	
+
 	public void addNewCardAndVerifyLabelsCMS(String saveCard, String gdCardFirstName, String gdCardLastName, String gdCardNum,String gdCardExpiry, String gdZipCode, String gdAddress,String zipLabelText,String stateLabelText, String cityLabelText, String lastNameLabelText) throws Exception {
 		click(addNewPaymentButtonSelectPaymentPopUp, "Add New Payment");
 		getElementWhenClickable(cardNameFirst);
@@ -1405,7 +1440,7 @@ public class InvoiceNew extends BaseUtil {
 		Assert.assertTrue(getText(cityLabel).contains(cityLabelText));
 		Assert.assertTrue(getText(stateLabel).contains(stateLabelText));
 		Assert.assertTrue(getText(lastNameLabel).contains(lastNameLabelText));
-		
+
 		type(zipCode, "Zip Code", gdZipCode, true, By.xpath("(//XCUIElementTypeTextField)[8]"));
 		type(address, "Address ", gdAddress, true, By.xpath("(//XCUIElementTypeTextField)[4]"));
 		click(saveButton, "Save");
@@ -1413,7 +1448,7 @@ public class InvoiceNew extends BaseUtil {
 			sync(4000L);
 		}
 	}
-	
+
 	public void verifyReviewTab(String reviewTitleText,String subtotalText, String fieldText, String amountDue,String payToday) {
 		Assert.assertTrue(getText(reviewTitle).contains(reviewTitleText));
 		Assert.assertTrue(getText(subtotalTitleReview).contains(subtotalText.toUpperCase()));
@@ -1422,4 +1457,51 @@ public class InvoiceNew extends BaseUtil {
 		Assert.assertTrue(getText(payTodayPaymentTitleReview).contains(payToday.toUpperCase()));
 	}
 
+	public List<String> verifyEditPaymentMethod() {
+
+		List<WebElement> invoiceactive =getDriver().findElements(By.xpath("//div[contains(@class,'invoice-cardInfo')]//p/span[2]"));	
+		List<String> allinvoiceactive=new ArrayList<>();
+		for(int i=0; i<invoiceactive.size(); i++){
+			allinvoiceactive.add(invoiceactive.get(i).getText());
+		}
+
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS") || driverType.trim().toUpperCase().contains("SAFARI"))) {
+			if(!checkIfElementPresent(editpaymentmethodmobile, 5))
+				throw new SkipException("Skipped");
+			Assert.assertTrue(getText(editpaymentmethodmobile).contains("Edit"));
+			click(editpaymentmethodmobile, "Edit Payment method");
+			Assert.assertTrue(getText(selectpaymentpopup).contains("SELECT PAYMENT METHOD"));
+		}
+		else {
+			if(!checkIfElementPresent(editpaymentmethoddesktop, 5))
+				throw new SkipException("Skipped");
+			Assert.assertTrue(getText(editpaymentmethoddesktop).contains("Edit Payment Method"));
+			click(editpaymentmethoddesktop, "Edit Payment Method");
+			Assert.assertTrue(getText(selectpaymentpopup).contains("SELECT PAYMENT METHOD"));	
+		}
+
+		return allinvoiceactive;	
+	}
+
+	public void verifyCVVandEnter() {
+		getElementWhenClickable(allCVVSelectPaymentPopUp);
+		allCvvField = getDriver().findElements(allCVVSelectPaymentPopUp);
+		for (int i = 0; i < allCvvField.size(); i++) {
+			Assert.assertTrue(allCvvField.get(i).isDisplayed(), "CVV field is displayed");
+		}
+
+	}
+
+	public void clickInactiveCvv() {
+		if(checkIfElementPresent(activecvv, 2)) {
+			click(activecvv, "Inactive CVV",2);
+		}
+		else {
+			//nothing
+		}
+	}
+	
+	public void clickcancelbutton() {
+		click(cancelbutton, "Cancel Button",2);
+	}
 }

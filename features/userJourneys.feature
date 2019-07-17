@@ -509,30 +509,35 @@ Scenario: STP Create Account Buy ticket SSO to NAM Verify ticket flags and Verif
 	Then Verify printTicket or Render Barcode for email %{GD_NEW_EMAIL_ADDRESS} pass %{GD_NEW_PASSWORD} and ticketID %{GD_RenderTicketID} 
 	
 Scenario: Reset Password 
-	And Save "nitin.mussani@ticketmaster.com" into EMAIL_ADDRESS 
-	And Save "iom123" into PASSWORD 
+	And Save "jitendra.roy@ticketmaster.com" into EMAIL_ADDRESS 
+	And Save "jitendra1" into PASSWORD 
 	#And Verify user exist in the site for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} with "mailbox" "passkey"
 	When User click on Forgot Password link 
 	Then Verify Forgot Password page is displayed 
 	When User puts email %{GD_EMAIL_ADDRESS} 
-	And User request for further instruction "mailbox" "passkey" 
+  And User request for further instruction "mailbox" "passkey" 
 	Then Get reset password link from Email "mailbox" "passkey" 
 	When User redirected to link %{GD_Reset_Link} 
 	Then User enters new password using %{GD_PASSWORD} 
 	And Verify password gets changed 
-	Given User is on /account-login Page 
+	#Reset Password link expire after user reset password 
+	When User redirected to link %{GD_Reset_Link} 
+	Then Verify password expires 
+	Given User is on / Page 
 	When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} 
 	Then User logged in successfully 
+	And User logs out from NAM 
+	 
 	
 Scenario: User login after Reset Password Request 
-	And Save "nitin.mussani@ticketmaster.com" into EMAIL_ADDRESS 
-	And Save "iom123" into PASSWORD 
-	#And Verify user exist in the site for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} with "mailbox" "passkey"
-	When User click on Forgot Password link 
-	Then Verify Forgot Password page is displayed 
-	When User puts email %{GD_EMAIL_ADDRESS} 
-	And User request for further instruction "mailbox" "passkey" 
-	And Get reset password link from Email "mailbox" "passkey" 
+	And Save "jitendra.roy@ticketmaster.com" into EMAIL_ADDRESS 
+	And Save "jitendra2" into PASSWORD 
+	##And Verify user exist in the site for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} with "mailbox" "passkey"
+	#When User click on Forgot Password link 
+	#Then Verify Forgot Password page is displayed 
+	#When User puts email %{GD_EMAIL_ADDRESS} 
+	#And User request for further instruction "mailbox" "passkey" 
+	#And Get reset password link from Email "mailbox" "passkey" 
 	Given User is on /account-login Page 
 	When User puts email %{GD_EMAIL_ADDRESS} 
 	And User puts password %{GD_PASSWORD} 
@@ -540,8 +545,8 @@ Scenario: User login after Reset Password Request
 	Then Verify user does not get logged in 
 	
 Scenario: Reset Password link expire after user reset password 
-	And Save "nitin.mussani@ticketmaster.com" into EMAIL_ADDRESS 
-	And Save "iom123" into PASSWORD 
+	And Save "jitendra.roy@ticketmaster.com" into EMAIL_ADDRESS 
+	And Save "jitendra1" into PASSWORD 
 	#And Verify user exist in the site for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD} with "mailbox" "passkey" 
 	When User click on Forgot Password link 
 	Then Verify Forgot Password page is displayed 
@@ -562,8 +567,8 @@ Scenario: Claim ticket after reseting the password
 	And User creates account using ats with events 
 	And Get transfer ticket ID for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD} 
 	And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD} 
-	And Save "nitin.mussani@ticketmaster.com" into EMAIL_ADDRESS 
-	And Save "iom123" into PASSWORD 
+	And Save "jitendra.roy@ticketmaster.com" into EMAIL_ADDRESS 
+	And Save "jitendra1" into PASSWORD 
 	And Send Ticket using %{GD_TransferTicketID} 
 	And User generate TransferId for %{GD_TransferTicketID} 
 	And Customer details are fetched for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}

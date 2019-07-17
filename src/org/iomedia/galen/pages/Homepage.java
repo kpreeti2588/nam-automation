@@ -18,8 +18,6 @@ import java.util.List;
 import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.Assert;
 
-import static java.lang.Boolean.TRUE;
-
 public class Homepage extends BaseUtil {
 
 	private String driverType;
@@ -50,6 +48,7 @@ public class Homepage extends BaseUtil {
 	private By signInReactLink = By.xpath(".//a[@href='/']");
 	private By errorMessage = By.xpath(".//input[@name='email']/..//span[starts-with(@class, 'theme-error')]");
 	private By userMenu = By.xpath("//*[contains(@id,'block-useraccountmenu')]//a");
+	private By mobileUserMenu = By.cssSelector("button span[class='mobusericon']");
 	private By logout = By.xpath("//*[@id='amgr-user-menu']/li/a[contains(@href, 'user/logout')]");
 	private By loginMessage = By.cssSelector("div[class*='notification-notificationBannerText']"); //div[class*='notification-notificationBannerTitle'] ,
 	private By error = By.cssSelector("div[class*='notification-notificationBannerText']");
@@ -182,7 +181,7 @@ public class Homepage extends BaseUtil {
 	}
 
 	public void clickSaveChanges() {
-		click(Savechange,"SAVE CHANGE");
+		click(Savechange,"SAVE CHANGE",30);
 	}
 
 	public String getresetpwdmessage() {
@@ -237,7 +236,7 @@ public class Homepage extends BaseUtil {
 
 	public void clickLogout(){
 		click(userMenu,"UserMenu");
-		click(logout, "Logout");
+		click(logout, "Logout",10);
 	}
 
 	public void clickSignInLink(TestDevice device){
@@ -263,8 +262,8 @@ public class Homepage extends BaseUtil {
 	}
 
 	public void clickSignInReactLink() {
-		if(checkIfElementPresent(signInReactLink))		
-			click(signInReactLink, "Sign in");
+		if(checkIfElementPresent(signInReactLink))
+			click(signInReactLink, "Sign in",10);
 	}
 
 	public void clickForgotPasswordLink(){
@@ -280,6 +279,21 @@ public class Homepage extends BaseUtil {
 		if(driverType.trim().toUpperCase().contains("SAFARI")) {
 			we.clear();
 			we.sendKeys(emailAddress, Keys.TAB);
+			//utils.clearAndSetText(this.emailAddress,emailAddress);
+			//type(we,"sss",emailAddress);
+		} else {
+			type(we, "Email address", emailAddress);
+			we.sendKeys(Keys.TAB);
+		}
+	}
+
+	public void reTypeEmailAddress(String emailAddress) throws Exception{
+		WebElement we = getElementWhenVisible(this.emailAddress);
+		if(driverType.trim().toUpperCase().contains("IOS")) {
+			((JavascriptExecutor) getDriver()).executeScript("$(\"input[name*='email']\").val( '' )");
+			//we.clear();
+			we.sendKeys(emailAddress, Keys.TAB);
+			type(we,"sss","xyz");
 		} else {
 			type(we, "Email address", emailAddress);
 			we.sendKeys(Keys.TAB);
@@ -405,6 +419,12 @@ public class Homepage extends BaseUtil {
 		return checkIfElementPresent(errorMessage, 1);
 	}
 
+	public boolean isDashBoardDisplayed() {
+		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))) {
+			return utils.checkIfElementClickable(mobileUserMenu,10);
+		} else return utils.checkIfElementClickable(userMenu,10);
+	}
+
 	public void clickCancelLink(){
 		click(cancelLink, "Cancel");
 	}
@@ -424,11 +444,11 @@ public class Homepage extends BaseUtil {
 	}
 
 	public void clickRememberMe() {
-		click(rememberCheckbox, "Remember me", 1);
+		click(rememberCheckbox, "Remember me", 10);
 	}
 
 	public void clickSignInButton(){
-		click(submitBtn, "Sign In");
+		click(submitBtn, "Sign In",10);
 	}
 
 	public void login(String emailaddress, String password, TestDevice device, boolean interstitial) throws Exception{
@@ -443,7 +463,8 @@ public class Homepage extends BaseUtil {
 			password = Dictionary.get("PASSWORD").trim();
 		}
 		
-		if(emailaddress.trim().equalsIgnoreCase("") || password.trim().equalsIgnoreCase("") || emailaddress.trim().equalsIgnoreCase("EMPTY") || password.trim().equalsIgnoreCase("EMPTY")) {
+		if(emailaddress.trim().equalsIgnoreCase("") || password.trim().equalsIgnoreCase("") ||
+				emailaddress.trim().equalsIgnoreCase("EMPTY") || password.trim().equalsIgnoreCase("EMPTY")) {
 			throw new SkipException("Please provide valid email address and password");
 		}
 		typeEmailAddress(emailaddress);
@@ -465,13 +486,19 @@ public class Homepage extends BaseUtil {
 		    			clickSignInButton();
 	    			   }
 	    		   }	    	   			
-		}  	
+		} 
+	    if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
+	    	typePassword(password);	
+			//clickRememberMe();
+			clickSignInButton();
+	    }
+	    
 	    else {
 		typePassword(password);	
 		clickRememberMe();
 		clickSignInButton();
 	    }
-		
+	    
 		Hamburger hamburger = new Hamburger(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 //                            if(!driverType.trim().toUpperCase().contains("ANDROID") && !driverType.trim().toUpperCase().contains("IOS")) {
 		try {
@@ -605,9 +632,6 @@ public class Homepage extends BaseUtil {
 		Assert.assertTrue(hamburger.waitforLoggedInPage(device), "Verify user get logged in");
 		Dictionary.put("NEW_EMAIL_ADDRESS", emailaddress);
 		Dictionary.put("NEW_PASSWORD", password);
-		
-		
-		
 //                            if(!driverType.trim().toUpperCase().contains("ANDROID") && !driverType.trim().toUpperCase().contains("IOS")) {
 		try {
 			((JavascriptExecutor) getDriver()).executeScript("$('#doorbell-button').remove()");
@@ -642,13 +666,15 @@ public class Homepage extends BaseUtil {
 		String password = "123456";
 		typeEmailAddress(emailaddress);
 		typePassword(password);
-		click(termsConditionsCheckBox, "Terms & Conditions");
+		//click(termsConditionsCheckBox, "Terms & Conditions");
 		click(submitBtn, "Sign Up");
 		if(Environment.get("tncpop").trim().equalsIgnoreCase("false")) {
 			//Do Nothing
 		} else {
 			try {
-				click(agree, "Agree", null, By.name("AGREE"), "Agree", 10);
+				
+				//click(agree, "Agree", null, By.name("AGREE"), "Agree", 10);
+				click(agree, "Agree",20);
 			} catch(Exception ex) {
 				//Do Nothing
 			}
@@ -656,7 +682,7 @@ public class Homepage extends BaseUtil {
 
 		Hamburger hamburger = new Hamburger(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		Assert.assertTrue(hamburger.waitforLoggedInPage(device), "Verify user get logged in");
-//                            Dictionary.put("NEW_EMAIL_ADDRESS", emailaddress);
+//                      Dictionary.put("NEW_EMAIL_ADDRESS", emailaddress);
 		Dictionary.put("NEW_PASSWORD", password);
 //                            if(!driverType.trim().toUpperCase().contains("ANDROID") && !driverType.trim().toUpperCase().contains("IOS")) {
 		try {
@@ -693,5 +719,22 @@ public class Homepage extends BaseUtil {
 	public void redirect(String link) {
 		getDriver().navigate().to(link);
 	}
+	
+	public void popUpEventsComingUp() {
+		if (utils.checkIfElementClickable(popUpEventsComingUpWeb, 10)) {
+
+			if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
+				getElementWhenClickable(popUpEventsComingUpWeb,30);
+				click(popUpEventsComingUpWeb, "Events Coming Up",30);
+			}else
+			{
+				getElementWhenClickable(popUpEventsComingUpWeb,30);
+				click(popUpEventsComingUpWeb, "Events Coming Up",30);
+			}
+		}else {
+
+		}
+	}
+
 
 }

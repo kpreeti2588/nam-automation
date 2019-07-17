@@ -45,7 +45,7 @@ public class Invoices extends Driver{
 		header = new DashboardHeader(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		dashboardSection = new DashboardSection(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert);
 		homepage = new Homepage(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
-		invoice = new Invoice(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+		invoice = new Invoice(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);;
 		utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		manageticketsapi = new ManageticketsAPI(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		hamburger = new Hamburger(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
@@ -1473,6 +1473,17 @@ public class Invoices extends Driver{
 	
 	@Test(groups = { "smoke", "regression", "invoiceNew" }, enabled = false)
 	public void upSellPaymentPlan() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+	@Test(groups = { "smoke", "regression", "invoiceNew" })
+	public void updateCreditCardInfo() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+
+	@Test(groups = { "smoke", "regression", "invoiceNew" })
+	public void updateCreditCardInfoinvalid() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 }

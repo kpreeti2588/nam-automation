@@ -2,7 +2,8 @@
 @script my-rules.js
 
 @objects
-    client-logo    .navbar-brand-logo:first-child
+    client-logo  .navbar-brand-logo:first-child
+    client-logo-mobile  .navbar-brand-logo:nth-child(2)
     header      .container > .navbar-header
     container   .container
     hamburger   button.navbar-toggle
@@ -83,7 +84,7 @@
             inside screen ${tabletMargin} right
             
 = Client-Logo =
-    @on *
+    @on laptop, desktop, tablet, mini-tablet
         client-logo:
             height 1 to 40 px
             centered vertically inside header ~10 px
@@ -105,8 +106,10 @@
             inside screen ~44.5% of screen/width left
 
     @on mobile
-        client-logo:
+       client-logo-mobile:
             inside screen ~38.9% of screen/width left
+            height 1 to 40 px
+            centered vertically inside header ~10 px
             
 = Hamburger =
     @on laptop, desktop, tablet

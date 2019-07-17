@@ -13,7 +13,7 @@ public class CAMSteps {
 	org.iomedia.framework.Assert Assert;
 	BaseUtil base;
 	CAM cam;
-	
+
 	public CAMSteps(DashboardHeader header, org.iomedia.framework.Assert Assert, BaseUtil base, CAM cam) {
 		this.header = header;
 		this.Assert = Assert;
@@ -22,7 +22,14 @@ public class CAMSteps {
 	}
 	
 	@Then("^Classic AMGR is displayed with correct (.+) and (.+)$")
-	public void classic_amgr_is_displayed_with_correct_and(String accountName, String accountId) {
+	public void classic_amgr_is_displayed_with_correct_and(String accountName, String accountId)  {
+		
+		if(cam.isAlertPresent()) {
+			base.checkAlert("decline");
+			base.getDriver().navigate().refresh();
+		}else {
+			//nothing
+		}
 		accountName = (String) base.getGDValue(accountName);
 		accountId = (String) base.getGDValue(accountId);
 		Assert.assertEquals(header.getAMGRaccntName(), accountName , "Account Name is matching. SSO is successful");

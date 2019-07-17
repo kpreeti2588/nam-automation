@@ -1,7 +1,6 @@
 package org.iomedia.galen.tests;
 
 import org.iomedia.framework.Driver;
-
 import org.iomedia.galen.pages.AddNewPage;
 import org.iomedia.galen.pages.AdminLogin;
 import org.iomedia.galen.pages.ContentPageEdit;
@@ -9,9 +8,7 @@ import org.iomedia.galen.pages.HomePageEdit;
 import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.pages.Homepage;
 import org.iomedia.galen.pages.SuperAdminPanel;
-import org.iomedia.galen.steps.AdminPanelSteps;
 import org.openqa.selenium.JavascriptExecutor;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -27,9 +24,11 @@ public class CMS extends Driver {
 	private HomePageEdit homePageEdit;
 	private Utils utils;
 	private AdminLogin adminLogin;
+	
 	String username;
 	String password;
 	
+
 	@BeforeMethod(alwaysRun=true)
 	public void init() throws Exception	{
 		homepage = new Homepage(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
@@ -39,18 +38,16 @@ public class CMS extends Driver {
 		homePageEdit = new HomePageEdit(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert);
 		utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		
-		
-		
 		if(Dictionary.get("cmsUserName").trim().equalsIgnoreCase(""))
 		{
 		adminLogin = new AdminLogin(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		adminLogin.adminLogin();
-		utils.navigateTo("/user/2/edit?destination=/namautomation/en/admin/people%3Fuser%3Dsiteadmin%26role%3DAll%26permission%3DAll%26status%3DAll");
-		adminLogin.changePasswordOfSiteAdminUser();
+		utils.navigateTo("/admin/people");
+	    adminLogin.createAdduserCMS();
 		utils.navigateTo("/user/logout");
-		Dictionary.put("cmsUserName", "siteadmin");
+		Dictionary.put("cmsUserName", "automationsuport4");
 		Dictionary.put("cmsPassword", "123456");
-			username = "siteadmin";
+			username = "automationsuport4";
 			password = "123456";
 		}
 	}
@@ -107,7 +104,7 @@ public class CMS extends Driver {
 	}
 
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifyFirstpromotilesBuyTicketsForPublicUsers(){
+	public void verifyFirstpromotilesBuyTicketsForPublicUsers() throws InterruptedException{
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.viewPromoTiles();
@@ -185,7 +182,7 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifySecondpromotilesForPublicUsers(){
+	public void verifySecondpromotilesForPublicUsers() throws InterruptedException{
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.viewPromoTiles();
@@ -209,7 +206,7 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifyThirdpromotilesBuyTicketsForPublicUsers(){
+	public void verifyThirdpromotilesBuyTicketsForPublicUsers() throws InterruptedException{
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.viewPromoTiles();
@@ -260,7 +257,7 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifyFourthPromotilesForPublicUsers(){
+	public void verifyFourthPromotilesForPublicUsers() throws InterruptedException{
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.viewPromoTiles();
@@ -377,7 +374,7 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifyHomepagePageSettings() {
+	public void verifyHomepagePageSettings() throws InterruptedException {
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.getType();
@@ -392,7 +389,7 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression","cmsFunctional"})
-	public void verifyCKEditor() {
+	public void verifyCKEditor() throws InterruptedException {
 		load("/user/login");
 		superAdminPanel.login(username,password);
 		superAdminPanel.loggedInEdit();
@@ -467,7 +464,15 @@ public class CMS extends Driver {
 	}
 	
 	@Test(groups={"smoke","regression", "cmsFunctional"})
+	public void verifycmsdashboardconfiguration() throws Throwable{
+		runScenario(Dictionary.get("SCENARIO"));
+	}
 	public void editInvoiceInCms() throws Throwable{
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+	@Test(groups={"smoke","regression", "cmsFunctional"})
+	public void verifyTicketSalesPage() throws Throwable{
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 	

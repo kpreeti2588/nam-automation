@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+
 import org.iomedia.framework.Reporting;
 import org.iomedia.framework.WebDriverFactory;
 
@@ -17,7 +19,6 @@ public class TypeformPage extends BaseUtil {
 		super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		driver = driverFactory.getDriver().get();
 	}
-	
 	public boolean enableTypeForm() {
 		String url = Environment.get("APP_URL").trim();
 		String userName = System.getProperty("adminUserName") != null && !System.getProperty("adminUserName").trim().equalsIgnoreCase("") ? System.getProperty("adminUserName").trim() : Environment.get("adminUserName").trim();
@@ -101,9 +102,11 @@ public class TypeformPage extends BaseUtil {
 	}
 	
 	public void selectTypeform(WebDriver driver, String url, String userName, String password, String showAfter, boolean allowMultipleSubmission) {
+		
 		driver.navigate().to(url + "/user/login");
 		driver.findElement(By.id("edit-name")).sendKeys(userName);
 		driver.findElement(By.id("edit-pass")).sendKeys(password);
+		
 		JavascriptExecutor ex = (JavascriptExecutor)driver;
 		ex.executeScript("arguments[0].click();", driver.findElement(By.id("edit-submit")));
 		try {
@@ -114,7 +117,7 @@ public class TypeformPage extends BaseUtil {
 			
 			By questionsTab = By.xpath(".//span[text()='QUESTIONS']");
 			By embedTypeform = By.xpath(".//*[@id='openPopup']/span[text()='EMBED TYPEFORM'] | .//*[@id='openPopup']/span[text()='SELECT TYPEFORM']");
-			
+			//
 			ex.executeScript("arguments[0].click();", driver.findElement(questionsTab));
 			
 			if(checkIfElementPresent(embedTypeform)) {

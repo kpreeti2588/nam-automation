@@ -51,7 +51,7 @@ Feature: CMS
     And Click on Homepage Sign In Gear and Enter Details
     And Click on Claim Sign In Gear and Enter Details
     And Click on Change Password Gear and Enter Details
-    And User navigates to "/user/logout" from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     And Verify the Home Page Labels - Create, Sign in and Forgot
     Then User navigates to "/invoice" from NAM
     And Verify the Interstitial Labels - Create, Sign in and Forgot
@@ -68,3 +68,27 @@ Feature: CMS
     And User navigates to "/invites/%{GD_TransferID}" from NAM
     When User verify congratulation message
     Then Verify the Claim Labels - Create, Sign in and Forgot
+
+  Scenario: Customise Dashboard Config and verify on front-end
+    And User navigates to /user/login from NAM
+    When User login into CMS
+    And Click on Settings - View Dashboard config
+    And Enter Welcome, Account ID, Client Name, Manage Ticket, Ticket Total, Account Balance, Outstanding Invoices Label under Manage Ticket Dashboard Header
+    And Enter Ticket Label under Manage Tickets
+    And Enter Invoice Label under Manage Invoices
+    And Enter Quick Link Label under Manage Quick Links
+    And Click on Dashboard Config Save Button
+    #Then User logout from cms
+    And User navigates to "/user/logout" from NAM
+    And User navigates to / from NAM
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User verifies Customise Dashboard Config and verify on front-end
+    And User navigates to "/user/logout" from NAM
+
+  Scenario: Verify Add page section under page manager in cms
+    And User navigates to /user/login from NAM
+    When User login into CMS
+    Then user click on Add Page button
+    And user select page type under add new page section
+    Then user verify Ticket Sales page
+    And User navigates to "/user/LOGOUT" from NAM

@@ -19,6 +19,7 @@ public class EncryptDecrypt {
         chiper.init(Cipher.ENCRYPT_MODE, key);
         byte[] encVal = chiper.doFinal(plainText.getBytes());
         String encryptedValue = new BASE64Encoder().encode(encVal);
+        System.out.println(encryptedValue);
         return encryptedValue;
     }
 
@@ -40,4 +41,7 @@ public class EncryptDecrypt {
         Key key = new SecretKeySpec(keyValue, algorithm);
         return key;
     }
+
+	
+   
 }

@@ -1,8 +1,6 @@
 package org.iomedia.galen.pages;
 
-import io.appium.java_client.ios.IOSDriver;
 import org.iomedia.framework.Reporting;
-import org.iomedia.framework.SoftAssert;
 import org.iomedia.framework.WebDriverFactory;
 import org.iomedia.galen.common.ManageticketsAAPI;
 import org.json.JSONObject;
@@ -36,7 +34,7 @@ public class TicketsNew extends BaseUtil {
 	private By recipientLastName = By.xpath("//*[@name='last_name']");
 	private By recipientEmail = By.xpath("//*[@name='email']");
 	private By recipientMessage = By.xpath("//*[@name='message']");
-	private By sendButton = By.cssSelector("div[class*=bulkTransferActionBar] button:nth-child(2)");
+	private By sendButton = By.cssSelector("div[class*= formSubmitButtons] button:nth-child(2),div[class*= style-bulkTransferActionBar] button:nth-child(2)");
 	private By recipientEmailAddressDisplayed = By.xpath("//*[contains(@class,'sentInfo')]//strong");
 	private By doneButton = By.xpath("//div[contains(@class,'formSubmitButton')]//button");
 	private By sendExpire = By.xpath("//*[contains(@class,'sentInfo')]//u");
@@ -56,7 +54,7 @@ public class TicketsNew extends BaseUtil {
 	private By allEventsBulkTransfer = By.xpath("//*[contains(@class,'eventInfo')]//h3");
 	private By bulkTransferCheckbox = By.xpath("//*[contains(@class,'multiSelectIcon')]");
 	//private By sendTicket = By.xpath("//*[contains(@class,'sendButton')]/button")|//button[contains(@class,'send_recipientContinue') and @type='submit'];
-	private By sendTicket =By.cssSelector("div[class*='manage-tickets-sendDonateButtons'] button,[class*='manage-tickets-formSubmitButtons'] button:nth-child(2)");
+	private By sendTicket =By.cssSelector("div[class*='manage-tickets-sendDonateButtons'] button,[class*='manage-tickets-formSubmitButtons'] button:nth-child(2),[class*='style-sendButton'] button");
 	private By selectAllBulkTransfer = By.xpath("//*[contains(text(),'Select')]");
 	private By allEventCheckboxBulkTransfer = By.xpath("//*[contains(@class,'eventCheckbox')]//div[contains(@class,'check')]");
 	private By allSectionLables = By.xpath("//*[contains(@class,'sectionTitle')]//span[contains(@class,'titleInner')]");
@@ -124,6 +122,7 @@ public class TicketsNew extends BaseUtil {
 	private By selectAll = By.cssSelector("label[class*='selectAll'] span");
 	private By eventNameSelectTicket = By.cssSelector("div[class*='style-eventTile'] div[class*='style-eventDetails'] div[class*='style-eventDetailsInner'] h3");
 	private By eventDateTimeSelectTicket = By.cssSelector("div[class*='style-eventTile'] div[class*='style-eventDetails'] div[class*='style-eventDetailsInner'] p");
+	private By sameParkingYesButton = By.cssSelector("div[class*='bulkTransferActionBar'] button:nth-child(2)");
 
 	Utils utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 
@@ -220,6 +219,7 @@ public class TicketsNew extends BaseUtil {
 		type(recipientMessage, "Optional", optionalMessage);
 		Assert.assertEquals(getAttribute(sendButton, "disabled"), "true",
 				"verify Continue Button disabled before selecting payment option");
+		
 
 	}
 
@@ -281,18 +281,18 @@ public class TicketsNew extends BaseUtil {
 		String secondTicketBackHeader = x2 + "/.." + ticketDetailBackHeader;
 
 		try {
-			click(By.xpath(x1 + ticketDetail), "First Ticket Detail", 1);
+			click(By.xpath(x1 + ticketDetail), "First Ticket Detail", 5);
 		} catch (Exception e) {
-			click(By.xpath(x1 + ticketDetail2), "First Ticket detail", 1);
+			click(By.xpath(x1 + ticketDetail2), "First Ticket detail", 5);
 		}
 
 		getElementWhenVisible(By.xpath(firstTicketBackHeader));
 		Assert.assertTrue(checkIfElementPresent(By.xpath(firstTicketBackHeader)));
 
 		try {
-			click(By.xpath(x2 + ticketDetail), "Second Ticket Detail", 1);
+			click(By.xpath(x2 + ticketDetail), "Second Ticket Detail", 5);
 		} catch (Exception e) {
-			click(By.xpath(x2 + ticketDetail2), "Second Ticket Detail", 1);
+			click(By.xpath(x2 + ticketDetail2), "Second Ticket Detail", 5);
 		}
 
 		getElementWhenVisible(By.xpath(secondTicketBackHeader));
@@ -300,6 +300,7 @@ public class TicketsNew extends BaseUtil {
 
 		try {
 			WebElement we = getElementWhenClickable(By.xpath(firstTicketBackHeader));
+			sync(200l);
 			we.click();
 			Assert.assertFalse(true, "Previous ticket not closed");
 		} catch (Exception ex) {
@@ -375,7 +376,7 @@ public class TicketsNew extends BaseUtil {
 		if (sectionLabel.trim().equalsIgnoreCase("[S]")) {
 			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
 		} else
-			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section + "'] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
+			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section + "'] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/.. | .//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section +"'] and descendant::strong[text()='" + Seat + "']]/..");
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
 			getElementWhenVisible(mobiletickets);
 			List<WebElement> tickets = getWebElementsList(noofmobiletickets);
@@ -384,7 +385,7 @@ public class TicketsNew extends BaseUtil {
 			if (sectionLabel.trim().equalsIgnoreCase("[S]")) {
 				xpath = By.xpath("(" + getXpath(activeMobileTicket, "Mobile ticket", "", -1) + ")" + "//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
 			} else
-				xpath = By.xpath("(" + getXpath(activeMobileTicket, "Mobile ticket", "", -1) + ")" + "//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section + "'] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
+				xpath = By.xpath("(" + getXpath(activeMobileTicket, "Mobile ticket", "", -1) + ")" + "//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section + "'] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/.. | (" + getXpath(activeMobileTicket, "Mobile ticket", "", -1) + ")" + "//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Section + "']  and descendant::strong[text()='" + Seat + "']]/..");
 			
 			int i = 0;
 			Object[] coords = null;
@@ -393,6 +394,7 @@ public class TicketsNew extends BaseUtil {
 					if (driverType.trim().toUpperCase().contains("ANDROID") && i == 0) {
 						coords = getCoordinates(By.xpath(".//android.view.View[@resource-id='block-componentblockformanageticket']/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[not(@content-desc='') and @index='" + i + "'] | .//android.view.View[@resource-id='block-componentblockformanageticket']/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[@index='" + i + "']"));
 					}
+					
 					swipe(By.xpath(".//div[contains(@class, 'react-root-event')]//div[contains(@class, 'ticket-eventListContainerMobile')]//div[contains(@class, 'slick-list')]//div[contains(@class, 'slick-slide') and @data-index='" + i + "']"), "Left", coords);
 				}
 				i++;
@@ -422,7 +424,7 @@ public class TicketsNew extends BaseUtil {
 		if (sectionLabel.trim().equalsIgnoreCase("[S]")) {
 			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
 		} else
-			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[contains(text(),'" + Section + "')] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/..");
+			xpath = By.xpath(".//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[contains(text(),'" + Section + "')] and descendant::strong[text()='" + Row + "'] and descendant::strong[text()='" + Seat + "']]/.. | .//div[contains(@class, 'react-root-event')]//ul//li[contains(@class, 'list-item')]//div[contains(@class, 'ticket-ticketDetails') and descendant::strong[contains(text(),'" + Section +"')] and descendant::strong[text()='" + Seat +"']]/.. ");
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
 			getElementWhenVisible(mobiletickets);
 			List<WebElement> tickets = getWebElementsList(noofmobiletickets);
@@ -445,7 +447,8 @@ public class TicketsNew extends BaseUtil {
 				i++;
 			}
 		}
-		getElementWhenVisible(xpath);
+		//getElementWhenVisible(xpath);
+		getElementWhenClickable(xpath, 2);
 		return getXpath(xpath, "Ticket", "", -1);
 	}
 	
@@ -555,10 +558,14 @@ public class TicketsNew extends BaseUtil {
 	}
 
 	public void selectEventByName(String name) {
-		if(checkIfElementPresent(viewAllButton)){
-			click(viewAllButton,"VIEW ALL");
+		if (checkIfElementPresent(viewAllButton)) {
+			click(viewAllButton, "VIEW ALL");
 		}
-		click(By.xpath("//div[contains(@class, 'style-eventName') and text()='"+name+"']"),"Event Name");
+		if (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
+			click(By.xpath("//div[contains(@class, 'style-eventName') and text()='" + name + "']"), "Event");
+		} else {
+			click(By.xpath("//div[contains(@class, 'style-eventName') and text()='" + name + "']"), "Event Name");
+		}
 	}
 
 	public void clickTransfer() {
@@ -571,7 +578,6 @@ public class TicketsNew extends BaseUtil {
 		if(checkIfElementPresent(sendButton,7)){
 			click(sendButton,"SEND BUTTON");
 		}
-
 	}
 
 	
@@ -844,14 +850,17 @@ public class TicketsNew extends BaseUtil {
 		Assert.assertTrue(checkIfElementPresent(bulkmodel, 10));
 		Assert.assertTrue(en.contains(getText(eventNameSelectTicket)));
 		String [] date = ed.split(" ");
-		Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[0]),"Day does not match");
-		Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[1]),"Month does not match");
-		Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[2]),"Date does not match");
-		Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[5]),"Year does not match");
+		//Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[0]),"Day does not match");
+		//Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[1]),"Month does not match");
+		//Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[2]),"Date does not match");
+		//Assert.assertTrue(getText(eventDateTimeSelectTicket).contains(date[5]),"Year does not match");
 	}
 
 	public void verifyModelTwoEvents(String en, String ed, String et) {
 		Assert.assertTrue(checkIfElementPresent(bulkmodel, 10));
+		if(utils.checkIfElementClickable(sameParkingYesButton,5)) {
+			click(sameParkingYesButton, "Transfer same seat(s) and/or parking ticket(s) for all selected events?");
+		}
 	}
 
 
@@ -917,8 +926,8 @@ public class TicketsNew extends BaseUtil {
 		int flag =0;
 		selectAll=By.xpath("//div[contains(@class,'style-eventDetails')]/div/h3[contains(.,'"+eventname+"')]/ancestor::div[contains(@class,'style-eventContainer')]/div[contains(@class,'style-eventSections')]/div[contains(@class,'eventSectionItem')]/div[contains(@class,'sectionData')]/label[contains(@class,'selectAll')]/span");
 		By sectionDD= By.xpath("//div[contains(@class,'style-eventDetails')]/div/h3[contains(.,'"+eventname+"')]/ancestor::div[contains(@class,'style-eventContainer')]/div[contains(@class,'style-eventSections')]/div/h3/span[contains(.,'"+section+"')]");
-		if(checkIfElementPresent(sectionDD,10)){
-			click(sectionDD,"Section Drop Down");
+		if(utils.checkIfElementClickable(sectionDD,10)){
+			click(sectionDD,"Section Drop Down",5);
 			selectAll = By.xpath("//div[contains(@class,'style-eventDetails')]/div/h3[contains(.,'"+eventname+"')]/ancestor::div[contains(@class,'style-eventContainer')]/div[contains(@class,'style-eventSections')]/div[contains(@class,'eventSectionItem')]/h3/span[contains(.,'"+section+"')]/ancestor::div[contains(@class,'eventSectionItem')]/div[contains(@class,'style-sectionData')]/label[contains(@class,'selectAll')]/span");
 			flag=1;
 		}
@@ -971,14 +980,32 @@ public class TicketsNew extends BaseUtil {
 		if (utils.getElementWhenVisible(addReceipient)!=null) {
 			click(addReceipient, "Add Receipient");
 		}
-		try {
-			type(fnameinput,"FNAME", fname);
-			type(lnameinput,"LNAME", lname);
-			type(emailinput,"EMAIL", email);
-			type(noteinput,"NOTES", notes);
-			click(nextbutton,"TRANSFER");
-		} catch (Exception e) {
-			e.printStackTrace();
+		if ((driverType.trim().toUpperCase().contains("IOS"))) {
+			try {
+				type(fnameinput, "First Name", fname, true, By.xpath("(//XCUIElementTypeTextField)[1]"));
+				type(lnameinput, "Last Name", lname, true, By.xpath("(//XCUIElementTypeTextField)[2]"));
+				type(emailinput, "Email", email, true, By.xpath("(//XCUIElementTypeTextField)[3]"));
+				type(noteinput, "NOTES", notes, true, By.xpath("(//XCUIElementTypeTextView)"));
+				click(nextbutton, "TRANSFER");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+
+			try {
+				click(fnameinput, "FNAME");
+				type(fnameinput, "FNAME", fname);
+				click(lnameinput, "LNAME");
+				type(lnameinput, "LNAME", lname);
+				click(emailinput, "EMAIL");
+				type(emailinput, "EMAIL", email);
+				sendKeys(emailinput, Keys.TAB);
+				click(noteinput, "NOTES");
+				type(noteinput, "NOTES", notes);
+				click(nextbutton, "TRANSFER");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -1016,16 +1043,17 @@ public class TicketsNew extends BaseUtil {
 		Assert.assertEquals(getText(transferCompleteModel), "TRANSFER - COMPLETE");
 		Assert.assertTrue(getText(thankyouTitle).contains("Success"), "Tickets transferred");
 		Assert.assertTrue(getText(inviteDetail).contains("If you’d like to cancel this transfer - you can do so, just as long as"));
-		click(bulkTransferDoneButton,"Clicked Done on Bulk Transfer complete dialogue");
+		click(bulkTransferDoneButton,"Clicked Done on Bulk Transfer complete dialogue",10);
+
 	}
 
-	public void verifyTransferCompleteBackend(String tid) {
+	/*public void verifyTransferCompleteBackend(String tid) {
 		try {
-			 SoftAssert.assertTrue(aapi.verifyTransferSuccessful(tid));
+			 //SoftAssert.assertTrue(aapi.verifyTransferSuccessful(tid));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public void verifyMyEventsPage(String name) {
 	    Assert.assertTrue(checkIfElementPresent(By.xpath("//div[contains(@class, 'style-eventName') and text()='"+name+"']")));

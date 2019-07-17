@@ -66,6 +66,7 @@ public class Dashboard extends Driver {
 		ManageticketsAPI manageticketsAPI = new ManageticketsAPI(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 		Map<String, Object> names = manageticketsAPI.getCustomerName();
 		checkLayout(Dictionary.get("SPEC_FILE_NAME").trim(), device.getTags(), names);
+		
 	}
 	
 	@Test(groups={"smoke","ticketsUi", "regression","prod"}, dataProvider="devices", priority = 2)
@@ -152,12 +153,14 @@ public class Dashboard extends Driver {
 	
 	@Test(groups={"smoke","regression","miscFunctional","prod"})
 	public void verifyChangePassword() throws Exception {
-		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS") || driverType.trim().toUpperCase().contains("SAFARI"))
+		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS") ||
+				driverType.trim().toUpperCase().contains("SAFARI"))
 			throw new SkipException("Skipped");
+		
 		load("/dashboard");
 		homepage.login("", "", null, true);
 		Assert.assertTrue(getDriver().getCurrentUrl().contains("/dashboard"));
-		boolean can_edit_password = api.canUserEditPassword();	
+		boolean can_edit_password = api.canUserEditPassword();
 		Set<Cookie> cookies = getDriver().manage().getCookies();
 	    String text = dashboardSection.getChangePasswordText();
 		if(!can_edit_password) {

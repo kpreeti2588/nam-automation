@@ -3,22 +3,22 @@
 @import ../galen-extras/galen-extras-rules.gspec
 
 @objects
-	eventName	div[class*='eventListContainer'] li:first-child [class*='style-eventName']
-	eventTimeVenue  div[class*='eventListContainer'] li:first-child [class*='style-eventDescription']
+	eventName	xpath ((//div[contains(@class,'eventListContainer')]//li)[1]/a/div[1]/div[2]/div)[1]
+	eventTimeVenue xpath ((//div[contains(@class,'eventListContainer')]//li)[1]/a/div[1]/div[2]/div)[2]
 	
 = Ticket Listing Detail Section =
 	@on desktop, mini-tablet
 		eventName:
-			css font-family contains "verta"
-			#css font-size is "20px"
-			#css font-weight matches "^(normal|400)$"
+			css font-family contains "AvertaPeRegular"
+			#css font-size is "14px"
+			#css font-weight matches "^(normal|300)$"
 			#css font-style is "normal"
 			#css font-stretch is "normal"
-			inside partly parent ~0% of parent/height top
-			inside partly parent ~20 px left
+			#inside partly parent ~110% of parent/height top
+			#inside partly parent ~35 px left
 
 		eventTimeVenue:
-			css font-family contains "verta"
+			css font-family contains "AvertaPeRegular"
 			#css font-size is "16px"
 			#css font-weight matches "^(normal|400)$"
 			#css font-style is "normal"
@@ -28,16 +28,16 @@
 
 	@on tablet, mobile, laptop
 		eventName:
-			css font-family contains "verta"
-			#css font-size is "18px"
-			#css font-weight matches "^(normal|400)$"
+			css font-family contains "AvertaPeRegular"
+			#css font-size is "14px"
+			#css font-weight matches "^(normal|300)$"
 			#css font-style is "normal"
 			#css font-stretch is "normal"
-			inside partly parent ~80% of parent/height top
-			inside partly parent ~20 px left
+			##inside partly parent ~105% of parent/height top
+			##inside partly parent ~25 px left
 
 		eventTimeVenue:
-			css font-family contains "verta"
+			css font-family contains "AvertaPeRegular"
 			#css font-size is "14px"
 			#css font-weight matches "^(normal|400)$"
 			#css font-style is "normal"

@@ -1,10 +1,7 @@
 package org.iomedia.galen.steps;
 
-import java.io.BufferedReader;
+import java.awt.AWTException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,9 +17,7 @@ import org.iomedia.galen.pages.CMS;
 import org.iomedia.galen.pages.DashboardSection;
 import org.iomedia.galen.pages.Invoice;
 import org.iomedia.galen.pages.InvoiceNew;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.testng.SkipException;
@@ -98,6 +93,7 @@ public class InvoiceNewSteps {
 //				invoiceId = adminlogin.getInvoiceListAndId(accId, invoicestatus);
 //			}
 //		}
+	
 		invoiceNew.loadInvoice(invoiceId);
 	}
 
@@ -454,7 +450,7 @@ public class InvoiceNewSteps {
 			//Do Nothing
 		} else
 			accountBalance = dashboard.getAccountBalance();
-		invoiceNew.amountFieldDisplayed();
+		      invoiceNew.amountFieldDisplayed();
 	}
 
 	@Then("^Payment card is selected, Amount Due is populated and Continue gets enabled$")
@@ -514,6 +510,32 @@ public class InvoiceNewSteps {
 			invoice.getInvoiceBalWhenRefreshed(invoiceId, x);
 		}
 	}
+	//payment with typeform review
+	@Then("^Typeform submitted and Payment should be successfull and amount should get updated$")
+	public void reviewpaymentValidation() throws AWTException {
+		Double debitAmount = invoiceNew.validateAmountUpdatedAndGetAmountDebitted(accountBalance);
+		System.out.println(debitAmount);
+
+		if (((driverType.trim().toUpperCase().contains("ANDROID")
+				|| driverType.trim().toUpperCase().contains("IOS")))) {
+		} else {
+			System.out.println(BalanceDue);
+			System.out.println(BalanceDue - debitAmount);
+			double x = BalanceDue - debitAmount;
+			System.out.println(x);
+			invoice.getInvoiceBalWhenRefreshed(invoiceId, x);
+			
+			//verify and submiiting typeform
+			try {
+				invoice.verify_surveytab_display_payment();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+	}
 	
 	@Then("^Payment should be successfull and amount should get updated for addons$")
 	public void paymentValidationAddOns() {
@@ -530,8 +552,10 @@ public class InvoiceNewSteps {
 		invoiceNew.transactionDeclined();
 	}
 
+	//user entering amount
 	@When("^User enters (.+),pay today gets updated, user clicks on Continue button$")
 	public void enterAmount(String amount) throws Exception {
+		
 		amount = (String) base.getGDValue(amount);
 		System.out.println(amount);
 		invoiceNew.enterAmount(amount);
@@ -599,7 +623,7 @@ public class InvoiceNewSteps {
 
 	@When("^User clicks on Add New Card, adds new card and saves to account (.+), (.+), (.+), (.+), (.+), (.+)$")
 	public void addNewCardSaveToAccount(String gdCardFirstName, String gdCardLastName, String gdCardNum,
-			String gdCardExpiry, String gdZip, String gdAddress) throws Exception {
+		String gdCardExpiry, String gdZip, String gdAddress) throws Exception {
 		String saveCard = "YES";
 
 		gdCardFirstName = (String) base.getGDValue(gdCardFirstName);
@@ -615,6 +639,21 @@ public class InvoiceNewSteps {
 		System.out.println(gdCardExpiry);
 		invoiceNew.addNewCard(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry, gdZip, gdAddress);
 
+	}
+	
+	@When("^User clicks on Add New Card, adds new card with invalid data (.+), (.+), (.+), (.+)$")
+	public void addNewCardWithNegativeValue(String gdCardFirstName, String gdCardLastName, String gdCardNum,String gdCardExpiry) throws Exception {
+		String saveCard = "YES";
+		gdCardFirstName = (String) base.getGDValue(gdCardFirstName);
+		gdCardLastName = (String) base.getGDValue(gdCardLastName);
+		gdCardNum = (String) base.getGDValue(gdCardNum);
+		gdCardExpiry = (String) base.getGDValue(gdCardExpiry);
+		System.out.println(gdCardFirstName);
+		System.out.println(gdCardLastName);
+		System.out.println(gdCardNum);
+		System.out.println(gdCardExpiry);
+		invoiceNew.addNewCardNegative(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry);	
+		
 	}
 	
 	@When("^User clicks on Add New Card, adds new card and saves to account,CMS Validation (.+), (.+), (.+), (.+), (.+), (.+)$")
@@ -960,27 +999,20 @@ public class InvoiceNewSteps {
 		pass = (String) base.getGDValue(pass);	    
 		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));	    
 	    String invoiceId = Integer.toString(adminLogin.getSingleInoviceId(accountId));
-	     System.out.println("Invoice ID:   "+invoiceId);
+	  //  System.out.println("cvfv    "+invoiceId);
 	    if (adminLogin.getSingleInoviceId(accountId)==-1) {
 	    	System.out.println("No Invoice Id Found for the user");
 	    	utils.navigateTo("/invoice#/");
 	    	Assert.assertEquals(invoiceNew.getInvoicePlaceholder(),"There is no invoice to pay at the moment.","No Invoices present for the user");
 	    }
 	    else {
-        	dashboard.clickViewAllInvoice();
-		    invoiceNew.isInvoiceListDisplayed();
-			Assert.assertTrue(base.getDriver().getCurrentUrl().contains("/invoice"));
-			utils.navigateTo("/invoice#/"+invoiceId+"/1");
-			try {
-				if(invoiceNew.IsInvoicePrintButtonDisplayed())
-			Assert.assertTrue(invoiceNew.IsInvoicePrintButtonDisplayed(), "Invoice Print Details are getting displayed");	
-				else
-					throw new Exception();
-			}
-			catch(Exception e) {
-			Assert.assertTrue(invoiceNew.IsInvoiceSummaryDisplayed(), "Invoice Summary Details are getting displayed");
-			}
-	    }		
+	    dashboard.clickViewAllInvoice();
+	    invoiceNew.isInvoiceListDisplayed();
+		Assert.assertTrue(base.getDriver().getCurrentUrl().contains("/invoice"));
+		utils.navigateTo("/invoice#/"+invoiceId+"/1");
+		Assert.assertTrue(invoiceNew.IsInvoiceButtonDisplayed(), "Invoice Details are getting displayed");		
+	    }
+				
 	}
 	
 	@When("^Amount Due should be updated with Add on amount and service charge$")
@@ -1008,5 +1040,21 @@ public class InvoiceNewSteps {
 		invoiceNew.verifyReviewTab(cms.reviewName, cms.subtotalName, cms.fieldNameAuto, cms.amountDueName, cms.paytodayName);
 	}
 	
+	@Then("^User can verify Edit Payment Method present in UI and click on Edit Payment Method$")
+	public void EditPaymentMethod() throws Exception {
+	   invoiceNew.verifyEditPaymentMethod();
+	}
 	
+	@Then("^User enter CVV and verify field is displayed$")
+	public void enterCVVverifyfielddisplayed() throws Exception {
+	   invoiceNew.verifyCVVandEnter();
+	   invoiceNew.enterCVVFirstExistingCard();
+	   invoiceNew.clickInactiveCvv();
+	   invoiceNew.clickContinuePopUp();
+	}
+	
+	@Then("^User Click on Cancel button$")
+	public void ClickCancebuttonAddPaymentPage() throws Exception {
+	    invoiceNew.clickcancelbutton();
+	}
 }

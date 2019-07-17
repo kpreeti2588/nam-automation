@@ -194,7 +194,7 @@ public class Sessions extends Driver {
 			if(util.isProd() && (datasheet.trim().equalsIgnoreCase("PROD_SANITY") || datasheet.trim().equalsIgnoreCase("PRE_DEPLOYMENT"))) {
 				driver.navigate().to(url + "/user/logout");
 				BaseUtil.getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
-				String appVersion = getAppVersionNew(driver, url);
+				String appVersion = getAppVersion(driver, url, "automation_editor_manager", "nam_editor_manager", postBuild);
 				System.out.println("APP_VERSION :: " + appVersion);
 				setXMLNodeValue(Environment.get("appCredentialsPath").trim(), Environment.get("env").trim(), Environment.get("version").trim(), "appVersion", appVersion);
 				return;
@@ -292,7 +292,7 @@ public class Sessions extends Driver {
 			}
 			driver.navigate().to(url + "/user/logout");
 			BaseUtil.getElementWhenPresent(By.xpath(".//input[@name='email'] | .//div[@class='mobile-signin']//*[text()='Sign In'] | .//div[@class='desktop-signin-dashboard']//a[text()='Sign In']"));
-			String appVersion = getAppVersionNew(driver, url);
+			String appVersion = getAppVersion(driver, url, "automation_editor_manager", "nam_editor_manager", postBuild);
 			System.out.println("APP_VERSION :: " + appVersion);
 			setXMLNodeValue(Environment.get("appCredentialsPath").trim(), Environment.get("env").trim(), Environment.get("version").trim(), "appVersion", appVersion);
 		} catch(Exception ex) {
@@ -303,13 +303,6 @@ public class Sessions extends Driver {
 			Environment.put("videoGifIntegration", videoGifIntegration);
 	    	super.Environment = Environment;
 		}
-	}
-	
-		public String getAppVersionNew(WebDriver driver, String url) {
-		driver.navigate().to(url + "/");
-		WebElement e= driver.findElement(By.xpath("//body[contains(@class,'page-node-type-home-page')] | //body[contains(@class,'path-frontpage')]"));
-		String version =e.getAttribute("data-version");
-		return version;		
 	}
 	
 	public String getAppVersion(WebDriver driver, String url, String userName, String password, boolean postBuild) {

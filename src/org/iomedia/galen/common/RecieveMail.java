@@ -61,7 +61,7 @@ public class RecieveMail {
 			long end = time + 30000;
 			while (System.currentTimeMillis() < end) {
 				if (request.getMessages().length <= actualCount) {
-					Thread.sleep(100);
+					Thread.sleep(200);
 				} else {
 					break;
 				}
@@ -121,27 +121,37 @@ public class RecieveMail {
 			htmlcontent = "";
 			message = foundMessages[i];
 			Object content = message.getContent();
-			if (content instanceof Multipart) {
+			if (content instanceof MimeMultipart) {
 				Multipart mp = (Multipart) content;
 				for (int j = 0; j < mp.getCount(); j++) {
 					BodyPart bp = mp.getBodyPart(j);
-					if (Pattern.compile(Pattern.quote("text/html"), Pattern.CASE_INSENSITIVE)
-							.matcher(bp.getContentType()).find()) {
+				//String htmlcontent1 =	getTextFromMimeMultipart((MimeMultipart) message.getContent()); 
+				//System.out.println(htmlcontent1);
+				
+					if (Pattern.compile(Pattern.quote("text/html"), Pattern.CASE_INSENSITIVE).matcher(bp.getContentType()).find()) {
 						// found html part
-						htmlcontent = (String) bp.getContent();
+						//htmlcontent = (String) bp.getContent();
+						htmlcontent =getTextFromMimeMultipart((MimeMultipart) message.getContent()); 
 						break;
+						
 					} else {
-						// some other bodypart...
-					}
+						
+						 htmlcontent =	getTextFromMimeMultipart((MimeMultipart) message.getContent()); 
+					}	
 				}
 				if (!htmlcontent.trim().equalsIgnoreCase("")) {
-					link = getResetPasswordlink(htmlcontent);
+					String link1 = getResetPasswordlink(htmlcontent);
+					String link2 ="http://";
+					link = link2+link1;
+					//link = getResetPasswordlink(htmlcontent);
+					//System.out.println(link);
 					break;
 				}
 			}
 		}
+		
 		if (link.trim().equalsIgnoreCase(""))
-			throw new SkipException("Forot password link not found");
+			throw new SkipException("Forgot password link not found");
 		if (message != null)
 			deleteMessage(message);
 		folder.close(true);
@@ -222,7 +232,9 @@ public class RecieveMail {
 	}
 
 	public String getResetPasswordlink(String htmlcontent) throws Exception {
-		Pattern p = Pattern.compile("href=\"(.*?)\"", Pattern.DOTALL);
+		
+		//Pattern p = Pattern.compile("href=\"(.*?)\"", Pattern.DOTALL);
+		Pattern p = Pattern.compile("http://(.*?)]", Pattern.DOTALL);
 		Matcher m = p.matcher(htmlcontent);
 
 		String link = "";

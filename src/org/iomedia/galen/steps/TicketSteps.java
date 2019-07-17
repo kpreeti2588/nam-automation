@@ -16,7 +16,6 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.OSValidator;
-import org.iomedia.framework.Driver.TestDevice;
 import org.iomedia.galen.common.AccessToken;
 import org.iomedia.galen.common.ManageticketsAPI;
 import org.iomedia.galen.common.Utils;
@@ -227,6 +226,7 @@ public class TicketSteps {
 	@Then("^Save the state of ticket for (.+)$")
 	public void save_state_of_ticket(String ticketId) throws Exception {
 		ticketId = (String) base.getGDValue(ticketId);
+		System.out.println(ticketId);
 		String state = api.waitForTicketState(ticketId, "pending");
 		base.Dictionary.put("State", state);
 	}
@@ -366,6 +366,7 @@ public class TicketSteps {
 		 ticketId = (String) base.getGDValue(ticketId);
 		 String[] tkt = ticketId.split("\\.");
 		 ticket.clickScanBarcode(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		
 		 Assert.assertEquals(ticket.getMobileScanEventDetails(), base.Dictionary.get("eventName"));
 		 Assert.assertEquals(ticket.getMobileScanSectionName(), tkt[1].replaceAll("%20", " "));
 		 Assert.assertEquals(ticket.getMobileScanRowName(),tkt[2]);

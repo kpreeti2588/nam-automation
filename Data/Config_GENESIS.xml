@@ -18,7 +18,7 @@
 	    		<ASSOCIATED_ACC_PASSWORD>123456</ASSOCIATED_ACC_PASSWORD>
         	</ANDROID1>
         	<IOS1>
-        		<EMAIL_ADDRESS>iomedia8faf95694d@example.com</EMAIL_ADDRESS>
+        		<EMAIL_ADDRESS>iomediae62d96a479@example.com</EMAIL_ADDRESS>
         		<PASSWORD>123456</PASSWORD>
         		<PLAN_EMAIL_ADDRESS>iomedia8faf95694d@example.com</PLAN_EMAIL_ADDRESS>
         		<PLAN_PASSWORD>123456</PLAN_PASSWORD>
@@ -98,8 +98,8 @@
 	    		<ASSOCIATED_ACC_PASSWORD>123456</ASSOCIATED_ACC_PASSWORD>
         	</FIREFOX1>
         	<CHROME1>
-        		<EMAIL_ADDRESS>ashish.tanwar@ticketmaster.com</EMAIL_ADDRESS>
-        		<PASSWORD>ashish1</PASSWORD>
+        		<EMAIL_ADDRESS>iomediae62d96a479@example.com</EMAIL_ADDRESS>
+        		<PASSWORD>123456</PASSWORD>
         		<cmsAdminUserName>siteadmin</cmsAdminUserName>
         		<cmsAdminPassword>123456</cmsAdminPassword>
         		<PLAN_EMAIL_ADDRESS>iomedia4cfe63356b@example.com</PLAN_EMAIL_ADDRESS>
@@ -121,7 +121,6 @@
        	 	   	<adminUserName>admin</adminUserName>
        		   	<adminPassword>123456</adminPassword>
        		   	<USER_AGENT>secretkey 5Lo1RZau</USER_AGENT>
-       		   	<Whitelist>8d0b5ef3b9vv</Whitelist>
         	</COMMON>
         </VER_JUNE_2017>
     </GENESIS>

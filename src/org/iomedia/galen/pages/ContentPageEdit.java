@@ -12,14 +12,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+
+
 public class ContentPageEdit extends BaseUtil{
 
 	public ContentPageEdit(WebDriverFactory driverFactory, HashMapNew Dictionary,HashMapNew Environment, Reporting Reporter,org.iomedia.framework.Assert Assert,org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew> sTestDetails) {
 		super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	}
 	
-	private By pageTitle = By.xpath(".//div[starts-with(@class, 'home-page-field-main-title')]");
-	private By pageContent = By.xpath(".//div[starts-with(@class, 'home-page-field-homepage-subtitle')]");
+	private By pageTitle = By.xpath("//div[starts-with(@class, 'field field--name-field-main-title')]");
+	private By pageContent = By.xpath("//div[starts-with(@class, 'field field--name-field-content-subtitle')]");
 	private By pageSetting= By.xpath("//button[contains(@class,'page-setting-button')]");
 	private By pageTitleSettings = By.xpath("//*[@id='edit-title']");
 	private By pageNameSettings = By.xpath("//*[@id='edit-page-name']");
@@ -48,6 +50,7 @@ public class ContentPageEdit extends BaseUtil{
 		WebElement wpageTitle = getElementWhenClickable(pageTitle);
 		WebElement wpageContent = getElementWhenClickable(pageContent);
 		Actions action = new Actions(getDriver());
+	
 		while(counter >= 0){
 			try{
 				if(wpageTitle != null){

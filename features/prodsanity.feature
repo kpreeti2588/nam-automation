@@ -1,7 +1,6 @@
 Feature: Prod Sanity
 	Background: User landed on homepage
 		Given User is on / Page
-		
 	
 	Scenario: Prod sanity verification Part1
 	    When User navigates to /invites/*a from NAM
@@ -21,11 +20,19 @@ Feature: Prod Sanity
 		Then Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName}
 		Given User logout from CAM
 		And User navigates to /user/logout from NAM
+		When User enters %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+		Then User logged in successfully
+		Given Change password to AMGR1234 for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+		And User navigates to /user/logout from NAM
+		And User navigates to / from NAM
+		When User enters %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+		Then User logged in successfully
+		Given Customer details are fetched for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+		When User clicks your account
+		Then Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName}
 		
 		
-	Scenario: Prod sanity verification
-	     When User navigates to /user/login for CMS Login
-		Given User is on / Page
+	Scenario: Prod sanity verification Part2 	
 		When User enters %{GD_ProdEmailAddress} and %{GD_ProdPassword}
 		Then User logged in successfully	
 		Given Customer details are fetched for %{GD_ProdEmailAddress} and %{GD_ProdPassword}	
@@ -36,7 +43,6 @@ Feature: Prod Sanity
 		Then Classic AMGR is displayed with correct %{GD_CustomerName} and %{GD_NickName}
 		Given User logout from CAM
 		And User navigates to /user/logout from NAM
-		
 		
 	Scenario: Verify privacy link is set up correctly
 		And User clicked on signup link

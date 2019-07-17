@@ -6,6 +6,7 @@ import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.Driver.HashMapNew;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.iomedia.framework.Reporting;
@@ -18,7 +19,8 @@ public class CAM extends BaseUtil {
 		super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	}
 
-	private By manageByPersonalProfile = By.id("link-personalprofile");
+	//private By manageByPersonalProfile = By.id("link-personalprofile");
+	private By manageByPersonalProfile = By.xpath("//a[@id='link-personalprofile']| //a[text()='Manage My Personal Profile']");
 	private By firstName = By.id("iNameFirst");
 	private By lastName = By.id("iNameLast");
 	private By streetAddress = By.id("iStreetAddr1");
@@ -68,14 +70,15 @@ public class CAM extends BaseUtil {
 	private By outstanding_balance = By.xpath(".//td[contains(@class,'bld') and text()='Outstanding Balance']/../td[2]"); 
 	private By Select_All = By.xpath("//*[@id=\"all-filter\"]");
 
-	private By INET_RETURN= By.id("is-20314-127"); 
+	private By INET_RETURN= By.id("is-20314-128"); 
 	//private By INET_RETURN= By.xpath("//table[@id='datatables']/tbody/tr[2]/td/table/tbody/tr/td[4]");
 	private By cart_table = By.id("cart-table");
 	private By account_home = By.id("account-home");
 
 
 	public void updateProfile(String firstName, String lastName, String streetAddress, String streetAddress2, String city, String state, String country, String zipCode, String emailAddress, String dayPhone, String eveningPhone, String pin) throws Exception {
-		((JavascriptExecutor) getDriver()).executeScript("$('.ui-dialog').remove()");
+		//((JavascriptExecutor) getDriver()).executeScript("$('.ui-dialog').remove()");
+	
 		if(getAttribute(this.firstName, "value").trim().equalsIgnoreCase(""))
 			type(this.firstName, "First name", firstName);
 		if(getAttribute(this.lastName, "value").trim().equalsIgnoreCase(""))
@@ -124,7 +127,7 @@ public class CAM extends BaseUtil {
 
 			List<WebElement> text=	getDriver().findElements(dateandtimepresent);
 			for(int i=0;i<text.size();i++) {
-				if(!text.get(i).getText().equals(" ")) {
+				if(!text.get(i).getText().equals(" ")){
 					getDriver().findElements(eventContinue).get(i).click();
 					break;
 				}
@@ -193,6 +196,7 @@ public class CAM extends BaseUtil {
 			getDriver().switchTo().parentFrame();
 		}
 	}
+	
 	//needs to choose correct filter then click on first event with date at cam
 	public void buyTickets(String paymentMode, String cardType, String cardNum, String ccExpiry, String CVV, String accountId) throws Exception {
 		((JavascriptExecutor) getDriver()).executeScript("$('.ui-dialog').remove()");
@@ -301,6 +305,17 @@ public class CAM extends BaseUtil {
 				click(checkBoxs.get(i), "Checkbox");
 			}
 			click(saveButton, "Save");
+		}
+	}
+	
+	public boolean isAlertPresent() {
+		try {
+			sync(8000l);
+			getDriver().switchTo().alert();
+			return true;
+			
+		}catch(NoAlertPresentException ex) {
+			return false;
 		}
 	}
 }

@@ -19,8 +19,8 @@ import org.iomedia.framework.Reporting;
 import org.iomedia.framework.WebDriverFactory;
 import org.iomedia.galen.common.AccessToken;
 
+
 public class DashboardSection extends BaseUtil {
-    Homepage hp = new Homepage(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	AccessToken at = new AccessToken(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert,sTestDetails);
 	private String driverType;
 	public DashboardSection(WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert) {
@@ -30,7 +30,6 @@ public class DashboardSection extends BaseUtil {
 	
 	private By manageTickets = By.cssSelector(".react-root-event-dashboard ul li a div");
 	private By manageTicketsPlaceholder = By.cssSelector(".react-root-event-dashboard ul li a,div[class*='events-placeholderContainer']");
-	private By manageTicketsPlaceholderNew = By.cssSelector(".react-root-event-dashboard ul li a,div[class*='style-placeholderContainer']");
 	private By EventsPlaceholder = By.xpath("//div[contains(@class,'style-placeholderContainer')]//div//p");
 	private By EventsText = By.xpath("//div[contains(@class,'react-root-event')]//p");
 	private By events = By.xpath(".//div[contains(@class, 'react-root-event')]//ul[contains(@class, 'events-eventList')]//li[contains(@class, 'events-event')]//a");
@@ -47,7 +46,7 @@ public class DashboardSection extends BaseUtil {
 	private By password = By.xpath("//input[@name='password']");
 	private By confirm = By.xpath("//input[@name='confirm_pass']");
 	private By Save = By.xpath("//button[@type='submit']");
-	private By EventText = By.xpath("//div[contains(@class,'style-eventDetails')]");
+	private By EventText = By.xpath("(//div[contains(@class,'style-eventDetails')])[3]");
 	private By ticketname= By.xpath("//div[contains(@class,'ticket-ticketImage')]");
 	private By mobileTicketName = By.cssSelector("div[class*='ticket-eventName'] h3");
 	private By InvoiceLink = By.cssSelector(".dashboard-invoicelist .react-root-invoice-dashboard ul.react-listing li.list-item a");
@@ -60,7 +59,7 @@ public class DashboardSection extends BaseUtil {
 	private By yourSwitchAccount = By.xpath(".//*[@id='amgr-user-menu']/li[1]/a[text()='Switch Accounts']");
 	private By switchAccountMobile = By.xpath(".//*[@id='amgr-user-menu-mobile']/li[1]/a[text()='Switch Accounts']");
 	private By editName = By.xpath("//*[contains(@class,'switch-switchDialog')]//*[contains(@class,'formSubmitButtons')]/button[1] | //*[contains(@class,'theme-dialog')]//*[contains(@class,'formSubmitButtons')]/button[1]");
-	private By switchAccount = By.xpath("//*[contains(@class,'switch-switchDialog')]//*[contains(@class,'formSubmitButtons')]/button[2][text()='SWITCH' or text()='Switch'] | //*[contains(@class,'theme-dialog')]//*[contains(@class,'formSubmitButtons')]/button[2][text()='SWITCH' or text()='Switch']");
+	private By switchAccount = By.xpath("//*[contains(@class,'theme-dialog')]//*[contains(@class,'formSubmitButtons')]/button[2][text()='SWITCH' or text()='Switch']");
 	private By accountName = By.xpath("//*[contains(@class,'switch-setName')]/input");
 	private By saveName = By.xpath("//*[contains(@class,'switch-switchDialog')]//*[contains(@class,'formSubmitButtons')]/button[2] | //*[contains(@class,'theme-dialog')]//*[contains(@class,'formSubmitButtons')]/button[2]");
 	private By closePopUp= By.xpath("//*[contains(@class,'manage-tickets-closeButton')]/i");
@@ -79,14 +78,17 @@ public class DashboardSection extends BaseUtil {
 	private By eventNameAcceptTransfer = By.cssSelector("div[class*=style-event] div[class*=style-detailsHolder] h4");
 	private By ticketsCountAcceptTransfer = By.cssSelector("div[class*=style-event] div[class*=style-iconAction] div span");
 	private By successMsg = By.cssSelector("div[class*='style-claimMessage'] h3");
-	private By gotoEventButton = By.cssSelector(" div[class*='style-buttonBox'] button");
+	private By gotoEventButton = By.cssSelector("div[class*='style-buttonBox'] button");
 	private By eventPage = By.cssSelector("div[class*='ticket-subHeader'] div div h3");
 	private By declineDialouge = By.cssSelector("div[class*='style-buttonBox'] div button:nth-child(1)");
 	private By acceptDialouge = By.cssSelector("div[class*='style-buttonBox'] div button:nth-child(2)");
 	private By actionText = By.cssSelector("div[class*='style-claimMessage'] div span");
 	private By declineTransferOffer = By.cssSelector("div[data-react-toolbox='dialog'] div[class*='text-center'] button:nth-child(2)");
 	private By declineTransferOfferClose = By.cssSelector("div[data-react-toolbox='dialog'] section span i");
-
+	private By popUpEventsComingUpWeb = By.xpath("//*[contains(@class,'takeOver')]//button[1]");
+	private By ticketCount = By.cssSelector("div[class*='ticket-totalTicketCounts'] span small");
+    private By dashboardnotpresent = By.xpath("//div[contains(@class,'placeholderContainer')]/div/p");
+    private By eventname = By.xpath("(//div[contains(@class,'style-eventName')])[3]");
 	
 	public void closePopUp(){
 		click(closePopUp,"ClosePopUp");
@@ -138,12 +140,13 @@ public class DashboardSection extends BaseUtil {
 	public void clickSwitchAccountMobile() {
 		getElementWhenVisible(By.xpath(".//*[@id='block-useraccountmenumobile']/div/div[1]/a/span[2]")).click();
 		sync(500L);
-		click(switchAccountMobile, "Switch Account");
+		click(switchAccountMobile, "Switch Account",10);
 	}
 	
 	public void clickSwitchAccounts() {
-		click(Dropdown, "dropdown");
-		click(yourSwitchAccount, "Switch Account");
+		click(Dropdown, "dropdown",10);
+		sync(4000L);
+		click(yourSwitchAccount, "Switch Account",10);
 	}
 	
 	public void typeAccountName(String nickName) throws Exception{
@@ -175,7 +178,7 @@ public class DashboardSection extends BaseUtil {
 	}
 	
 	public void clickSwitchAccount(){
-		click(switchAccount, "Switch");
+		click(switchAccount, "Switch",5);
 	}
 	
 	public void selectAccount(String AccountId){
@@ -218,7 +221,7 @@ public class DashboardSection extends BaseUtil {
 	}	
 
 	public String getChangePasswordText() {
-        click(Dropdown,"dropup");
+        click(Dropdown,"dropup",30);
 		return getText(ChangePassword);
 	}
 
@@ -228,8 +231,8 @@ public class DashboardSection extends BaseUtil {
 	
 	public String clickDashboardEvent() {
 		String eventName = getText(EventText);
-		click(manageTickets, eventName);
-		return eventName;
+		click(eventname, eventName);
+		return eventName;	
 	}
 	
 	public String getInvoiceDashboardText(){
@@ -289,60 +292,26 @@ public class DashboardSection extends BaseUtil {
 	
 	public boolean waitForDasboardSection(TestDevice device) {
 		try{
-			if(getDriver().getCurrentUrl().equals(Environment.get("APP_URL"))) {
-				hp.login("","",device,true);
-				}
 			getElementWhenVisible(manageTickets);
 		} catch(Exception ex) {
 			getDriver().navigate().refresh();
-			try {
-				if(getDriver().getCurrentUrl().equals(Environment.get("APP_URL"))) {
-					hp.login("","",device,true);
-					}
 			getElementWhenVisible(manageTickets);
-			}
-			catch(Exception e) {
-				getElementWhenVisible(manageTicketsPlaceholderNew);	
-			}
 		}
 		if((device != null && (device.getName().trim().equalsIgnoreCase("mini-tablet") || device.getName().trim().equalsIgnoreCase("mobile"))) || (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))) {
 			//Do Nothing
-		} else {
-			try {
-			getElementWhenVisible(invoices, 40);
-			}
-			catch(Exception e) {
-				getElementWhenVisible(invoicesPlaceholder, 40);
-			}
-		}
-		
-		try {
+		} else
+			getElementWhenVisible(invoices, 60);
 		getElementWhenRendered(manageTickets, 150, 150);
-		}
-		catch(Exception e) {
-			getElementWhenRendered(manageTicketsPlaceholderNew, 150, 150);
-		}
 		sync(2000L);
 		return true;
 	}
 	
 	public boolean waitForDashboardSection(TestDevice device) {
 		try{
-			try {
-           if(getDriver().getCurrentUrl().equals(Environment.get("APP_URL"))) {
-			hp.login("","",device,true);
-			}
-			getElementWhenVisible(manageTicketsPlaceholderNew);}
-			catch(Exception e) {
-				Assert.assertEquals(getEventsPlaceholderText(), "There are no events in your account.", "No events found");
-			}
-			
+			getElementWhenVisible(manageTicketsPlaceholder);
 		} catch(Exception ex) {
 			getDriver().navigate().refresh();
 			try {
-				if(getDriver().getCurrentUrl().equals(Environment.get("APP_URL"))) {
-					hp.login("","",device,true);
-					}
 			getElementWhenVisible(manageTicketsPlaceholder);}
 			catch(Exception e) {
 				Assert.assertEquals(getEventsPlaceholderText(), "There are no events in your account.", "No events found");
@@ -350,14 +319,8 @@ public class DashboardSection extends BaseUtil {
 		}
 		if((device != null && (device.getName().trim().equalsIgnoreCase("mini-tablet") || device.getName().trim().equalsIgnoreCase("mobile"))) || (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))) {
 			//Do Nothing
-		} else {
-			try {
+		} else
 			getElementWhenVisible(invoicesPlaceholder, 40);
-			}
-			catch(Exception e) {
-				getElementWhenVisible(invoices, 40);
-			}
-		}
 		sync(2000L);
 		return true;
 	}
@@ -433,17 +396,15 @@ public class DashboardSection extends BaseUtil {
 	}
 
 	public void verifyInfobar() {
-
 		Assert.assertTrue(checkIfElementPresent(transferInfoBar),"Transfer Info bar not present on DashBoard");
 		Assert.assertTrue(getText(DeclineButton).equalsIgnoreCase("Decline"));
 		Assert.assertTrue(getText(AcceptButton).equalsIgnoreCase("Accept"));
 		Assert.assertTrue(checkIfElementPresent(seeDetails),"See Details link not present");
-
-
 	}
 
 	public void clickSeeDetails() {
-		click(seeDetails,"SEE DETAILS");
+		click(seeDetails,"SEE DETAILS",10);
+		sync(2000l);
 	}
 
 	public void verifyTransferredTickets(String tickets, String event) {
@@ -476,8 +437,15 @@ public class DashboardSection extends BaseUtil {
 	}
 
 	public void verifyEventPage(String name) {
-		click(gotoEventButton,"Go to Event");
-		Assert.assertTrue(getText(eventPage).contains(name));
+		click(gotoEventButton, "Go to Event",5);
+		if (checkIfElementPresent(gotoEventButton, 5)) {
+		click(gotoEventButton, "Go to Event",5);
+		}
+		if (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
+			Assert.assertTrue(checkIfElementPresent(ticketCount,10));
+		} else {
+			Assert.assertTrue(getText(eventPage).contains(name));
+		}
 	}
 
 	public void verifyInfoBarDisappear() {
@@ -485,11 +453,20 @@ public class DashboardSection extends BaseUtil {
 	}
 
 	public void cleanPendingTransfer() {
-		while(checkIfElementPresent(DeclineButton)) {
-			click(DeclineButton,"DECLINE");
+		while(checkIfElementPresent(DeclineButton,10)) {
+			click(DeclineButton,"DECLINE BUTTON");
 			click(declineTransferOffer,"DECLINE TRANSFER OFFER");
-			click(declineTransferOfferClose,"DECLINE TRANSFER OFFER CLOSE");
+			declineMsg();
+			click(gotoEventButton,"Go to Event");
+		}
+	}
 
+	public void verifyMyEventPage(String name) {
+
+		if (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
+			Assert.assertTrue(checkIfElementPresent(ticketCount, 10));
+		} else {
+			Assert.assertTrue(getText(eventPage).contains(name));
 		}
 	}
 }

@@ -4,7 +4,8 @@ Feature: Internationalization
 		
 	Scenario: Verify langauge installation from CMS
 		And User navigates to /user/login from NAM
-		When User login into CMS with support user
+		#When User login into CMS with support user
+		When User login into CMS
 		Then Redirect to Language Configuration under Settings tab
 		And Verify user lands on Add Language Page
 		But Delete %{GD_LANGUAGE} language if already installed
@@ -21,7 +22,8 @@ Feature: Internationalization
 		
 	Scenario: Switch language and
 		And User navigates to /user/login from NAM
-		When User login into CMS with support user
+		#When User login into CMS with support user
+		When User login into CMS
 		Then Redirect to Language Configuration under Settings tab
 		And User is on Add Language Page
 		But Delete %{GD_LANGUAGE} language if already installed

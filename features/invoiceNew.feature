@@ -694,3 +694,35 @@ Feature: Invoice New
     When User clicks on Confirm button
     Then Payment should be successfull and amount should get updated
     And Selected card must be there in MOP for %{GD_EMAIL_ADDRESS}, %{GD_PASSWORD}
+
+  Scenario: Ability to update credit card on invoice tied to a payment plan
+    When User landed on interstitial page and enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User is on Invoice page and Invoice list is displayed
+    When User selects payment plan invoice %{GD_EMAIL_ADDRESS},%{GD_PASSWORD}
+    Then Invoice Summary is displayed with Due Amount and Continue button
+    When User clicks on Continue button in Summary Section
+    Then User can verify Edit Payment Method present in UI and click on Edit Payment Method
+    When User clicks on Add New Card, adds new card and saves to account %{GD_FIRST_NAME}, %{GD_LAST_NAME}, %{GD_CARD_NUMBER}, %{GD_CARD_EXPIRY}, %{GD_CARD_ZIP}, %{GD_CARD_ADDRESS}
+    Then User enter CVV and verify field is displayed
+    Then Payment card is select and Amount is autopopulated
+    When User enters %{GD_AMOUNT},pay today gets updated, user clicks on Continue button
+    When User clicks on Continue button in Payment Section
+    When User clicks on Confirm button
+    Then Confirm Payment pop-up is displayed
+    When User enters cvv,clicks on Continue button in Confirm Payment
+    Then Payment should be successfull and amount should get updated
+    
+    # Negative flow Edit Payment Method
+    Scenario: Ability to update credit card on invoice tied to a payment plan with negative value
+    When User landed on interstitial page and enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User is on Invoice page and Invoice list is displayed
+    When User selects payment plan invoice %{GD_EMAIL_ADDRESS},%{GD_PASSWORD}
+    Then Invoice Summary is displayed with Due Amount and Continue button
+    When User clicks on Continue button in Summary Section
+    Then User can verify Edit Payment Method present in UI and click on Edit Payment Method
+    When User clicks on Add New Card, adds new card with invalid data %{GD_FIRST_NAME_NEGATIVE}, %{GD_LAST_NAME_NEGATIVE}, %{GD_CARD_NUMBER_NEGATIVE}, %{GD_CARD_EXPIRY_NEGATIVE}
+    Then User Click on Cancel button
+    Then User can verify Edit Payment Method present in UI and click on Edit Payment Method 
+    When User clicks on Add New Card, adds new card and saves to account %{GD_FIRST_NAME}, %{GD_LAST_NAME}, %{GD_CARD_NUMBER}, %{GD_CARD_EXPIRY}, %{GD_CARD_ZIP}, %{GD_CARD_ADDRESS}
+    
+    

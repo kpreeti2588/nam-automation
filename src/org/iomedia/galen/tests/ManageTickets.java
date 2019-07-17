@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.iomedia.common.BaseUtil;
 import org.iomedia.framework.Driver;
 import org.iomedia.galen.pages.Hamburger;
 import org.iomedia.galen.pages.Homepage;
@@ -20,7 +19,10 @@ import org.iomedia.galen.pages.ManageTicket;
 import org.iomedia.galen.pages.SuperAdminPanel;
 import org.iomedia.galen.pages.TicketsNew;
 import org.json.JSONObject;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -171,7 +173,8 @@ public class ManageTickets extends Driver {
 		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
 		String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
 		managetickets.logoutNLogin("", "");
-		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
+		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+		//Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
 		Assert.assertEquals(state, "donated");
 		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
 	}
@@ -196,8 +199,10 @@ public class ManageTickets extends Driver {
 		String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
 		String state2 = manageticketsapi.waitForTicketState(Tkt[1], "donated");
 		managetickets.logoutNLogin("", "");
-		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
-		Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]), "Donated");
+		//Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
+		//Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]), "Donated");
+		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+		Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]).contains("Donated"), true);
 		Assert.assertEquals(state, "donated");
 		Assert.assertEquals(state2, "donated");
 		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the ticket flags");
@@ -243,7 +248,7 @@ public class ManageTickets extends Driver {
 	public void verifySortingOfManageTickets() throws Exception {
 		HashMap<Integer, ManageticketsAPI.Event> events = manageticketsapi.getEventIdWithTktsDetails();
 		Assert.assertNotNull(events);
-
+	
 		int eventId = -1;
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))
 			eventId = manageticketsapi.getEventIdWithMinTktsHavingRenderBarcode(events);
@@ -1018,6 +1023,7 @@ public class ManageTickets extends Driver {
 			String[] expected = manageticketsapi.renderTicketDetails(renderTkt);
 			String[] actual = managetickets.getTicketDetails();
 			Assert.assertEquals(actual, expected, "Verify ticket details for rendered ticket");
+                  
 		}
 		
 		if(cannotRenderTkts != null) {
@@ -1583,6 +1589,9 @@ public class ManageTickets extends Driver {
 		Assert.assertEquals(managetickets.isDonateButtonVisible(null), donate, "Verify donate button is visible");
 		
 		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+			WebElement ele=	getDriver().findElement(By.xpath("(//span[contains(@class,'viewBarcode')])"));
+		    JavascriptExecutor obj = (JavascriptExecutor)getDriver();
+		    obj.executeScript("arguments[0].click();", ele);
 			Assert.assertEquals(managetickets.isScanBarcodeVisible(), view, "Verify scan barcode is visible");
 		} else
 			Assert.assertEquals(managetickets.isViewButtonVisible(), view, "Verify view button is visible");
@@ -2099,7 +2108,7 @@ public class ManageTickets extends Driver {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 	
-	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 24)
+	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 24 , enabled= false)
 	public void verifyBulkTransferTickets() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}

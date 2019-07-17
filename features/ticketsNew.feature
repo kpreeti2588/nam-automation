@@ -280,12 +280,12 @@ Feature: Tickets New
     And User generate TransferId for %{GD_TransferTicketID}
     And User navigates to "/invites/%{GD_TransferID}" from NAM
     When User verify congratulation message
- #   Then User creates account from interstitial
-    Then User creates account from interstitial using Email %{GD_NEW_EMAIL_ADDRESS}
+    Then User creates account from interstitial
+    #Then User creates account from interstitial using Email %{GD_NEW_EMAIL_ADDRESS}
     Then Print Seat Detail %{GD_NEW_EMAIL_ADDRESS} %{GD_NEW_PASSWORD} %{GD_EMAIL_ADDRESS} %{GD_PASSWORD} %{GD_TransferTicketID}
     And Accept ticket from popup and verify success message
- #   And Customer details are fetched for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
- #   And User click on Claim link for ticketId %{GD_TransferTicketID} and %{GD_TransferID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    #And Customer details are fetched for %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+    #And User click on Claim link for ticketId %{GD_TransferTicketID} and %{GD_TransferID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     And Verify ticket status - No Status for ticketId %{GD_TransferTicketID}
     And Verify ticket flags for %{GD_TransferTicketID}, %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
     When User Logout and login again using %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
@@ -359,21 +359,24 @@ Feature: Tickets New
   Scenario: Verify visibility of Barcode Number on UI after enabling and disabling from super admin
     Given Get ticket ID without Deferred Delivery
     Given User navigates to Admin Login and Logs in using Admin Credentials
-    And User navigates to "/admin/config/site-settings" from NAM
+    # And User navigates to "/admin/config/site-settings" from NAM
+    And User navigates to "/admin/config/ticket-management" from NAM
     And Barcode check and save setting "ENABLED"
     And User navigates to "/tickets#/%{GD_EventId}" from NAM
     Then User Logout and login again using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     And User navigates to "/tickets#/%{GD_EventId}" from NAM
     Then Barcode should be "ENABLED" on UI %{GD_TransferTicketID1}
-    When User navigates to "/user/logout" from NAM
+    When User navigates to "/user/LOGOUT" from NAM
     And User navigates to Admin Login and Logs in using Admin Credentials
-    And User navigates to "/admin/config/site-settings" from NAM
+    #And User navigates to "/admin/config/site-settings" from NAM
+    And User navigates to "/admin/config/ticket-management" from NAM
     And Barcode check and save setting "DISABLED"
     And User navigates to "/tickets#/%{GD_EventId}" from NAM
     Then User Logout and login again using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     And User navigates to "/tickets#/%{GD_EventId}" from NAM
     Then Barcode should be "DISABLED" on UI %{GD_TransferTicketID1}
-
+    When User navigates to "/user/LOGOUT" from NAM
+    
   Scenario: Sent Ticket and Claim with Email
     And Save "nitin.mussani@ticketmaster.com" into NEW_EMAIL_ADDRESS
     And Save "iom123" into NEW_PASSWORD
@@ -455,17 +458,17 @@ Feature: Tickets New
   Scenario: Verify complete section ticket transfer through bulk transfer, multiselect icons, modal close etc.
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
-    And  User declines all pending transfers if any
-    And User logs out from NAM
+    And User declines all pending transfers if any
+    And Bulk is enabled on Site
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
-    And  User navigates to myevents page by clicking "VIEW ALL" link on dashboard
+    And User navigates to myevents page by clicking "VIEW ALL" link on dashboard
     Then Verify multiselect icon by default state  at event list page
-    And  User clicks multiselect icon
+    And User clicks multiselect icon
     Then Checkboxes are triggered next to each event
-    And  User is able to select all events via select all Checkbox and send button gets enabled
-    And  User deselects Select All Button
-    And  User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
+    And User is able to select all events via select all Checkbox and send button gets enabled
+    And User deselects Select All Button
+    And User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
     Then Model to select seats is triggered with correct Event Name and Time
     And Model can be closed by clicking  X button
     When User clicks on Send
@@ -479,9 +482,10 @@ Feature: Tickets New
     Then Ticket Transfer complete Dialouge appears
     Then User navigates to Manage tickets page by clicking event name
     Then Transferred tickets are shown as Pending with CANCEL TRANSFER link and proper Firstname and LastName of Transferee
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
+    And User navigates to "/dashboard" from NAM
     And User is able to see tickets transferred info bar on Dashboard with Decline and Accept Button
     And User clicks See Details Link
     Then Transferred tickets are seen
@@ -490,28 +494,28 @@ Feature: Tickets New
     And User is navigated to events page by clicking Go to Event Button
     And User navigates to "/dashboard" from NAM
     Then Transfer Tickets info bar disappears
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
     Then User navigates to Manage tickets page by clicking event name
-    And Transferred tickets are shown as Completed with  proper Firstname and LastName of Transferee and  CANCEL TRANSFER link disappears
+    #And Transferred tickets are shown as Completed with  proper Firstname and LastName of Transferee and  CANCEL TRANSFER link disappears
 
   Scenario: Verify transfer Decline through Bulk transfer, Special chars, Cancel transfer and already added Recipient
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
-    And  User declines all pending transfers if any
-    And User logs out from NAM
+    And User declines all pending transfers if any
+    And Bulk is enabled on Site
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
-    And  User navigates to myevents page by clicking "VIEW ALL" link on dashboard
-    And  User clicks multiselect icon
-    And  User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
+    And User navigates to myevents page by clicking "VIEW ALL" link on dashboard
+    And User clicks multiselect icon
+    And User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
     Then Model to select seats is triggered with correct Event Name and Time
     And User clicks Send All Button for section to send all tickets
     Then Select a Recipient model appears with proper labels for FirstName, LastName, Email and notes
     And User types following details for recipient and clicks Send %{GD_TRANSFEREE_EMAIL_ADDRESS} NAMAutomationTest
     Then Ticket Transfer complete Dialouge appears
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
     And User is able to see tickets transferred info bar on Dashboard with Decline and Accept Button
@@ -522,16 +526,16 @@ Feature: Tickets New
     And User is navigated to My Events page by clicking Go to Event Button
     And User navigates to "/dashboard" from NAM
     Then Transfer Tickets info bar disappears
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
     Then User navigates to Manage tickets page by clicking event name
     And Transferred tickets are shown as Active
     And User navigates to "/dashboard" from NAM
-    And  User navigates to myevents page by clicking "VIEW ALL" link on dashboard
+    And User navigates to myevents page by clicking "VIEW ALL" link on dashboard
     Then Verify multiselect icon by default state  at event list page
-    And  User clicks multiselect icon
-    And  User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
+    And User clicks multiselect icon
+    And User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
     Then Model to select seats is triggered with correct Event Name and Time
     And User clicks Send All Button for section to send all tickets
     And Already added Recipient is present
@@ -542,26 +546,23 @@ Feature: Tickets New
     And User is redirected to my events page
 
   Scenario: Verify transfer Reclaim through bulk transfer
-    When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
-    Then User logged in successfully
-    And  User declines all pending transfers if any
-    And User logs out from NAM
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
-    And  User navigates to myevents page by clicking "VIEW ALL" link on dashboard
-    And  User clicks multiselect icon
-    And  User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
+    And Bulk is enabled on Site
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And User navigates to myevents page by clicking "VIEW ALL" link on dashboard
+    And User clicks multiselect icon
+    And User selects  Valid Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
     Then Model to select seats is triggered with correct Event Name and Time
     And User clicks Send All Button for section to send all tickets
     Then Select a Recipient model appears with proper labels for FirstName, LastName, Email and notes
-    And User types following details for recipient and clicks Send %{GD_TRANSFEREE_EMAIL_ADDRESS} NAMAutomationTest
+    And User types new users's mail id for recipient and clicks Send
     Then Ticket Transfer complete Dialouge appears
-    And Ticket Transfer request is completed at backend
-    And User logs out from NAM
-    When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
+    And User navigates to "/user/LOGOUT" from NAM
+    When New User signs up with new mail id as entered in transfer request
     Then User logged in successfully
     And User is able to see tickets transferred info bar on Dashboard with Decline and Accept Button
-    And User navigates to "/user/logout" from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
     Then User navigates to Manage tickets page by clicking event name
@@ -571,22 +572,22 @@ Feature: Tickets New
   Scenario: Verify two events transfer through bulk transfer
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
-    And  User declines all pending transfers if any
-    And User logs out from NAM
+    And User declines all pending transfers if any
+    And Bulk is enabled on Site
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
-    And  User navigates to myevents page by clicking "VIEW ALL" link on dashboard
-    And  User clicks multiselect icon
-    And  User selects  Valid  two Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
+    And User navigates to myevents page by clicking "VIEW ALL" link on dashboard
+    And User clicks multiselect icon
+    And User selects  Valid  two Event for Complete Section Bulk Transfer and click Send Tickets button for member %{GD_EMAIL_ADDRESS} %{GD_PASSWORD}
     Then Model to select seats is triggered with correct Event Names and Time for both Events
     And User clicks Send All Button for two section to send all tickets
     And User types following details for recipient and clicks Send %{GD_TRANSFEREE_EMAIL_ADDRESS} NAMAutomationTest
     Then Ticket Transfer complete Dialouge appears
-    And Ticket Transfer request is completed at backend
     Then User navigates to Manage tickets pages by clicking event names one by one and Transferred tickets are shown for two events as Pending with CANCEL TRANSFER
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
     Then User logged in successfully
+    And User navigates to "/dashboard" from NAM
     And User is able to see tickets transferred info bar on Dashboard with Decline and Accept Button
     And User clicks See Details Link
     Then Tickets transferred are seen for two events
@@ -595,7 +596,7 @@ Feature: Tickets New
     And User is navigated to My Events page by clicking Go to Event Button
     And User navigates to "/dashboard" from NAM
     Then Transfer Tickets info bar disappears
-    And User logs out from NAM
+    And User navigates to "/user/LOGOUT" from NAM
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
-    Then User navigates to Manage tickets pages by clicking event name one by one  and Transferred tickets for two events are shown as Completed and  CANCEL TRANSFER link disappears
+    #Then User navigates to Manage tickets pages by clicking event name one by one  and Transferred tickets for two events are shown as Completed and  CANCEL TRANSFER link disappears

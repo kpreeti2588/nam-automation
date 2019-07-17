@@ -12,12 +12,12 @@ public class TempPassword extends Driver {
 	   runScenario(Dictionary.get("SCENARIO"));
 	}
 	
-	@Test(groups={"smoke","regression","user_journey","criticalbusiness","resetpassword"}, priority = 2)
+	@Test(groups={"smoke","regression","user_journey","criticalbusiness","resetpassword"}, priority = 2, dependsOnMethods="verifyResetPassword")
 	public void verifyUserLoginafterResetPasswordRequest() throws Throwable {
 	   runScenario(Dictionary.get("SCENARIO"));
 	}
 	
-	@Test(groups={"smoke","regression","user_journey","criticalbusiness","resetpassword"}, priority = 3)
+	@Test(groups={"smoke","regression","user_journey","criticalbusiness","resetpassword"}, priority = 3 ,enabled=false)
 	public void verifyResetPasswordExpireafterChangingPassword() throws Throwable {
 	   runScenario(Dictionary.get("SCENARIO"));
 	}

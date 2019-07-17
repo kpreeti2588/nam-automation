@@ -182,7 +182,20 @@ public class AccessToken extends BaseUtil{
 		  InputStream is = utils.waitForTMManageTicketsResponse(url, new String[] {"Content-Type", "Accept", "Accept-Language", "X-Client", "X-Api-Key", "X-OS-Name", "X-OS-Version", "X-Auth-Token"}, new String[] {"application/json", Environment.get("amgrVersion").trim().replace(" ", "+"), Environment.get("acceptLanguage").trim(), Environment.get("x-client").trim(), Environment.get("x-api-key").trim(), Environment.get("x-os-name").trim(), Environment.get("x-os-version").trim(), accesstoken}, false);
 		  JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
 		  return jsonObject;
-	  }
-	
+	}
+
+
+	public String postOauthTokenAAPI() throws IOException, JSONException {
+		String url = Environment.get("AAPI_AUTH").trim()+"/userauth";
+		String token = null;
+		try {
+			InputStream is = utils.post(url, "{\"username\":\"inet01\",\"password\":\"xinet01\"}", new String[]{"Content-Type", "DSN", "ClientId", "Accept-Language"}, new String[]{"application/json", "genesis", "genesis", "en-us"});
+			JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
+			token = jsonObject.getString("token");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return token;
+	}
 	
 }

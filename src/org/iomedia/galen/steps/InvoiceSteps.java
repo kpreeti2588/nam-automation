@@ -1,21 +1,24 @@
 package org.iomedia.galen.steps;
 
+import java.awt.AWTException;
 import org.iomedia.common.BaseUtil;
 import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.pages.Invoice;
-
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class InvoiceSteps {
 	
 	Invoice invoice;
+	InvoiceNewSteps new_invoice;
 	Utils utils;
 	BaseUtil base;
 	org.iomedia.framework.Assert Assert;
 	
-	public InvoiceSteps(Invoice invoice, Utils utils, BaseUtil base, org.iomedia.framework.Assert Assert) {
+	public InvoiceSteps(Invoice invoice,Utils utils, BaseUtil base, org.iomedia.framework.Assert Assert,InvoiceNewSteps newinvoice) 
+	{
 		this.invoice = invoice;
+		this.new_invoice=newinvoice;
 		this.utils = utils;
 		this.base = base;
 		this.Assert = Assert;
@@ -27,7 +30,7 @@ public class InvoiceSteps {
 		amtDue = (String) base.getGDValue(amtDue);
 		
 		if(invoiceId.trim().contains("/"))
-			invoiceId = invoiceId.trim().substring(0, invoiceId.trim().lastIndexOf("/"));
+		invoiceId = invoiceId.trim().substring(0, invoiceId.trim().lastIndexOf("/"));
 		invoice.isInvoiceSelected(Integer.valueOf(invoiceId), null);
 		base.sync(5000L);
 		Assert.assertTrue(invoice.isInvoiceDetailDisplayed(null), "Verify invoice detail block is displayed");
@@ -48,15 +51,21 @@ public class InvoiceSteps {
 	
 	@When("^Continue button gets display$")
 	public void continue_button_gets_display() {
-		invoice.isContinueButtonDisplayed();
+		//invoice.isContinueButtonDisplayed();
+		
 		String invDue = invoice.amountDue();
+		System.out.println(invDue);
 		base.Dictionary.put("InvoiceDue", invDue);
-		invoice.clickContinueButton();
+		new_invoice.clickContinueButton();
+		//invoice.clickContinueButton();
 	}
 	//method identify survey tab displaying
 	@Then("^Verify survey tab gets display$")
-	public void verify_surveytab_display() {
+	public void verify_surveytab_display() throws InterruptedException, AWTException 
+	{
 		Assert.assertTrue(invoice.isSurveyDisplay().trim().contains("Questions"),"Survey tab is not found");
+		invoice.submit_Typeform();
+		
 	}
 	
 	@When("^User clicks on pay in full$")

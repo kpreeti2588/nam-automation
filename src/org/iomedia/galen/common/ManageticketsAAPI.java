@@ -37,7 +37,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class ManageticketsAAPI extends AccessToken{
 
-  String host, emailaddress, password, accessToken, hostAAPI, TMPSCorrelationId,clientId,aapiClientId;
+  String host, emailaddress, password, accessToken, hostAAPI, TMPSCorrelationId,clientId,aapiClientId, hostAAPIAuth;
   String path = System.getProperty("user.dir");
  // private String sentTicketRequest = path + "/APIRequest/sendTicket.json";
   private String sentTicketRequestAAPI = path + "/APIRequest/sendTicketAAPI.json";
@@ -51,6 +51,7 @@ public class ManageticketsAAPI extends AccessToken{
 	  Environment = Environment == null || Environment.size() == 0 ? (driverFactory.getEnvironment() == null ? null : driverFactory.getEnvironment().get()) : Environment;
 	  host= Environment.get("TM_HOST").trim();
 	  hostAAPI = Environment.get("AAPI_HOST").trim();
+	  hostAAPIAuth = Environment.get("AAPI_AUTH").trim();
 	  TMPSCorrelationId = Environment.get("TMPSCorrelationId").trim();
 	  clientId = Environment.get("CLIENT_ID").trim();
 	  aapiClientId = Environment.get("AAPI_CLIENT_ID").trim();
@@ -2226,36 +2227,39 @@ public class ManageticketsAAPI extends AccessToken{
 		if (events != null) {
 			for (int i = 0; i < events.length(); i++) {
 				JSONObject event = events.getJSONObject(i);
-				String event_name = event.getString("name");
-				int eventId = event.getInt("id");
-				JSONObject eventDate = event.getJSONObject("date");
-				boolean has_date_override = eventDate.getBoolean("hasDateOverride");
-				boolean has_time_override = eventDate.getBoolean("hasTimeOverride");
-				String date_override_text = "";
-				String time_override_text = "";
-				if (has_date_override) {
-					date_override_text = eventDate.getString("dateOverrideText");
+				String type = event.getString("type");
+				if (type.equals("event") || type.equals("parking")) {
+					String event_name = event.getString("name");
+					int eventId = event.getInt("id");
+					JSONObject eventDate = event.getJSONObject("date");
+					boolean has_date_override = eventDate.getBoolean("hasDateOverride");
+					boolean has_time_override = eventDate.getBoolean("hasTimeOverride");
+					String date_override_text = "";
+					String time_override_text = "";
+					if (has_date_override) {
+						date_override_text = eventDate.getString("dateOverrideText");
+					}
+					if (has_time_override) {
+						time_override_text = eventDate.getString("timeOverrideText");
+					}
+					Date datetime = null;
+					Date date = null;
+					Date time = null;
+					if (eventDate.has("datetime")) {
+						SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+						datetime = sm.parse(eventDate.getString("datetime").trim());
+					}
+					if (!has_date_override) {
+						SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
+						date = sm.parse(eventDate.getString("date"));
+					}
+					if (!has_time_override) {
+						SimpleDateFormat sm = new SimpleDateFormat("HH:mm:ss");
+						time = sm.parse(eventDate.getString("time"));
+					}
+					_Event _event = new _Event(event_name, datetime, date, time, has_date_override, has_time_override, time_override_text, date_override_text, eventId);
+					_events.add(_event);
 				}
-				if (has_time_override) {
-					time_override_text = eventDate.getString("timeOverrideText");
-				}
-				Date datetime = null;
-				Date date = null;
-				Date time = null;
-				if (eventDate.has("datetime")) {
-					SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-					datetime = sm.parse(eventDate.getString("datetime").trim());
-				}
-				if (!has_date_override) {
-					SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
-					date = sm.parse(eventDate.getString("date"));
-				}
-				if (!has_time_override) {
-					SimpleDateFormat sm = new SimpleDateFormat("HH:mm:ss");
-					time = sm.parse(eventDate.getString("time"));
-				}
-				_Event _event = new _Event(event_name, datetime, date, time, has_date_override, has_time_override, time_override_text, date_override_text, eventId);
-				_events.add(_event);
 			}
 		}
 		Collections.sort(_events);
@@ -3821,11 +3825,158 @@ public class ManageticketsAAPI extends AccessToken{
 		return eventsDetail;
 	}
 
-	public boolean verifyTransferSuccessful(String tid) throws Exception {
-		String accessToken = getAccessToken(emailaddress, password);
+	/*public boolean verifyTransferSuccessful(String tid) throws Exception {
+		String accessToken = getAccessToken(String username, String password);
 		getAccountId(accessToken);
 		JSONObject jsonObject = get(host+"/members/"+Dictionary.get("member_id")+"/transfers/"+tid, accessToken);
 		return true;
+	}*/
+
+	public HashMap<String, String> getQDFunds() {
+		HashMap Funds = new HashMap<String,String>();
+		try {
+			String accessToken = postOauthTokenAAPI();
+			Object[] ab=utils.get(hostAAPIAuth+"/donations/funds", new String[] {"Content-Type", "Token", "DSN", "ClientId", "Accept-Language"}, new String[] {"application/json", accessToken, "genesis", "genesis", "en-us" });
+			InputStream is = (InputStream) ab[0];
+			JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
+			JSONObject embedded = (JSONObject) jsonObject.get("_embedded");
+			JSONArray funds =(JSONArray) embedded.get("funds");
+			for(int i = 0; i < funds.length(); i++) {
+			JSONObject fund = funds.getJSONObject(i);
+			String name = fund.getString("name");
+			String minAmt = String.valueOf(fund.getInt("minAmount")/100);
+			Funds.put(name,minAmt);
+		}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Funds;
+	}
+
+
+	/*public HashMap<String, String> aaaa (String uname, String passwd) throws Exception {
+		HashMap<String, String> eventDetail = new HashMap<String, String>();
+		List<_Event> eventDetailsMember = null;
+
+		try {
+			eventDetailsMember = getEventDetails(uname, passwd);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (ManageticketsAAPI._Event eventId : eventDetailsMember) {
+			JSONArray sections = null;
+			List<Boolean> canTransfer = new ArrayList<Boolean>();
+
+			getSectionDetailsForEvent();
+
+			sections = getAllSectionsForAnyEvent(String.valueOf(eventId.getEventId())).getJSONObject("_embedded").getJSONArray("sections");
+
+			for (int i = 0; i < sections.length(); i++) {
+
+				String sectionDetails = String.valueOf(getSectionDetailsForEvent(String.valueOf(eventId.getEventId()), (String.valueOf(sections.getJSONObject(i).get("id")))));
+				canTransfer.addAll(JsonPath.read(sectionDetails, "$.rows[*].seats[*].actions.canResale"));
+				canTransfer.removeAll(Collections.singleton(false));
+				if(canTransfer.size()>=3){
+					eventDetail.put("number", String.valueOf(canTransfer.size()));
+					eventDetail.put("section", String.valueOf(sections.getJSONObject(i).get("name")));
+					eventDetail.put("eventname", eventId.getEventName());
+					eventDetail.put("eventid", String.valueOf(eventId.getEventId()));
+					return eventDetail;
+				} else {
+					canTransfer.clear();
+				}
+			}
+		}
+		throw  new SkipException("Not able to get Transferable event/tickets for logged in user. Please try with another user");
+	}*/
+
+
+	public HashMap<String, String> getResaleableEventForMember(String uname, String passwd) {
+		HashMap<String, String> eventDetail = new HashMap<String, String>();
+		String accessToken = null;
+		String url = null;
+		if (Dictionary.get("AccessToken").equalsIgnoreCase("")) {
+			try {
+				accessToken = getAccessToken(emailaddress, password);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Dictionary.put("AccessToken", accessToken);
+		}
+		List<_Event> eventDetailsMember = null;
+		try {
+			eventDetailsMember = getEventDetails(uname, passwd);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		List<String> canresale = new ArrayList<String>();
+
+		for (ManageticketsAAPI._Event eventId : eventDetailsMember) {
+			if (eventId.getEventId()<1045) {continue;}
+			JSONObject jsonObject;
+			url = host + "/api/v1/member/" + Dictionary.get("member_id") + "/inventory/search?event_id=" + eventId.getEventId();
+			try {
+				jsonObject = get(url, accessToken);
+				String json = String.valueOf(jsonObject);
+				canresale.addAll(JsonPath.read(json, "$.inventory_items[*].sections[*].rows[*].tickets[?(@.can_resale == true)].ticket_id"));
+				//canresale.removeAll(Collections.singleton(false));
+				canresale.toString();
+				if (canresale.size() >= 2) {
+					eventDetail.put("number", String.valueOf(canresale.size()));
+					eventDetail.put("eventname", eventId.getEventName());
+					eventDetail.put("eventid", String.valueOf(eventId.getEventId()));
+					eventDetail.put("seats", String.join(";",canresale));
+					return eventDetail;
+				} else {
+					canresale.clear();
+				}
+			} catch (Exception e){
+			e.printStackTrace();
+			}
+		}
+		throw  new SkipException("Not able to get Resaleable event/tickets for logged in user. Please try with another user");
+	}
+
+	public  double getResalePolicyForMember(String [] tickets, int price) {
+		HashMap<String, String> eventDetail = new HashMap<String, String>();
+		String accessToken = null;
+		String url = null;
+		ArrayList<Integer> addend = new ArrayList<>();
+		ArrayList<Double> multiplier = new ArrayList<>();
+		double multipliervalue = 0.0f;
+		int addendvalue=0;
+		if (Dictionary.get("AccessToken").equalsIgnoreCase("")) {
+			try {
+				accessToken = getAccessToken(emailaddress, password);accessToken = getAccessToken(emailaddress, password);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Dictionary.put("AccessToken", accessToken);
+		} else { accessToken = Dictionary.get("AccessToken"); }
+
+		StringBuilder param = new StringBuilder();
+
+		for( int i=0; i<2;i++) {
+			param.append("&ticket_id[]="+tickets[i]);
+		}
+
+			JSONObject jsonObject;
+			url = host + "/api/v1/member/" + Dictionary.get("member_id") + "/posting/policy?"+param;
+			try {
+				jsonObject = get(url, accessToken);
+				String json = String.valueOf(jsonObject);
+				addend.addAll(JsonPath.read(json, "$.posting_group_policies[*].posting_policy.price_formula.addend"));
+				multiplier.addAll(JsonPath.read(json, "$.posting_group_policies[*].posting_policy.price_formula.multiplier"));
+				for (Double s : multiplier) { multipliervalue = multipliervalue + s; }
+				for (Integer s : addend) { addendvalue = addendvalue + s; }
+				multipliervalue = multipliervalue/multiplier.size();
+				addendvalue = addendvalue/addend.size();
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+
+		return (price - addendvalue)/multipliervalue;
 	}
 }
 

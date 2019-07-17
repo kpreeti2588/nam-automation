@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><selenium>
 	<common>
-		<calendar>PROD_SANITY</calendar>
+		<calendar>AMGR_BUILD_SANITY_MOBILE</calendar>
 		<implicitWait>26000</implicitWait>
 		<version>VER_JUNE_2017</version>	
 		<env>GENESIS</env>
@@ -13,13 +13,11 @@
 		<specFolderPath>/specs/</specFolderPath>
 		<reportColor>#009CDE</reportColor>
 		<orgName>AMGR Testing</orgName>
-		<ProdEmailAddress>namtest@ticketmaster.com</ProdEmailAddress>
-		<ProdPassword>x9876</ProdPassword>
 		<autoDetectAndroidDevices>false</autoDetectAndroidDevices>
 		<autoDetectIOSDevices>false</autoDetectIOSDevices>
 		<takeScreenshot>true</takeScreenshot>
 	    <emailNotification>true</emailNotification>
-   		<suiteTo>preeti.kumari@ticketmaster.com;</suiteTo>
+   		<suiteTo>prateek.ladha@ticketmaster.com;</suiteTo>
 	    <classTo></classTo>
 	    <attachSSInEmail>false</attachSSInEmail>
 	    <zipping>false</zipping>
@@ -35,10 +33,10 @@
 		<agilePackage>org.iomedia.galen.tests</agilePackage>
 		<testSet>SeleniumReport</testSet>
 		<clearX>F</clearX>
-		<mailbox>nitin.mussani@LYV.livenation.com</mailbox>
-		<passkey>X1jpxSIIJSd4c52kwtp6cgWOaXoOOeJT4qIHmVgGkLo=</passkey>
-		<mailbox_2>nitin.mussani@LYV.livenation.com</mailbox_2>
-		<passkey_2>X1jpxSIIJSd4c52kwtp6cgWOaXoOOeJT4qIHmVgGkLo=</passkey_2>
+		<mailbox>jitendra.roy@LYV.livenation.com</mailbox>
+		<passkey>ReyD/3klODvMu3EIEWSajlLlDmmmoPJoRA+iDAMMPng=</passkey>
+		<mailbox_2>jitendra.roy@LYV.livenation.com</mailbox_2>
+		<passkey_2>ReyD/3klODvMu3EIEWSajlLlDmmmoPJoRA+iDAMMPng=</passkey_2>
 		<replaceCalendarFile>false</replaceCalendarFile>
 		<jenkinsIpAddress>10.191.126.11:8080</jenkinsIpAddress>
 		<noOfRetriesForSameOperation>3</noOfRetriesForSameOperation>
@@ -112,12 +110,12 @@
 	<ios1>
 		<platformName>iOS</platformName>
 		<platformVersion>10.2</platformVersion>
-	    <deviceName>iPhone 7 Simulator</deviceName>
+	    <deviceName>iPhone 7</deviceName>
 	    <deviceOrientation>portrait</deviceOrientation>
 	    <deviceType>phone</deviceType>
 <!-- 		<ip>http://docker.for.mac.localhost:5555/wd/hub</ip> -->
 		<ip>http://localhost:5555/wd/hub</ip>
-		<udid>91E29908-1ABE-4C99-9A16-3777795E70C6</udid>
+		<udid>44AF4A00-D1E7-4CF4-BC59-0A92CAEFF805</udid>
 	</ios1>
 	<ios2>
 		<platformName>iOS</platformName>

@@ -22,7 +22,7 @@
 			@if ${isVisible("eventsList.sectionTitle")}
 				aligned vertically left eventsList.sectionTitle ~${parseFloat("0") + parseFloat(getCssProperty("quickLinks", "padding-left"))}px
 			#text is "Quick Links"
-			css font-family contains "verta"
+			css font-family contains "AvertaPeRegular"
 
 		| first promoTiles-*:
 			below quickLinks ~16 px

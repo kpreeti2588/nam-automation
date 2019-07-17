@@ -44,6 +44,21 @@ public class AdminLogin extends BaseUtil {
 	private By url = By.id("txtURL");
 	// private By header = By.id("txtHeader");
 	// private By response = By.id("txtResponse");
+	
+	private By adduserbutton = By.xpath("//ul[@class='action-links']/li/a");
+	private By adduserEmail= By.xpath("//input[@type='email' and @name='mail']");
+	private By usernamecms = By.xpath("//input[@id='edit-name' and @name='name' ]");
+	private By newpassword= By.xpath("//input[@id='edit-pass-pass1']");
+	private By confirmnewpassword = By.xpath("//input[@id='edit-pass-pass2']");
+	private By tmsupportcheck = By.xpath("//input[@value='support_admin4']");
+	private By createnewaccountButton = By.xpath("//input[@value='Create new account']");
+	private By statusmessageuser= By.xpath("//div[@class='messages messages--status']/a/em");
+	
+	public String Addusername ="automationsuport4";
+	public String AddNewpassword ="123456";
+	public String addemailadress ="automationsuport4@gmail.com";
+	
+	
 	String path = System.getProperty("user.dir");
 	private String invoiceRequest = path + "/APIRequest/invoiceListRequest.json";
 	private String upsellRequest = path + "/APIRequest/upsellRequest.json";
@@ -1130,9 +1145,73 @@ public class AdminLogin extends BaseUtil {
 		return obj;
 	}
 	
-	public void changePasswordOfSiteAdminUser() throws Exception {
-		type(By.xpath("//*[contains(@class,'password-field')]"), "New Password", "123456");
-		type(By.xpath("//*[contains(@class,'password-confirm form-text')]"), "Confirm Password", "123456");
-		click(By.xpath("//input[@id='edit-submit']"), "Save");
+	public By filtername=By.id("edit-user");
+	public By search=By.id("edit-submit-user-admin-people");
+	public By editlink=By.linkText("Edit");
+	
+	public void filterSiteadmin() throws Exception
+	{
+		click(filtername, "Name or Email");
+		type(filtername, "siteadmin", "siteadmin");
+		click(search, "Select Support 4 Role");
+		click(editlink, "Siteadmin Edit link");
 	}
+	
+	public void changePasswordOfSiteAdminUser() throws Exception {
+		type(By.id("edit-pass-pass1"), "New Password", "123456");
+		type(By.id("edit-pass-pass2"), "Confirm Password", "123456");
+		click(By.id("edit-roles-site-admin"), "Uncheck Site Admin");
+		WebElement check=getDriver().findElement(By.id("edit-roles-support-admin4"));
+		String flag= check.getAttribute("checked");
+		
+		if(flag!="checked") 
+		{
+		click(By.id("edit-roles-support-admin4"), "Select Support 4 Role");
+		}
+		click(By.id("edit-submit"), "Save");
+		
+	}
+	
+	public void adduserbutton() {
+		if(utils.checkIfElementClickable(adduserbutton, 10)) {
+		click(adduserbutton, "AddUserButton");
+		}else {
+			System.out.println("Element is not present");
+		}
+	}
+	
+	public void createuserCMS() throws Exception {
+		type(adduserEmail,"Email Address", addemailadress);
+		type(usernamecms, "User Name", Addusername);
+		type(newpassword, "New Password", AddNewpassword);
+		type(confirmnewpassword, "Confirm New Password", AddNewpassword);
+		click(tmsupportcheck, "TMSupport Check",10);
+		click(createnewaccountButton, "Create Account Button",10);
+		String statustext=utils.getText(statusmessageuser, 10);
+		if(statustext.equals(Addusername)) {
+			System.out.println("Account Add Succesfully");
+		}else {
+			System.out.println("Account Not Add Succesfully");
+		}
+	}
+	
+	public void createAdduserCMS() throws Exception {
+	  List<WebElement>  col = getDriver().findElements(By.xpath("//table/tbody/tr/td[2]"));
+      Boolean flag = false; 
+      
+      for(int i=1; i<=col.size();i++) {
+    	  WebElement user = getDriver().findElement(By.xpath("(//table/tbody/tr/td[2])["+i+"]"));
+    	  String  useraccountname = user.getText();
+    	  if(useraccountname.equals(Addusername)) {
+    		  System.out.println("Account exsits");
+    		  flag = true;
+    		  break;
+    	  }
+      }
+      if (flag==false) {
+    	  adduserbutton();
+		  createuserCMS(); 
+      }      
+	}
+		
 }

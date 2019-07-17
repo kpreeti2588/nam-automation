@@ -45,7 +45,7 @@ public class Hamburger extends BaseUtil {
 			utils.getElementWhenPresent(signoutLink, 40);
 		}
 		else {
-			getElementWhenPresent(userFullName, 40);
+			getElementWhenPresent(userFullName, 60);
 		}
 		
 		return true;

@@ -46,7 +46,7 @@ public class InternationalSteps {
 	
 	@Then("^Verify Footer Text in Each Page$")
 	public void verify_footer_text() throws Exception {
-		Assert.assertEquals(page.getCopyRightTextinOtherLanguage(),"© 1999-2018 Ticketmaster. Tous droits réservés.", "Translation gets matched ");
+		Assert.assertEquals(page.getCopyRightTextinOtherLanguage(),"© 1999-2019 Ticketmaster. Tous droits réservés.", "Translation gets matched ");
 		Assert.assertEquals(page.getPolicyinOtherLanguage(),"Politique de confidentialité", "Translation gets matched ");
 		Assert.assertEquals(page.getTermsinOtherLanguage(),"Conditions d'utilisation", "Translation gets matched ");
 //		Assert.assertEquals(utils.ReadFromPOFile(base.Dictionary.get("PRIVACY_POLICY")), page.getPolicyinOtherLanguage(), "Translation gets matched ");

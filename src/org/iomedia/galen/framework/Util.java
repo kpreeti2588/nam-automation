@@ -213,7 +213,7 @@ public class Util {
 	
 	public boolean isProd() {
     	String tm_host = Environment.get("APP_URL").trim();
-    	if(tm_host.contains("am.ticketmaster.com") || tm_host.contains("stg1-am.ticketmaster.com")) {
+    	if(tm_host.contains("am.ticketmaster.com") || tm_host.contains("support.nam.prd214.preprodpci3.us-east-1.tktm.io")) {
     		return true;
     	} else {
     		return false;

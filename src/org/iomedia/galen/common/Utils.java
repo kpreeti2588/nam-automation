@@ -21,13 +21,8 @@ import java.net.URLEncoder;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +31,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.touch.LongPressOptions;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.ssl.SSLContexts;
@@ -47,17 +51,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.*;
 
 import org.iomedia.framework.Assert;
 import org.iomedia.framework.Reporting;
 import org.iomedia.framework.SoftAssert;
 import org.iomedia.framework.WebDriverFactory;
+
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Utils extends BaseUtil {
 	
@@ -390,7 +393,6 @@ public class Utils extends BaseUtil {
 		}
 	}
 	
-
 	public String loginThruDrupalApi(String emailaddress, String password) throws Exception {
 		Util util = new Util(Environment);
 		String sessionCookie = util.post(Environment.get("APP_URL") + "/user/login?_format=json", "{\"name\":\"" + emailaddress + "\",\"pass\":\"" + password + "\",\"remember_me\":0}", new String[]{"accept", "accept-encoding", "accept-language", "content-type", "user-agent"}, new String[]{"application/json, text/plain, */*", "utf-8", "en-GB,en-US;q=0.8,en;q=0.6", "application/json", "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"});
@@ -552,12 +554,14 @@ public class Utils extends BaseUtil {
 	
 	public void fillSurveyForm() {
 		By ok = By.cssSelector("#typeform li div[class*='button'] span:first-child");
-		By submit = By.cssSelector("#typeform #unfixed-footer div[class*='submit']");
+		//By submit = By.cssSelector("#typeform #unfixed-footer div[class*='submit']");
+		By submit = By.xpath("//div[text()='Submit']");
 		By textBox = By.cssSelector("#typeform li input[type='text']");
 		By radioButton = By.cssSelector("#typeform li input[type='radio']");
 		By checkBox = By.cssSelector("#typeform li input[type='checkbox']");
 		By dropDown = By.cssSelector("#typeform li select[name*='question']");
-		By choiceButton = By.xpath(".//*[@id='typeform']//li//input[@value='Yes']/..//div[@class='bd']");
+		By choiceButton = By.xpath(".//*[@id='typeform']//li//input[@value='Yes']/..//div[@class='bd'] | (//div[text()='Yes'])[2]");
+		
 		WebElement wesubmit = null;
 		boolean flag = false;
 		sync(5000L);
@@ -573,7 +577,7 @@ public class Utils extends BaseUtil {
 				wesubmit = getElementWhenVisible(submit);
 			}
 		} while(flag && wesubmit == null);
-		click(submit, "Submit");
+		click(submit, "Submit",1);
 	}
 	
 	public void click(By locator, String objName, long... waitSeconds){
@@ -1781,4 +1785,113 @@ public class Utils extends BaseUtil {
 		}
 
 	}
+
+	public void typeKeys(By e, String s) throws Exception {
+		WebElement we = getElementWhenVisible(e);
+		if(driverType.trim().toUpperCase().contains("IOS")) {
+			we.clear();
+			we.sendKeys(s);
+		} else {
+			type(we, "Email address", s);
+			we.sendKeys(Keys.TAB);
+		}
+
+	}
+
+	public void clearAndSetText(By by, String text)
+	{
+		WebElement element = getDriver().findElement(by);
+		Actions navigator = new Actions(getDriver());
+		navigator.click(element)
+				.sendKeys(Keys.END)
+				.keyDown(Keys.SHIFT)
+				.sendKeys(Keys.HOME)
+				.keyUp(Keys.SHIFT)
+				.sendKeys(Keys.BACK_SPACE)
+				.sendKeys(text)
+				.perform();
+	}
+
+	public void type(By locator, String objName, String textToType, long... waitSeconds) throws Exception {
+		WebElement we = this.getElementWhenVisible(locator, waitSeconds);
+
+		for(int intCount = 1; intCount <= 4; ++intCount) {
+			try {
+				this.clear(we);
+				this.sendKeys(we, textToType);
+				if ((this.driverType.trim().toUpperCase().contains("IOS") || this.driverType.trim().toUpperCase().contains("ANDROID")) && we.getAttribute("value").trim().equalsIgnoreCase(textToType.trim()) || (this.driverType.trim().toUpperCase().contains("CHROME") || this.driverType.trim().toUpperCase().contains("FIREFOX") || this.driverType.trim().toUpperCase().contains("SAFARI") || this.driverType.trim().toUpperCase().contains("IE")) && we.getAttribute("value").trim().equalsIgnoreCase(textToType.trim()) || we.getText().trim().equalsIgnoreCase(textToType.trim()) || we.getAttribute("name").trim().equalsIgnoreCase(textToType.trim())) {
+					we.clear();
+					break;
+				}
+			} catch (Exception var8) {
+				we = this.getElementWhenVisible(locator, waitSeconds);
+			}
+
+			if (intCount == 4) {
+				this.Reporter.log("Validate user is able to enter text - " + textToType + " into editbox - " + objName.toLowerCase(), "Text - " + textToType + " should be entered into editbox - " + objName.toLowerCase(), "Not able to enter text - " + textToType + " into editbox - " + objName.toLowerCase(), "Fail");
+				throw new Exception("Not able to enter text - " + textToType + " into editbox - " + objName.toLowerCase());
+			}
+		}
+
+		this.Reporter.log("Validate user is able to enter text - " + textToType + " into editbox - " + objName.toLowerCase(), "Text - " + textToType + " should be entered into editbox - " + objName.toLowerCase(), "User entered text - " + textToType + " into editbox - " + objName.toLowerCase(), "Pass");
+	}
+
+
+	public void swipe(IOSDriver<?> ios, int startx, int starty, int endx, int endy, Duration duration) {
+		int xOffset = endx - startx;
+		int yOffset = endy - starty;
+		//(new TouchAction(ios)).longPress(startx, starty).waitAction(duration).moveTo(xOffset, yOffset).release().perform();
+		
+		new TouchAction(ios)
+		.press(PointOption.point(startx, starty))
+		.waitAction(WaitOptions.waitOptions(duration))
+		.moveTo(PointOption.point(xOffset, yOffset))
+		.release().perform();	
+	}
+
+	public void waitForPageLoad() {
+		new WebDriverWait(getDriver(), 20).until(
+				webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+		getDriver().manage().timeouts().pageLoadTimeout(20, SECONDS);
+	}
+
+	public void waitTillElementVisible(By xpath, int sec) {
+		//WebDriverWait wait = new WebDriverWait(getDriver(), sec);
+		FluentWait wait = new FluentWait(getDriver())
+				.withTimeout(2, SECONDS)
+				.pollingEvery(sec, SECONDS)
+				.ignoring(TimeoutException.class);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(xpath));
+	}
+
+	public boolean checkIfElementClickable(By xpath, int sec) {
+		try {
+			new WebDriverWait(getDriver(), sec).until(ExpectedConditions.elementToBeClickable(xpath));
+			return true;
+		} catch (Exception var39) {
+			return false;
+		}
+	}
+
+	public boolean checkIfElementsClickable(By args[]) {
+		try {
+			for(By ele : args)
+				new WebDriverWait(getDriver(), 0).until(ExpectedConditions.elementToBeClickable(ele));
+			return true;
+		} catch (Exception var39) {
+			return false;
+		}
+	}
+
+	public void sendBackSpace (By element, int number ) {
+		while(number!=0) {
+            try {
+                sendKeys(element,Keys.BACK_SPACE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            number--;
+		}
+	}	
+	
 }

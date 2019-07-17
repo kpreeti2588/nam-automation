@@ -6,21 +6,19 @@ import java.util.List;
 
 import org.iomedia.common.BaseUtil;
 import org.iomedia.galen.common.Utils;
+
 import org.iomedia.galen.pages.AddNewPage;
 import org.iomedia.galen.pages.CMS;
 import org.iomedia.galen.pages.ContentPageEdit;
 import org.iomedia.galen.pages.SuperAdminPanel;
 import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
-
 import cucumber.api.DataTable;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.But;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import java.util.Calendar;
-import java.util.Dictionary;
 
 public class CMSSteps {
 	
@@ -31,32 +29,33 @@ public class CMSSteps {
 	BaseUtil base;
 	Utils utils;
 	org.iomedia.framework.Assert Assert;
+	//Homepage homepage;
 	
-	public CMSSteps(SuperAdminPanel adminPanel, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, AddNewPage addNewPage,ContentPageEdit contentPageEdit,CMS cms) {
-		this.adminPanel = adminPanel;
+	//public CMSSteps(Homepage hm,SuperAdminPanel adminPanel, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, AddNewPage addNewPage,ContentPageEdit contentPageEdit,CMS cms)
+	public CMSSteps(SuperAdminPanel adminPanel, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, AddNewPage addNewPage,ContentPageEdit contentPageEdit,CMS cms)
+	{
+	this.adminPanel = adminPanel;
 		this.base = base;
 		this.utils = utils;
 		this.Assert = Assert;
 		this.addNewPage = addNewPage;
 		this.contentPageEdit =contentPageEdit;
 		this.cms = cms;
+		//this.homepage=hm;
 	}
-	
+	//user_navigates_to_from_nam 
 	@When("^User login into CMS$")
-	public void user_login_into_cms_using_and() {
-		
+	public void user_login_into_cms_using_and() throws InterruptedException {	
 			String userName = base.Dictionary.get("cmsUserName");
 			String password = base.Dictionary.get("cmsPassword");
-		adminPanel.login(userName, password);
+		    adminPanel.login(userName, password);
 	}
 	
 	@When("^User login into CMS with support user$")
-	public void user_login_into_cms_with_support_user() {
+	public void user_login_into_cms_with_support_user() throws InterruptedException {
 		String username, password;
-//		username = "automation_editor_manager";
-//		password = "nam_editor_manager";
-		username = "siteadmin";
-		password = "123456";
+		username = "automation_editor_manager";
+		password = "nam_editor_manager";
 		adminPanel.login(username, password);
 	}
 	
@@ -331,8 +330,7 @@ public class CMSSteps {
 				System.out.println(list.get(i).getText());
 			}
 			else {
-				adminPanel.selectLanguageFromDropdown("Français - FR");
-//				throw new SkipException("Only" +list.get(i).getText() +"Language is getting dispayed. No internationalization Enabled.");
+				throw new SkipException("Only" +list.get(i).getText() +"Language is getting dispayed. No internationalization Enabled.");
 			}
 		}
 	}
@@ -493,8 +491,117 @@ public class CMSSteps {
 		cms.verifyClaimForgotPasswordLabel();
 	}
 	
+	//dashboard config
+	
+	@And("^Click on Settings - View Dashboard config$")
+	public void ClickonSettings_ViewDashboardconfig() throws Exception{	
+		cms.ViewDashboardconfig();
+	}
+
+	@And("^Enter Welcome, Account ID, Client Name, Manage Ticket, Ticket Total, Account Balance, Outstanding Invoices Label under Manage Ticket Dashboard Header$")
+	public void enterManageTicketDashboardHeaderlabels() throws Exception{
+			cms.enterManageTicketDashboard();
+	}
+	
+	@And("^Enter Ticket Label under Manage Tickets$")
+	public void EnterTicketLabelunderManageTickets() throws Exception{
+		cms.EnterTicketLabel();
+		
+	}
+	
+	@And("^Enter Invoice Label under Manage Invoices$")
+	public void EnterInvoiceLabelunderManageInvoices() throws Exception{
+		
+		cms.EnterInvoiceLabel();
+	}
+	
+	@And("^Enter Quick Link Label under Manage Quick Links$")
+	public void EnterQuickLinkLabelunderManageQuickLinks() throws Exception{
+		cms.EnterQuickLinkLabel();	
+	}
+	
+	@And("^Click on Dashboard Config Save Button$")
+	public void ClickonDashboardConfigSaveButton() throws Exception{
+		cms.DashboardConfigSaveButton();	
+	}
+
+	@Then("^User verifies Customise Dashboard Config and verify on front-end$")
+	public void verifiesCustomiseDashboardConfig() throws Exception{
+		cms.verifiesCustomiseDashboard();	
+	}
+	
 	@And("^Verify Change Password Labels$")
 	public void verifyChangePasswordLabels() throws Exception{
 		cms.verifyChangePasswordLabels();
 	}
+
+	
+	@Then("^User navigates to superadmin setting of typeform$")
+	public void usernavigated_typeform_superadminsetup() throws Exception{
+		utils.navigateTo("/admin/config/typeform");	
+	}
+	
+	@When("^user verifies typeform configuration at admin setup$")
+	public void verifiestypeformconfiguration() throws Exception{
+		cms.verifiestypeformadminsetup();	
+	}
+	
+	@Then("^User select typeform$")
+	public void selectcmstypeform() throws InterruptedException
+	{
+		System.out.println("naivigated to invoices ");
+		utils.navigateTo("/admin/invoice/list");
+		cms.typeform_selection();
+		
+	}
+	
+	@Then("^User select typeform at payment position$")
+	public void selectcmstypeform_payment() throws InterruptedException
+	{
+		System.out.println("naivigated to invoices ");
+		utils.navigateTo("/admin/invoice/list");
+		cms.typeform_selection_payment();
+		
+	}
+
+
+
+	@Given("Bulk is enabled on Site")
+	public void check_bulk_enabled() throws InterruptedException {
+		if(!cms.checkBulkEnabled()) {
+			utils.navigateTo("/user/logout");
+			this.user_login_into_cms_with_support_user();
+			cms.enableBulk();
+			//if(!cms.checkBulkEnabled()) throw new SkipException("Bulk is not enabled on site and  Not able to enable the same through CMS too");
+		}
+		utils.navigateTo("/user/logout/");
+	}
+
+    @Given("Quick Donation is enabled on Site")
+    public void check_qd_enabled() throws InterruptedException {
+        if(!cms.checkQDEnabled()) {
+            utils.navigateTo("/user/logout");
+            this.user_login_into_cms_with_support_user();
+            cms.enableQD();
+            //if(!cms.checkBulkEnabled()) throw new SkipException("Bulk is not enabled on site and  Not able to enable the same through CMS too");
+        }
+        utils.navigateTo("/user/logout/");
+    }
+    
+    @Then("^user click on Add Page button$")
+    public void user_click_on_Add_Page_button() throws Exception {
+       cms.clickAddPageButton();
+    }
+    
+    @Then("^user select page type under add new page section$")
+    public void user_select_page_type_under_add_new_page_section() throws Exception {
+        cms.selectHomePageButton();
+    } 
+    
+    @Then("^user verify Ticket Sales page$")
+    public void user_verify_Ticket_Sales_page() throws Exception {
+        cms.verifyTicketsSalespage();
+    }
+    
 }
+
