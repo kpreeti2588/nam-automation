@@ -10,6 +10,7 @@ import org.iomedia.galen.common.AccessToken;
 import org.iomedia.galen.common.ManageticketsAAPI;
 import org.iomedia.galen.common.ManageticketsAPI;
 import org.iomedia.galen.pages.DashboardSection;
+import org.iomedia.galen.pages.ManageTicket;
 import org.iomedia.galen.pages.TicketsNew;
 import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.common.ManageticketsAPI.Event;
@@ -24,6 +25,7 @@ public class TicketsApiSteps {
 	DashboardSection section;
 	ManageticketsAPI api;	
 	BaseUtil base;
+	ManageTicket managetickets;
 	TicketsNew ticket;
 	Utils utils;
 	AccessToken accessToken;
@@ -33,7 +35,7 @@ public class TicketsApiSteps {
 	
 	boolean CAN_TRANSFER, CAN_RESALE, CAN_RENDER, CAN_RENDER_FILE, CAN_RENDER_BARCODE, CAN_RENDER_PASSBOOK, CAN_DONATE_CHARITY;
 	
-	public TicketsApiSteps(DashboardSection section,Utils utils,ManageticketsAAPI aapi,TicketsNew ticket,ManageticketsAPI api, BaseUtil base, AccessToken accessToken, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert) {
+	public TicketsApiSteps(DashboardSection section,Utils utils,ManageticketsAAPI aapi,TicketsNew ticket,ManageticketsAPI api, BaseUtil base, AccessToken accessToken, ManageTicket managetickets, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert) {
 		this.aapi=aapi;
 		this.section=section;
 		this.utils=utils;
@@ -44,6 +46,7 @@ public class TicketsApiSteps {
 		this.accessToken = accessToken;	
 		this.Assert = Assert;
 		this.SoftAssert = SoftAssert;
+		this.managetickets = managetickets;
 		CAN_TRANSFER = CAN_RESALE = CAN_RENDER = CAN_RENDER_FILE = CAN_RENDER_BARCODE = CAN_RENDER_PASSBOOK = CAN_DONATE_CHARITY = true;
 	}
 
@@ -79,11 +82,19 @@ public class TicketsApiSteps {
 	
 	@Given("^Get transfer ticket ID for (.+) and (.+)$")
 	public void get_transfer_ticket_ID(String emailaddress, String password) throws Exception {
+     	String EventID = System.getProperty("EventId") != null && !System.getProperty("EventId").trim().equalsIgnoreCase("") ? System.getProperty("EventId").trim() : "";		
+		System.out.println("Event ID  from POM :: "+   EventID);
 		emailaddress = (String) base.getGDValue(emailaddress);
 		password = (String) base.getGDValue(password);
 		String[] Tkt = aapi.getTransferDetails(emailaddress, password, true, "event", false, false, false);
 		base.Dictionary.put("TransferTicketID", Tkt[0]);
+		if(EventID==null || EventID=="") {			
 		base.Dictionary.put("EventId", Tkt[0].split("\\.")[0]);
+		}
+		else {
+			base.Dictionary.put("EventId", EventID);		
+			}
+			System.out.println("EventID from System ::  "+ base.Dictionary.get("EventId"));
 	}
 	
 	@Given("^Get donate ticket ID for (.+) and (.+)$")
@@ -240,7 +251,6 @@ public class TicketsApiSteps {
 		password = (String) base.getGDValue(password);
 		
 		HashMap<Integer, ManageticketsAPI.Event> events = api.getSingleEventIdWithTktsDetails(emailaddress, password);
-	//	System.out.println("vdfdfvvf   "+events.size());
 		if (events.size()>0) {
 			  List<Event> eventsByTktCount = new ArrayList<Event>(events.values());
 			  Event event = eventsByTktCount.get(0);
@@ -248,11 +258,21 @@ public class TicketsApiSteps {
 			  utils.navigateTo("/myevents#/"+eventid);
 			  String accessToken= api.getAccessToken(emailaddress, password);
 			  int TicketCount = api.getTicketsCount(event.getId(), accessToken);
-			  String count = Integer.toString(ticket.getTicketCountText());
-			  if(TicketCount>1)
+			   try {
+				   String countText =  managetickets.getTicketsCountTextEDP();
+			              if(TicketCount>1) 			   
+						  Assert.assertEquals(countText, "My Tickets ("+TicketCount+")", "Total Ticket counts are correctly displayed");			              
+						  else
+						  Assert.assertEquals(countText, "My Ticket ("+TicketCount+")", "Total Ticket counts are correctly displayed");
+			    }  			   
+			   catch(Exception e) {				  
+				String count = Integer.toString(ticket.getTicketCountText());			
+     		  if(TicketCount>1)   			
 			  Assert.assertEquals(count+" Tickets", TicketCount+" Tickets", "Total Ticket counts are correctly displayed");
-			  else
+			  else 			
 			  Assert.assertEquals(count+" Ticket", TicketCount+" Ticket", "Total Ticket counts are correctly displayed");
+     		  }
+			   
 		}
 		else {
 			Assert.assertEquals(section.getEventsPlaceholderText(),"There are no events in your account.", "No Events found in the account");

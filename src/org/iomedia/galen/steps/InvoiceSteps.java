@@ -4,6 +4,8 @@ import java.awt.AWTException;
 import org.iomedia.common.BaseUtil;
 import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.pages.Invoice;
+import org.testng.asserts.SoftAssert;
+
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
@@ -27,8 +29,7 @@ public class InvoiceSteps {
 	@Then("^Pending invoice found on NAM with id (.+) and amount due (.+)$")
 	public void pending_invoice_found_on_nam_with_id_and_amount_due(String invoiceId, String amtDue) {
 		invoiceId = (String) base.getGDValue(invoiceId);
-		amtDue = (String) base.getGDValue(amtDue);
-		
+		amtDue = (String) base.getGDValue(amtDue);	
 		if(invoiceId.trim().contains("/"))
 		invoiceId = invoiceId.trim().substring(0, invoiceId.trim().lastIndexOf("/"));
 		invoice.isInvoiceSelected(Integer.valueOf(invoiceId), null);
@@ -63,9 +64,8 @@ public class InvoiceSteps {
 	@Then("^Verify survey tab gets display$")
 	public void verify_surveytab_display() throws InterruptedException, AWTException 
 	{
-		Assert.assertTrue(invoice.isSurveyDisplay().trim().contains("Questions"),"Survey tab is not found");
+		Assert.assertTrue(invoice.isTypeformPresent(),"Survey tab is not found");
 		invoice.submit_Typeform();
-		
 	}
 	
 	@When("^User clicks on pay in full$")

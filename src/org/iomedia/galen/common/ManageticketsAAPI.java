@@ -45,6 +45,8 @@ public class ManageticketsAAPI extends AccessToken{
   private AdminLogin adminLogin;
   private String driverType;
 
+  boolean can_transfer,can_resale,can_render,can_render_file,can_render_barcode, can_render_passbook,can_donate_charity, has_pending_invoice, is_mobile_enabled,is_deferred_delivery;
+  
   public ManageticketsAAPI(WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew> sTestDetails) {
 	  super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	  Dictionary = Dictionary == null || Dictionary.size() == 0 ? (driverFactory.getDictionary() == null ? null : driverFactory.getDictionary().get()) : Dictionary;
@@ -1597,16 +1599,16 @@ public class ManageticketsAAPI extends AccessToken{
 					String seat_label = seat.has("label") ? seat.getString("label") : "";
 					String formattedLabel = seat.getString("formattedLabel");
 					String ticketId = seat.getString("id");
-					boolean can_transfer = actions.has("canTransfer") ? actions.getBoolean("canTransfer") : false;
-					boolean can_resale = actions.has("canResale") ? actions.getBoolean("canResale") : false;
-					boolean can_render = actions.has("can_render") ? actions.getBoolean("can_render") : false;
-					boolean can_render_file = actions.has("canRenderFile") ? actions.getBoolean("canRenderFile") : false;
-					boolean can_render_barcode = actions.has("canRenderBarcode") ? actions.getBoolean("canRenderBarcode") : false;
-					boolean can_render_passbook = actions.has("canRenderPassbook") ? actions.getBoolean("canRenderPassbook") : false;
-					boolean can_donate_charity = actions.has("canDonateCharity") ? actions.getBoolean("canDonateCharity") : false;
-					boolean has_pending_invoice = actions.has("has_pending_invoice") ? actions.getBoolean("has_pending_invoice") : false;
-					boolean is_mobile_enabled = actions.has("is_mobile_enabled") ? actions.getBoolean("is_mobile_enabled") : false;
-					boolean is_deferred_delivery = actions.has("is_deferred_delivery") ? actions.getBoolean("is_deferred_delivery") : false;
+					can_transfer = actions.has("canTransfer") ? actions.getBoolean("canTransfer") : false;
+					can_resale = actions.has("canResale") ? actions.getBoolean("canResale") : false;
+					can_render = actions.has("can_render") ? actions.getBoolean("can_render") : false;
+					can_render_file = actions.has("canRenderFile") ? actions.getBoolean("canRenderFile") : false;
+					can_render_barcode = actions.has("canRenderBarcode") ? actions.getBoolean("canRenderBarcode") : false;
+					can_render_passbook = actions.has("canRenderPassbook") ? actions.getBoolean("canRenderPassbook") : false;
+					can_donate_charity = actions.has("canDonateCharity") ? actions.getBoolean("canDonateCharity") : false;
+					has_pending_invoice = actions.has("has_pending_invoice") ? actions.getBoolean("has_pending_invoice") : false;
+					is_mobile_enabled = actions.has("is_mobile_enabled") ? actions.getBoolean("is_mobile_enabled") : false;
+					is_deferred_delivery = actions.has("is_deferred_delivery") ? actions.getBoolean("is_deferred_delivery") : false;
 					Ticket _ticket = new Ticket("" + seat.getInt("number") + "", seat_label, can_transfer, can_resale, can_render, can_render_file, can_render_barcode, can_render_passbook, can_donate_charity, has_pending_invoice, is_mobile_enabled, formattedLabel, ticketId);
 					ltickets.add(_ticket);
 					if (can_transfer)
@@ -3219,6 +3221,7 @@ public class ManageticketsAAPI extends AccessToken{
 					return Integer.valueOf(haspendinginvoicetktcount).compareTo(Integer.valueOf(o.haspendinginvoicetktcount));
 				case "IS_MOBILE_ENABLED":
 					return Integer.valueOf(ismobileenabledtktcount).compareTo(Integer.valueOf(o.ismobileenabledtktcount));
+					
 				default:
 					return Integer.valueOf(tktsCount).compareTo(Integer.valueOf(o.tktsCount));
 			}
@@ -3769,7 +3772,7 @@ public class ManageticketsAAPI extends AccessToken{
 			for (int i = 0; i < sections.length(); i++) {
 
 				String sectionDetails = String.valueOf(getSectionDetailsForEvent(String.valueOf(eventId.getEventId()), (String.valueOf(sections.getJSONObject(i).get("id")))));
-				canTransfer.addAll(JsonPath.read(sectionDetails, "$.rows[*].seats[*].actions.canTransfer"));
+				canTransfer.addAll(JsonPath.read(sectionDetails, "$.rows[*].seats[*].actions.canTransfer"));  
 				canTransfer.removeAll(Collections.singleton(false));
 				if(canTransfer.size()>=3){
 					eventDetail.put("number", String.valueOf(canTransfer.size()));

@@ -25,6 +25,7 @@ public class CMS extends BaseUtil {
 		
 	}
 	
+	private By buildtext= By.xpath("//span[@class='build-text']");
 	private By invoices = By.xpath("//p[text()='Invoices']");
 	private By setting = By.xpath("//p[text()='Settings']");
 	private By ticketmanagement = By.xpath("//p[text()='Ticket Management']");
@@ -175,6 +176,12 @@ public class CMS extends BaseUtil {
 	private By invoice_active = By.cssSelector("div[class*='togglebutton'] label[class*='toggle-color']");
 	public By checkbox = By.cssSelector("input[checked*='checked']");
 	
+	//edp implemetation
+	public By edptoggle = By.xpath("//label[@title='Enable this to list View EDP UI']//span[@class='toggle']");
+	
+	//secure barcode Implementation
+	public By secureBarcode = By.xpath("//label[@title='Enable this to show Secure Barcode (Rotating Barcode)']//span[@class='toggle']");
+	
 	public String cmsuser="//*[@id=\"block-iom-admin-account-menu\"]/div/div/div[2]/i";
 	public String cmslogout="//*[@id=\"amgr-user-menu\"]/li[2]/a";
 	public String flogin="//*[@id=\"invoke-signin-modal\"]";
@@ -298,6 +305,7 @@ public class CMS extends BaseUtil {
 	public String changePasswordCurrentPasswordText = "AutoChangePasswordCurrent";
 	public String changePasswordNewPasswordText = "AutoChangePasswordNew";
 	public String changePasswordConfirmPasswordText = "AutoChangePasswordConfirm";
+	
 	
 	
 	public Utils utils;
@@ -646,8 +654,23 @@ public class CMS extends BaseUtil {
 		else
 			{
 			System.out.println("typeform already selected");
+
+			boolean isSelectTypeformDisabled = getElementWhenVisible(By.id(selecttypeform)).getAttribute("class").contains("removesign-button-text");
+			if(isSelectTypeformDisabled) {
+				WebElement removesign = getElementWhenVisible(By.xpath("//button[@id=\"openPopup\"]/following-sibling::*[contains(@class,'removesign')]"), 2);
+				removesign.click();
+			}
+			
+			// click and select type form
+			click(getDriver().findElement(By.id(selecttypeform)), "Select Typeform");
+			WebElement typeform = getElementWhenClickable(By.xpath("//a[@title='Automation' and @class='typeform_anchor']"), 10);
+			typeform.click();
+			// Save the Select Typeform
+			click(getDriver().findElement(By.xpath("//*[@id=\"typeform-accepted\"]")), "Submit Typeform (Save)");
+			
+			
 			By dropDown = By.cssSelector("div[class*='typeform'] input[class*='select-dropdown']");
-			WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 2);
+			WebElement wdropDown = getElementWhenRefreshed(dropDown, "disabled", "null", 20);
 			
 			if(!wdropDown.getAttribute("value").trim().equalsIgnoreCase(showAfter.trim())) 
 			{
@@ -657,11 +680,11 @@ public class CMS extends BaseUtil {
 				wait.until(ExpectedConditions.elementToBeClickable(locator));
 				typeform_summary=getDriver().findElement(locator);
 				typeform_summary.click();
-				ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
-				//ex.executeScript("arguments[0].click();", getDriver().findElement(submit));
+				//ex.executeScript("arguments[0].click();", getDriver().findElement(dashboardconfigsave));
+				
 				
 			}
-			
+			ex.executeScript("arguments[0].click();", getDriver().findElement(submit));
 			getDriver().navigate().to(Environment.get("APP_URL")+"/user/logout");
 			 //	getDriver().navigate().to("https://stg1-am.ticketmaster.com/namautomation/user/logout");
 			//utils.navigateTo("/user/logout");
@@ -979,6 +1002,17 @@ public class CMS extends BaseUtil {
 		return false;
 	}
 
+	public boolean checkenableSecureBarcode() {
+		try {
+			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return window.drupalSettings.componentConfigData.siteconfig.manage_ticket_configuration.secure_barcode_enabled");
+			if(value==1)
+				return true;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+	
 	public boolean checkQDEnabled() {
 		try {
 			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.componentConfigData.siteconfig.manage_ticket_configuration.donate");
@@ -989,7 +1023,18 @@ public class CMS extends BaseUtil {
 		}
 		return false;
 	}
-
+	
+	public boolean checkenableEDP() {
+		try {
+			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return window.drupalSettings.componentConfigData.siteconfig.manage_ticket_configuration.eventslistView");
+			if(value==1)
+				return true;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+	
 	public void enableQD() {
 		click(donation, "DONATION");
 		click(quickdonation, "Quick Donation");
@@ -1016,5 +1061,36 @@ public class CMS extends BaseUtil {
 	    	  By form = By.xpath("//div[@id='edit-ticket-sales']/div["+i+"]/label//div[2]");	
 	    	  Assert.assertTrue((getText(form, 0)!=""),getText(form, 0));
 	      }
-	}   
+	}  
+	
+	
+	public void enableEDP() {
+		click(ticketmanagement, "TICKET MANAGEMENT");
+		click(ticketoptions, "TICKET OPTIONS");
+		click(edptoggle,"EDP TOGGLE");
+		click(editsubmit,"SUBMIT changes");
+	}
+	
+	public void enableSecureBarcode() {
+		click(ticketmanagement, "TICKET MANAGEMENT");
+		click(ticketoptions, "TICKET OPTIONS");
+		click(secureBarcode,"Secure Barcode TOGGLE");
+		click(editsubmit,"SUBMIT changes");
+	}
+	
+	public String versionUI() {
+	  return	getText(buildtext, 2);
+	}
+	
+	public String versionAPI() {
+		try {
+			String value =  (String)((JavascriptExecutor)this.getDriver()).executeScript("return window.drupalSettings.componentConfigData.siteconfig.version");
+				return value;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return "";
+	}
+	
+	
 }

@@ -10,8 +10,8 @@
     <classes>
       <class name="org.iomedia.galen.tests.ProdSanity">
         <methods>
-          <include name="compareScreenshotafterDeployment"/>
           <include name="prodSanityVerification"/>
+          <exclude name="compareScreenshotafterDeployment"/>
           <exclude name="prodSanityVerificationPart1"/>
           <exclude name="verifyPrivacyLink"/>
           <exclude name="verifyCMSLogin"/>

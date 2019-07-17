@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.iomedia.framework.Driver.HashMapNew;
 import org.iomedia.galen.pages.AdminLogin;
+import org.iomedia.galen.common.ManageticketsAAPI;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,18 +35,23 @@ import org.iomedia.framework.WebDriverFactory;
 
 public class ManageticketsAPI extends AccessToken{
   
-  String host, emailaddress, password, accessToken;
+  String host, emailaddress, password, accessToken, hostAAPI, TMPSCorrelationId, clientId, aapiClientId, hostAAPIAuth;
   String path = System.getProperty("user.dir");
   private String sentTicketRequest = path + "/APIRequest/sendTicket.json";
   private String postTicketsRequest= path + "/APIRequest/PostTickets.json";
   private AdminLogin adminLogin;
   private String driverType;
-  
+ 
   public ManageticketsAPI(WebDriverFactory driverFactory, HashMapNew Dictionary, HashMapNew Environment, Reporting Reporter, org.iomedia.framework.Assert Assert, org.iomedia.framework.SoftAssert SoftAssert, ThreadLocal<HashMapNew> sTestDetails) {
 	  super(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
 	  Dictionary = Dictionary == null || Dictionary.size() == 0 ? (driverFactory.getDictionary() == null ? null : driverFactory.getDictionary().get()) : Dictionary;
 	  Environment = Environment == null || Environment.size() == 0 ? (driverFactory.getEnvironment() == null ? null : driverFactory.getEnvironment().get()) : Environment;
 	  host= Environment.get("TM_HOST").trim();
+	  hostAAPI = Environment.get("AAPI_HOST").trim();
+	  hostAAPIAuth = Environment.get("AAPI_AUTH").trim();
+	  TMPSCorrelationId = Environment.get("TMPSCorrelationId").trim();
+	  clientId = Environment.get("CLIENT_ID").trim();
+	  aapiClientId = Environment.get("AAPI_CLIENT_ID").trim();
 	  emailaddress = Dictionary.get("EMAIL_ADDRESS").trim();
 	  password = Dictionary.get("PASSWORD").trim();
 	  accessToken = "";
@@ -54,6 +60,7 @@ public class ManageticketsAPI extends AccessToken{
   }
   
   Utils utils = new Utils(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
+  ManageticketsAAPI aapi = new ManageticketsAAPI(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
   
   public JSONObject get(String url, String accesstoken) throws Exception {
 	  InputStream is = utils.waitForTMManageTicketsResponse(url, new String[] {"Content-Type", "Accept", "Accept-Language", "X-Client", "X-Api-Key", "X-OS-Name", "X-OS-Version", "X-Auth-Token"}, new String[] {"application/json", Environment.get("amgrVersion").trim().replace(" ", "+"), Environment.get("acceptLanguage").trim(), Environment.get("x-client").trim(), Environment.get("x-api-key").trim(), Environment.get("x-os-name").trim(), Environment.get("x-os-version").trim(), accesstoken}, false);
@@ -79,6 +86,7 @@ public class ManageticketsAPI extends AccessToken{
 		  is = utils.post(url, payload, new String[] {"Content-Type", "Accept", "Accept-Language", "X-Client", "X-Api-Key", "X-OS-Name", "X-OS-Version", "X-Auth-Token"}, new String[] {"application/json", Environment.get("amgrVersion").trim().replace(" ", "+"), Environment.get("acceptLanguage").trim(), Environment.get("x-client").trim(), Environment.get("x-api-key").trim(), Environment.get("x-os-name").trim(), Environment.get("x-os-version").trim(), accesstoken});  
 	  }
 	  JSONObject jsonObject = utils.convertToJSON(new BufferedReader(new InputStreamReader(is, "UTF-8")));
+	  
 	  return jsonObject;
   }
   
@@ -251,7 +259,8 @@ public class ManageticketsAPI extends AccessToken{
   }
 
   public ArrayList<String> getAllEvents(String accesstoken, String member_id, boolean haveRelatedEventId, boolean currentvalideventsonly, String eventType) throws Exception{
-	  JSONObject jsonObject = get(host + "/api/v1/member/" + member_id + "/inventory/events", accesstoken);
+	 
+	  JSONObject jsonObject = get(host + "/api/v1/member/" + member_id + "/inventory/events", accesstoken);	  
       ArrayList<String> eventIds = new ArrayList<String>();
       JSONArray events =(JSONArray) jsonObject.get("events");
       if (events != null) { 
@@ -684,6 +693,75 @@ public class _Event implements Comparable<_Event> {
 	  } catch(Exception ex) {
 		  //Do Nothing
 	  }
+  }
+  
+  public String[] getTransferDetailsEDP(boolean currentvalideventsonly, String eventType, boolean multiple, boolean multipleRelevantTicketIds, boolean haveRelatedEventId, boolean... extras) throws Exception {
+	  if(!utils.getManageTicketConfiguration("send"))
+		  throw new SkipException("Send is not enabled in CMS");
+	  assert extras.length <= 2;
+	  boolean delete = extras.length > 0 ? extras[0] : true;
+	  boolean needaccesstoken = extras.length > 1 ? extras[1] : true;
+	  if(delete)
+		  deleteAllPending(needaccesstoken);
+	  if(needaccesstoken) {
+		  accessToken = getAccessToken(emailaddress, password);
+		  getAccountId(accessToken);
+	  } else {
+		  accessToken = Dictionary.get("AccessToken").trim();
+		  if(accessToken.equalsIgnoreCase("")) {
+			  accessToken = getAccessToken(emailaddress, password);
+			  getAccountId(accessToken);
+		  }
+	  }
+	  ArrayList<String> event_id = aapi.getAllEvents(accessToken, Dictionary.get("member_id"), haveRelatedEventId, currentvalideventsonly, eventType);
+	  System.out.println("event_id:" + event_id);
+	  String[] transfer_ticket_ids = null;  
+	  for(int m=0 ; m<event_id.size(); m++) {
+		  String[] ticketIds = getTicketIds(Integer.valueOf(event_id.get(m)), accessToken, "CAN_TRANSFER", multiple);
+		  System.out.println("ticketIds:" + ticketIds);
+		  if(ticketIds != null) {
+			  String eventName = Dictionary.get("eventName").trim();
+			  if(haveRelatedEventId) {
+				  String[] related_events_id = Dictionary.get(event_id.get(m)).split(",");
+				  String[] transferIds = getTransferID(convertToInt(Arrays.asList(related_events_id)), needaccesstoken);
+				  System.out.println("transferIds: " + transferIds.toString());
+				  for(int i = 0; i < transferIds.length; i++) {
+					  deleteTransfer(transferIds[i], needaccesstoken);
+				  }
+				  if(needaccesstoken) {
+					  accessToken = getAccessToken(emailaddress, password);
+				  }
+				  boolean success = false;
+				  int counter = 0;
+				  for(int j = 0; j < related_events_id.length; j++) {
+					  String[] relatedeventticketId = getRelevantEventTicketIds(Integer.valueOf(related_events_id[j]), accessToken, "CAN_TRANSFER", multipleRelevantTicketIds);
+					  if(relatedeventticketId != null) {
+						  counter += relatedeventticketId.length;
+					  }
+					  if(multipleRelevantTicketIds && counter > 1) {
+						  success = true;
+						  break;
+					  } else if(!multipleRelevantTicketIds && counter > 0) {
+						  success = true;
+						  break;
+					  }
+				  }
+				  
+				  if(!success)
+					  continue;
+			  }
+			  Dictionary.put("eventName", eventName);
+			  transfer_ticket_ids = ticketIds;
+			  break;
+		  }
+	  }
+	  
+	  if(transfer_ticket_ids == null)
+		  throw new SkipException("ticket to be used for transfer not found");
+	  else
+		  Assert.assertNotNull(transfer_ticket_ids, "Verify ticket to be used for transfer found");
+	  
+	  return transfer_ticket_ids;
   }
   
   public String[] getTransferDetails(boolean currentvalideventsonly, String eventType, boolean multiple, boolean multipleRelevantTicketIds, boolean haveRelatedEventId, boolean... extras) throws Exception {
@@ -1151,6 +1229,7 @@ public class _Event implements Comparable<_Event> {
 	  }
 	  ArrayList<String> event_id = getAllEvents(accessToken, Dictionary.get("member_id"), haveRelatedEventId, currentvalideventsonly, eventType);
 	 // System.out.println("event_id:"+event_id);
+	  
 	  String[] donate_ticket_ids = null;
      
 	  for(int m=0; m<event_id.size(); m++) {
@@ -1220,6 +1299,55 @@ public class _Event implements Comparable<_Event> {
 	  } catch(Exception ex) {
 		  return false;
 	  }
+  }
+  
+  public String[] getRenderDetailsEDP(boolean currentvalideventsonly, String eventType, boolean multiple, boolean... extras) throws Exception{
+	  if(!utils.getManageTicketConfiguration("download"))
+		  throw new SkipException("Download is not enabled in CMS");
+	  
+	  assert extras.length <= 2;
+	  boolean delete = extras.length > 0 ? extras[0] : true;
+	  boolean needaccesstoken = extras.length > 1 ? extras[1] : true;
+	  if(delete)
+		  deleteAllPending(needaccesstoken);
+	  if(needaccesstoken) {
+		  accessToken = getAccessToken(emailaddress, password);
+		  getAccountId(accessToken);
+	  } else {
+		  accessToken = Dictionary.get("AccessToken").trim();
+		  if(accessToken.equalsIgnoreCase("")) {
+			  accessToken = getAccessToken(emailaddress, password);
+			  getAccountId(accessToken);
+		  }
+	  }
+	  
+//	  assert deletePending.length <= 1;
+//	  boolean delete = deletePending.length > 0 ? deletePending[0] : true;
+//	  if(delete)
+//	  deleteAllPending();
+//	  String accessToken = getAccessToken(emailaddress, password);
+//	  getAccountId(accessToken);
+	  
+	  ArrayList<String> event_id = aapi.getAllEvents(accessToken, Dictionary.get("member_id"), false, currentvalideventsonly, eventType);
+	  
+	  System.out.println("all event_id:"+event_id);
+	  
+	  String[] render_ticket_ids = null;
+     
+	  for(int m=0; m<event_id.size(); m++) {
+		  String[] ticketIds = getTicketIds(Integer.valueOf(event_id.get(m)), accessToken, "CAN_RENDER_FILE", multiple);
+		  System.out.println("ticketId:"+ticketIds);
+		  if(ticketIds != null) {
+			  render_ticket_ids = ticketIds;
+			  break;
+		  }
+	  }    
+	  if(render_ticket_ids == null)
+		  throw new SkipException("ticket to be used for download not found");
+	  else
+		  Assert.assertNotNull(render_ticket_ids, "Verify ticket to be used for download found");
+	  
+	  return render_ticket_ids; 
   }
 
   public String[] getRenderDetails(boolean currentvalideventsonly, String eventType, boolean multiple, boolean... extras) throws Exception{
@@ -1356,6 +1484,19 @@ public class _Event implements Comparable<_Event> {
 	  int counter = 100;
 	  do{
 		  state = getTicketState(ticketId, extras);
+		  System.out.println(state);
+		  sync(100L);
+		  counter--;
+	  } while(counter > 0 && (state == null || !state.trim().equalsIgnoreCase(expectedState.trim())));
+	  Assert.assertNotNull(state, "Verify " + ticketId + " state");
+	  return state;
+  }
+  
+  public String waitForTicketStateEDP(String ticketId, String expectedState, boolean... extras) throws Exception {
+	  String state = null;
+	  int counter = 100;
+	  do{
+		  state = getTicketStateEDP(ticketId, extras);
 		  sync(100L);
 		  counter--;
 	  } while(counter > 0 && (state == null || !state.trim().equalsIgnoreCase(expectedState.trim())));
@@ -1389,6 +1530,32 @@ public class _Event implements Comparable<_Event> {
 	  return state;
   }
   
+  public String waitForPendingActionRemovedEDP(String ticketId) throws Exception {
+	  String state = "pending";
+	  int counter = 100;
+	  do{
+		  state = getTicketStateEDP(ticketId);
+		  sync(100L);
+		  counter--;
+	  } while(counter > 0 && state != null);
+	  Assert.assertNull(state, "Verify " + ticketId + " state");
+	  return state;
+  }
+  
+  public String waitForPendingActionRemovedEDP(String email, String pass, String ticketId) throws Exception {
+	  emailaddress = email;
+	  password = pass;
+	  String state = "pending";
+	  int counter = 100;
+	  do{
+		  state = getTicketStateEDP(emailaddress,password,ticketId);
+		  sync(100L);
+		  counter--;
+	  } while(counter > 0 && state != null);
+	  Assert.assertNull(state, "Verify " + ticketId + " state");
+	  return state;
+  }
+  
   public String waitForPendingActionRemoved(String email, String pass, String ticketId) throws Exception {
 	  emailaddress = email;
 	  password = pass;
@@ -1403,6 +1570,146 @@ public class _Event implements Comparable<_Event> {
 	  return state;
   }
 
+	public String getTicketStateEDP(String ticketId, boolean... extras) throws Exception {
+		String state = "";
+		String[] ticket_id = ticketId.split("\\.");
+		int eventId = Integer.valueOf(ticket_id[0].trim());
+		assert extras.length <= 3;
+		boolean needaccesstoken = extras.length > 0 ? extras[0] : true;
+		boolean needmemberid = extras.length > 1 ? extras[1] : true;
+		boolean switchUser = extras.length > 2 ? extras[2] : false;
+
+		if (needaccesstoken) {
+			accessToken = getAccessToken(emailaddress, password);
+		} else {
+			accessToken = Dictionary.get("AccessToken").trim();
+			if (accessToken.trim().equalsIgnoreCase("")) {
+				accessToken = getAccessToken(emailaddress, password);
+			}
+		}
+		if (needmemberid) {
+			System.out.println(getAccountId(accessToken));
+			getAccountId(accessToken);
+		} else {
+			if (Dictionary.get("member_id").trim().equalsIgnoreCase("")) {
+				getAccountId(accessToken);
+			}
+		}
+
+		if (switchUser) {
+			getMemberResponse(Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS"), Dictionary.get("SWITCH_ACC_PASSWORD"));
+			Dictionary.put("member_id", Dictionary.get("memberId1"));
+			switchToAssociatedMember(Dictionary.get("memberId1"));
+			accessToken = Dictionary.get("AccessToken").trim();
+		}
+		JSONObject eventJsonObject = aapi.getAllSectionsForAnyEvent(String.valueOf(eventId));
+		JSONObject embedded = (JSONObject) eventJsonObject.get("_embedded");
+		JSONArray eventSections = embedded.getJSONArray("sections");
+		String sectionID = "" + ((JSONObject) eventSections.get(0)).getInt("id") + "";
+
+		JSONObject jsonObject = aapi.getSectionDetailsForEvent(String.valueOf(eventId), sectionID);
+		JSONArray rows = (JSONArray) jsonObject.get("rows");
+		for (Object rowObject : rows) {
+			JSONObject row = (JSONObject) rowObject;
+			JSONArray seats = (JSONArray) row.get("seats");
+			for (Object seatObject : seats) {
+				JSONObject seat = (JSONObject) seatObject;
+				String ticketId_ = seat.getString("id").trim();
+				if (ticketId_.equals(ticketId)) {
+					if (seat.has("latestActivity")) {
+						JSONObject latestActivity = (JSONObject) seat.get("latestActivity");
+						if (latestActivity.has("state")) {
+							state = latestActivity.getString("state");
+							return state;
+						} else {
+							return null;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+  
+  public String getTicketStateEDP(String email,String pass,String ticketId, boolean... extras) throws Exception {
+	  emailaddress=email;
+	  password=pass;
+	  String state="";
+	  String[] ticket_id = ticketId.split("\\.");
+	  int eventId = Integer.valueOf(ticket_id[0].trim());
+	  String section_name = ticket_id[1].replaceAll("%20", " ").trim();
+	  String row_name = ticket_id[2].replaceAll("%20", " ").trim();
+	  assert extras.length <= 3;
+	  boolean needaccesstoken = extras.length > 0 ? extras[0] : true;
+	  boolean needmemberid = extras.length > 1 ? extras[1] : true;
+	  boolean switchUser = extras.length > 2 ? extras[2] : false;
+	  
+	  if(needaccesstoken) {
+		  accessToken = getAccessToken(emailaddress, password);
+	  } else {
+		  accessToken = Dictionary.get("AccessToken").trim();
+		  if(accessToken.trim().equalsIgnoreCase("")) {
+			  accessToken = getAccessToken(emailaddress, password);
+		  }
+	  }
+	  if(needmemberid) {
+		  getAccountId(accessToken);
+	  } else {
+		  if(Dictionary.get("member_id").trim().equalsIgnoreCase("")) {
+			  getAccountId(accessToken);
+		  }
+	  }
+	  
+	  if(switchUser) {
+		  getMemberResponse(Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS"), Dictionary.get("SWITCH_ACC_PASSWORD"));
+		  Dictionary.put("member_id", Dictionary.get("memberId1"));
+		  switchToAssociatedMember(Dictionary.get("memberId1"));
+		  accessToken = Dictionary.get("AccessToken").trim();
+	  }
+	  
+	  JSONObject jsonObject = get(hostAAPI+"/members/" + Dictionary.get("member_id") + "/inventory/search?event_id=" + eventId, accessToken);
+	  JSONArray inventory_items = (JSONArray) jsonObject.get("inventory_items");
+	  for(int i = 0; i < inventory_items.length(); i++) {
+		  JSONObject data = (JSONObject) inventory_items.get(i);
+		  String eventname = data.getJSONObject("event").getString("name");
+		  Dictionary.put("eventName", eventname);
+		  JSONArray sections = (JSONArray) data.get("sections");
+		  for(int j = 0; j < sections.length(); j++) {
+			  JSONObject row = (JSONObject) sections.get(j);
+			  if(!row.getString("section_name").trim().equalsIgnoreCase(section_name))
+				  continue;
+			  JSONArray rows = (JSONArray) row.get("rows");
+			  for(int k = 0; k < rows.length(); k++) {
+				  JSONObject ticket = (JSONObject) rows.get(k);
+				  if(!ticket.getString("row_name").trim().equalsIgnoreCase(row_name))
+					  continue;
+				  JSONArray tickets = (JSONArray) ticket.get("tickets");
+				  for(int l = 0; l < tickets.length(); l++) {
+					  JSONObject jticket = (JSONObject) tickets.get(l);
+					  String ticketids= jticket.getString("ticket_id");
+					  Dictionary.put("State_ticket_id", ticketids);
+					  if(ticketids.toString().equals(ticketId)){
+						  if(jticket.has("pending_action")) {
+				    		  JSONObject pending_action = (JSONObject) jticket.get("pending_action");
+				    		  if(pending_action.has("state")) {
+				    			  state = pending_action.getString("state");
+				    			  return state;
+				    		  } else {
+				    			  return null;
+				    		  }
+						  } else {
+							  return null;
+						  }
+			    	  }
+				  }
+			  }
+		  }
+	  }
+	  return null;    
+  }
+  
+  
   public String getTicketState(String ticketId, boolean... extras) throws Exception {
 	  String state="";
 	  String[] ticket_id = ticketId.split("\\.");
@@ -2131,6 +2438,61 @@ public class _Event implements Comparable<_Event> {
 	  return event;
   }
   
+  public Boolean[] getTicketFlagsEDP(String ticketId, String email, String pass, boolean... needAccessToken) throws Exception {
+	  if(email.trim().equalsIgnoreCase("") && pass.trim().equalsIgnoreCase("")) {
+		  email = emailaddress;
+		  pass = password;
+	  }
+	  assert needAccessToken.length <= 1;
+	  boolean needToken = needAccessToken.length > 0 ? needAccessToken[0] : true;
+	  if(needToken) {
+		  accessToken = getAccessToken(email, pass);
+		  getAccountId(accessToken);
+	  } else {
+		  accessToken = Dictionary.get("AccessToken").trim();
+		  if(accessToken.equalsIgnoreCase("")) {
+			  accessToken = getAccessToken(email, pass);
+			  getAccountId(accessToken);
+		  }
+	  }
+	  String[] ticket_id = ticketId.split("\\.");
+	  int eventId = Integer.valueOf(ticket_id[0].trim());
+	  String section_name = ticket_id[1].replaceAll("%20", " ").trim();
+	  String row_name = ticket_id[2].replaceAll("%20", " ").trim();
+	  JSONObject jsonObject;
+	  try {
+		  jsonObject = get(hostAAPI + "/members/" + Dictionary.get("member_id") + "/inventory/search?event_id=" + eventId, accessToken);
+	  } catch(Exception ex) {
+		  return null;
+	  }
+	  JSONArray inventory_items = (JSONArray) jsonObject.get("inventory_items");
+	  for(int i = 0; i < inventory_items.length(); i++) {
+		  JSONObject data = (JSONObject) inventory_items.get(i);
+		  String eventname = data.getJSONObject("event").getString("name");
+          Dictionary.put("eventName", eventname);
+		  JSONArray sections = (JSONArray) data.get("sections");
+		  for(int j = 0; j < sections.length(); j++) {
+			  JSONObject row = (JSONObject) sections.get(j);
+			  if(!row.getString("section_name").trim().equalsIgnoreCase(section_name))
+				  continue;
+			  JSONArray rows = (JSONArray) row.get("rows");
+			  for(int k = 0; k < rows.length(); k++) {
+				  JSONObject ticket = (JSONObject) rows.get(k);
+				  if(!ticket.getString("row_name").trim().equalsIgnoreCase(row_name))
+					  continue;
+				  JSONArray tickets = (JSONArray) ticket.get("tickets");
+				  for(int l = 0; l < tickets.length(); l++) {
+					  JSONObject jticket = (JSONObject) tickets.get(l);
+					  if(!jticket.getString("ticket_id").trim().equalsIgnoreCase(ticketId))
+						  continue;
+					  return new Boolean[] {jticket.has("can_transfer") && jticket.getBoolean("can_transfer"), jticket.has("can_resale") && jticket.getBoolean("can_resale"), jticket.has("can_render") && jticket.getBoolean("can_render"), jticket.has("can_render_file") && jticket.getBoolean("can_render_file"), jticket.has("can_render_barcode") && jticket.getBoolean("can_render_barcode"), jticket.has("can_render_passbook") && jticket.getBoolean("can_render_passbook"), jticket.has("can_donate_charity") && jticket.getBoolean("can_donate_charity")};
+				  }
+			  }
+		  }
+	  }
+	  return null;
+  }
+  
   public Boolean[] getTicketFlags(String ticketId, String email, String pass, boolean... needAccessToken) throws Exception {
 	  if(email.trim().equalsIgnoreCase("") && pass.trim().equalsIgnoreCase("")) {
 		  email = emailaddress;
@@ -2185,6 +2547,8 @@ public class _Event implements Comparable<_Event> {
 	  }
 	  return null;
   }
+  
+  
   
   public String getTicketIdPendingAction(int eventId, String accessToken, String type, String state){
 	  String ticketId= null;
@@ -2618,11 +2982,11 @@ public HashMap<Integer, Event> getEventIdWithAllTktsFlags() throws Exception {
 	  JSONObject jsonObject = get(host + "/api/v1/member/" + member_id + "/inventory/events", accessToken);
       JSONArray events =(JSONArray) jsonObject.get("events");
       HashMap<Integer,Event> eventsDetail = new HashMap<Integer,Event>();
+    //  int eventId=;
       if (events != null) { 
     	  for (int i=0; i<events.length(); i++) { 
-    		  int eventId = events.getJSONObject(i).getInt("event_id");
+    		int eventId = events.getJSONObject(i).getInt("event_id");   		  
     		  String eventName = events.getJSONObject(i).getString("description");
-    		  System.out.println("event Id :: " + eventId);
     		  try{
 	    		  Event _event = getSections(eventId, eventName, accessToken);
 	    		  eventsDetail.put(eventId, _event);
@@ -2632,6 +2996,7 @@ public HashMap<Integer, Event> getEventIdWithAllTktsFlags() throws Exception {
     	  }
     	  	  
       }
+    //  Dictionary.put("EVENT_NAME", String.valueOf(eventId));
       return eventsDetail;
   }
   
@@ -3300,4 +3665,48 @@ public HashMap<Integer, Event> getEventIdWithAllTktsFlags() throws Exception {
 	    }
 	   return sb.toString();
    	}
+   
+   
+   public String[] getDonateDetailsEDP(boolean currentvalideventsonly, String eventType,  boolean multiple, boolean haveRelatedEventId, boolean... extras) throws Exception {
+		  if(!utils.getManageTicketConfiguration("donate"))
+			  throw new SkipException("Donate is not enabled in CMS");
+		  assert extras.length <= 2;
+		  boolean delete = extras.length > 0 ? extras[0] : true;
+		  boolean needaccesstoken = extras.length > 1 ? extras[1] : true;
+		  if(delete)
+			  deleteAllPending(needaccesstoken);
+		  if(needaccesstoken) {
+			  accessToken = getAccessToken(emailaddress, password);
+			  getAccountId(accessToken);
+		  } else {
+			  accessToken = Dictionary.get("AccessToken").trim();
+			  if(accessToken.equalsIgnoreCase("")) {
+				  accessToken = getAccessToken(emailaddress, password);
+				  getAccountId(accessToken);
+			  }
+		  }
+		  ArrayList<String> event_id = getAllEvents(accessToken, Dictionary.get("member_id"), haveRelatedEventId, currentvalideventsonly, eventType);
+		 // System.out.println("event_id:"+event_id);
+		  
+		  String[] donate_ticket_ids = null;
+	     
+		  for(int m=0; m<event_id.size(); m++) {
+			  String[] ticketIds = getTicketIds(Integer.valueOf(event_id.get(m)), accessToken, "CAN_DONATE_CHARITY", multiple);
+			  //System.out.println("ticketId:"+ticketId);
+			  if(ticketIds != null) {
+				  if(!isCharityAvailable(Integer.valueOf(event_id.get(m)), accessToken)){
+					  continue;
+				  }
+	              donate_ticket_ids = ticketIds;
+	             // System.out.println("donate_ticket_id:"+donate_ticket_id);
+	              break;
+			  }     
+		  }
+		  if(donate_ticket_ids == null)
+			  throw new SkipException("ticket to be used for donate not found");
+		  else
+			  Assert.assertNotNull(donate_ticket_ids, "Verify ticket to be used for donate found");
+		  
+		  return donate_ticket_ids; 
+	  }
 }

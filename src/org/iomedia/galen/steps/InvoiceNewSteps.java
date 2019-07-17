@@ -2,6 +2,9 @@ package org.iomedia.galen.steps;
 
 import java.awt.AWTException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +20,7 @@ import org.iomedia.galen.pages.CMS;
 import org.iomedia.galen.pages.DashboardSection;
 import org.iomedia.galen.pages.Invoice;
 import org.iomedia.galen.pages.InvoiceNew;
+import org.iomedia.galen.pages.ManageTicket;
 import org.json.JSONException;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
@@ -32,6 +36,7 @@ public class InvoiceNewSteps {
 	CMS cms;
 	DashboardSection dashboard;
 	AdminLogin adminLogin;
+	ManageTicket managetickets;
 	BaseUtil base;
 	Utils utils;
 	org.iomedia.framework.Assert Assert;
@@ -62,6 +67,7 @@ public class InvoiceNewSteps {
 		this.Assert = Assert;
 		this.section = section;
 		this.accessToken = accessToken;
+		this.managetickets =managetickets;
 		driverType = base.driverFactory.getDriverType().get();
 		this.mail = mail;
 		this.api = api;
@@ -71,7 +77,9 @@ public class InvoiceNewSteps {
 
 	@Then("^User is on Invoice page and Invoice list is displayed$")
 	public void invoiceListIsDisplayed() throws JSONException, IOException {
+		
 		invoiceNew.isInvoiceListDisplayed();
+		
 	}
 
 	@When("^User selects payment plan invoice (.+),(.+)$")
@@ -104,6 +112,23 @@ public class InvoiceNewSteps {
 		base.Dictionary.put("AccessToken", accessToken.getAccessToken(email, password));
 		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));
 		String invoicestatus = "UNPAID";
+		invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
+		if(invoiceId == -1){
+			invoicestatus = "PARTIALLY PAID";
+			invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
+		}
+		if(invoiceId == -1)
+			throw new SkipException(invoicestatus + " Invoice not found");
+		invoiceNew.loadInvoice(invoiceId);
+	}
+	
+	@When("^User clicks on Unpaid tab without plan invoice (.+),(.+)$")
+	public void clickNonPlanInvoice(String email, String password) throws Exception {
+		email = (String) base.getGDValue(email);
+		password = (String) base.getGDValue(password);
+		base.Dictionary.put("AccessToken", accessToken.getAccessToken(email, password));
+		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));
+		String invoicestatus = "UNPAID";
 		invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
 		if(invoiceId == -1){
 			invoicestatus = "PARTIALLY PAID";
@@ -113,6 +138,8 @@ public class InvoiceNewSteps {
 			throw new SkipException(invoicestatus + " Invoice not found");
 		invoiceNew.loadInvoice(invoiceId);
 	}
+	
+	
 	
 	@When("^User clicks on Unpaid tab and selects invoice with Upsells (.+),(.+)$")
 	public void selectInvoiceWithUpsells(String email, String password) throws Exception {
@@ -167,16 +194,16 @@ public class InvoiceNewSteps {
 				|| driverType.trim().toUpperCase().contains("IOS")))) {
 
 		} else
+		    utils.sync(6000L);
 			BalanceDue = invoiceNew.getBalanceDue();
 	}
 
 	@And("^MOP has same card as displayed in UI$")
-	public void verifyMOPCard() throws Exception {
+	public void verifyMOPCard() throws Exception {	
 		System.out.println(accountId);
 		// adminLogin.beforeMtdInvoiceAPI("PLAN",false);
 		adminLogin.getPaymentSchedule(accountId, adminLogin.getInvoiceListAndId(accountId, "PLAN"), "PLAN");
 		adminLogin.getPaymentScheduleMopValues(base.Dictionary.get("PLAN".trim().toUpperCase() + "paymentPlansSchedule"), "PLAN");
-
 		System.out.println("PLAN ID IS " + base.Dictionary.get("PLAN" + "planId"));
 		invoiceNew.verifyMOP("PLAN");
 	}
@@ -197,11 +224,26 @@ public class InvoiceNewSteps {
 		System.out.println("PLAN ID IS " + base.Dictionary.get("PLAN" + "planId"));
 		invoiceNew.verifyMOP("PLAN");
 	}
+	
+	@Then("^User fetches the existing card payment method$")
+	public void user_fetch_existing_card() {
+		String card = invoiceNew.getTextpaymentMethod();
+		int size=4;
+		List<String> parts = new ArrayList<>();
+        int length = card.length();
+        for (int i = 0; i < length; i += size) {
+            parts.add(card.substring(i, Math.min(length, i + size)));
+        }
+        String [] ar = parts.toArray(new String[0]);	
+		base.Dictionary.put("CARD", ar[1]);
+	}
+	
 
 	@When("^User clicks on Continue button in Summary Section$")
 	public void clickContinueButton() {
 		invoiceNew.clickSummaryContinue();
 	}
+	
 
 	@And("^Two cards added are not saved and verified in cc query (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+)$")
 	public void testCCCardsNotSaved(String email, String password, String gdCardFirstName, String gdCardLastName,
@@ -219,6 +261,7 @@ public class InvoiceNewSteps {
 		invoiceId = invoiceNew.getInvoiceNumber();
 
 		System.out.println(accountId);
+		
 
 		gdCardFirstName = (String) base.getGDValue(gdCardFirstName);
 		gdCardLastName = (String) base.getGDValue(gdCardLastName);
@@ -252,6 +295,23 @@ public class InvoiceNewSteps {
 
 		System.out.println(cardAdded);
 
+	}
+	
+	@Then("^Payment should be successfull and amount should get updated$")
+	public void payment_should_be_successfull_and_amount_should_get_updated() throws Exception {
+		invoiceNew.validateAmountUpdatedAndGetAmountDebittedNew();
+	//	String AmountDue = invoiceNew.getamountDue();
+//		String previousBalance = base.Dictionary.get("DUE_BALANCE");
+//		if (((driverType.trim().toUpperCase().contains("ANDROID")
+//				|| driverType.trim().toUpperCase().contains("IOS")))) {
+//		} else {
+//			System.out.println(AmountDue);
+//			Double CalculativeAmountDue= Double.valueOf(previousBalance) - Double.valueOf(payamount);
+//			Assert.assertTrue(AmountDue.contains(String.valueOf(CalculativeAmountDue)),"Amount are correctly displayed");
+//			System.out.println(Double.valueOf(CalculativeAmountDue));
+//			invoice.getInvoiceBalWhenRefreshed(invoiceId, Double.valueOf(CalculativeAmountDue));
+//		}
+//	}
 	}
 
 	@And("^Two cards added are saved and verified in cc query (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+), (.+)$")
@@ -374,7 +434,12 @@ public class InvoiceNewSteps {
 
 	@And("^User selects Pay Other from Payment Option dropdown$")
 	public void selectPayOther() {
-		invoiceNew.selectPayOther();
+//		try {
+//		invoiceNew.selectPayOther();
+//		}
+	//	catch(Exception e) {
+			invoiceNew.amountforPaymentNew();
+	//	}
 
 	}
 
@@ -449,8 +514,9 @@ public class InvoiceNewSteps {
 		if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && base.Environment.get("deviceType").trim().equalsIgnoreCase("phone"))) {
 			//Do Nothing
 		} else
-			accountBalance = dashboard.getAccountBalance();
-		      invoiceNew.amountFieldDisplayed();
+		//	accountBalance = dashboard.getAccountBalance();
+		      invoiceNew.amountFieldDisplayedNew();
+		  //invoiceNew.amountFieldDisplayedNew();
 	}
 
 	@Then("^Payment card is selected, Amount Due is populated and Continue gets enabled$")
@@ -494,22 +560,33 @@ public class InvoiceNewSteps {
 		invoiceNew.enterCVVinConfirmPopUp();
 		invoiceNew.clickContinuePopUp();
 	}
+	
+	@Then("^Verify Payment is successfull$")
+	public void verify_payment_successfull() {
+		invoiceNew.verifySuccessMessage();
 
-	@Then("^Payment should be successfull and amount should get updated$")
-	public void paymentValidation() {
-		Double debitAmount = invoiceNew.validateAmountUpdatedAndGetAmountDebitted(accountBalance);
-		System.out.println(debitAmount);
+	}
 
+	
+	
+	@Then("^Payment of amount (.+) should be successfull and amount should get updated$")
+	public void paymentValidation(String amount) {
+		String payamount = (String) base.getGDValue(amount);
+		invoiceNew.validateAmountUpdatedAndGetAmountDebittedNew();
+		String AmountDue = invoiceNew.getamountDue();
+		String previousBalance = base.Dictionary.get("DUE_BALANCE");
 		if (((driverType.trim().toUpperCase().contains("ANDROID")
 				|| driverType.trim().toUpperCase().contains("IOS")))) {
 		} else {
-			System.out.println(BalanceDue);
-			System.out.println(BalanceDue - debitAmount);
-			double x = BalanceDue - debitAmount;
-			System.out.println(x);
-			invoice.getInvoiceBalWhenRefreshed(invoiceId, x);
+			System.out.println(AmountDue);
+			Double CalculativeAmountDue= Double.valueOf(previousBalance) - Double.valueOf(payamount);
+			Assert.assertTrue(AmountDue.contains(String.valueOf(CalculativeAmountDue)),"Amount are correctly displayed");
+			System.out.println(Double.valueOf(CalculativeAmountDue));
+			invoice.getInvoiceBalWhenRefreshed(invoiceId, Double.valueOf(CalculativeAmountDue));
 		}
 	}
+
+	
 	//payment with typeform review
 	@Then("^Typeform submitted and Payment should be successfull and amount should get updated$")
 	public void reviewpaymentValidation() throws AWTException {
@@ -560,6 +637,22 @@ public class InvoiceNewSteps {
 		System.out.println(amount);
 		invoiceNew.enterAmount(amount);
 	}
+	
+	@When("^User enters CVV number of Card$")
+	public void user_enters_cvv_card() throws Exception {
+		 String CVV1= base.Dictionary.get("CVV_CARD");
+		 String CVV2= base.Dictionary.get("CVV_CARD_AE");
+		 try {
+		invoiceNew.typeCVV(CVV1);
+		invoiceNew.selectTnC();
+		invoiceNew.getContinuePaymentSection();
+		}
+		 catch(Exception e) {
+			 invoiceNew.typeCVV(CVV2);
+			 invoiceNew.selectTnC();
+			 invoiceNew.getContinuePaymentSection(); 
+		 }
+	}
 
 	@When("^User clicks on Add New Card, adds new card without saving to account (.+), (.+), (.+), (.+), (.+), (.+)$")
 	public void addNewCard(String gdCardFirstName, String gdCardLastName, String gdCardNum, String gdCardExpiry,
@@ -577,14 +670,16 @@ public class InvoiceNewSteps {
 		System.out.println(gdCardLastName);
 		System.out.println(gdCardNum);
 		System.out.println(gdCardExpiry);
-		invoiceNew.addNewCard(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry, gdZip, gdAddress);
+		//invoiceNew.addNewCard(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry, gdZip, gdAddress);
+		invoiceNew.clickcancelbutton();
 
 	}
 
 	@When("^User enters cvv for added card, clicks on Continue button$")
 	public void enterCVVForAddedCard() throws Exception {
+		//invoiceNew.typeCVV();
 		invoiceNew.enterCVVForAddedCard();
-		invoiceNew.clickContinuePopUp();
+	//	invoiceNew.clickContinuePopUp();
 
 	}
 
@@ -614,10 +709,10 @@ public class InvoiceNewSteps {
 		System.out.println(gdCardLastNameSec);
 		System.out.println(gdCardNumSec);
 		System.out.println(gdCardExpirySec);
-		invoiceNew.addNewCard(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry, gdZip, gdAddress);
+	//	invoiceNew.addNewCard(saveCard, gdCardFirstName, gdCardLastName, gdCardNum, gdCardExpiry, gdZip, gdAddress);
 
-		invoiceNew.addNewCard(saveCard, gdCardFirstNameSec, gdCardLastNameSec, gdCardNumSec, gdCardExpirySec, gdZipSec,
-				gdAddressSec);
+	//	invoiceNew.addNewCard(saveCard, gdCardFirstNameSec, gdCardLastNameSec, gdCardNumSec, gdCardExpirySec, gdZipSec,
+		//		gdAddressSec);
 
 	}
 
@@ -769,7 +864,7 @@ public class InvoiceNewSteps {
 		base.Dictionary.put(invoicestatus + "_EMAIL_ADDRESS", email);
 		base.Dictionary.put(invoicestatus + "_PASSWORD", password);
 		adminLogin.beforeMtdInvoiceAPI(invoicestatus);
-		if (base.Dictionary.get(invoicestatus + "invoiceId").trim().equalsIgnoreCase("")) {
+         if (base.Dictionary.get(invoicestatus + "invoiceId").trim().equalsIgnoreCase("")) {
 			invoicestatus = "PAID";
 			base.Dictionary.put(invoicestatus + "_EMAIL_ADDRESS", email);
 			base.Dictionary.put(invoicestatus + "_PASSWORD", password);
@@ -780,7 +875,7 @@ public class InvoiceNewSteps {
 
 		int invoiceId = Integer.valueOf(base.Dictionary.get(invoicestatus.trim().toUpperCase() + "invoiceId").trim());
 		if (!invoicestatus.trim().equalsIgnoreCase("PAID"))
-			Assert.assertTrue(invoice.verifyInvoiceStatus(invoiceId, invoicestatus), "Verify " + invoicestatus.trim().toLowerCase() + " invoice is displayed");
+		Assert.assertTrue(invoice.verifyInvoiceStatus(invoiceId, invoicestatus), "Verify " + invoicestatus.trim().toLowerCase() + " invoice is displayed");
 		Assert.assertEquals(invoice.getInvoiceDesc(invoiceId), adminLogin.getInvoiceFieldValues(base.Dictionary.get(invoicestatus.trim().toUpperCase() + "InvoiceListArray"), new String[] { "invoice_descriptions", "balances", "due_dates" }, invoiceId, invoicestatus) .get("invoice_descriptions"),
 				"Verify invoice description matches with the result from TM Api");
 		Assert.assertEquals(invoice.getInvoiceDesc(invoiceId),
@@ -827,8 +922,8 @@ public class InvoiceNewSteps {
 			invoice.isContinueButtonDisplayed();
 		else
 			base.sync(2000L);
-
-		Assert.assertEquals(invoiceNew.getInvoiceQty(), base.Dictionary.get(invoicestatus.trim().toUpperCase() + "num_seat"),
+	    invoiceNew.clickInvoiceDetail();
+	 	Assert.assertEquals(invoiceNew.getInvoiceQty(), base.Dictionary.get(invoicestatus.trim().toUpperCase() + "num_seat"),
 				"Verify invoice number of seats matches with the result from TM Api");
 		Assert.assertEquals(invoiceNew.getSection(),
 				base.Dictionary.get(invoicestatus.trim().toUpperCase() + "section_name"),
@@ -878,13 +973,13 @@ public class InvoiceNewSteps {
 		base.Dictionary.put("AccessToken", accessToken.getAccessToken(email, password));
 		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));
 		String invoicestatus = "PLAN";
-		int invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
+		int invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
 		if (invoiceId == -1) {
 			invoicestatus = "PARTIALLY PAID";
-			invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
+			invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
 			if (invoiceId == -1) {
 				invoicestatus = "UNPAID";
-				invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
+				invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
 			}
 		}
 		if (invoiceId == -1)
@@ -921,10 +1016,10 @@ public class InvoiceNewSteps {
 		base.Dictionary.put("AccessToken", accessToken.getAccessToken(email, password));
 		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));
 		String invoicestatus = "UNPAID";
-		int invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
+		int invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
 		if (invoiceId == -1) {
 			invoicestatus = "PARTIALLY PAID";
-			invoiceId = adminLogin.getInvoiceListAndId(accountId, invoicestatus);
+			invoiceId = adminLogin.getInvoiceListAndIdNew(accountId, invoicestatus);
 		}
 		if (invoiceId == -1)
 			throw new SkipException("Invoice not found");
@@ -936,10 +1031,9 @@ public class InvoiceNewSteps {
 		String token = invoice.getCsrfToken(cookies);
 		invoice.acceptTerms(cookies, token, versionNumber);
 		
-		invoiceNew.getCCQuery(cookies);
-		
+		invoiceNew.getCCQuery(cookies,invoicestatus);
 		adminLogin.getCCQuery(accountId, invoicestatus);
-		System.out.println(base.Dictionary.get(invoicestatus.trim().toUpperCase() + "cc_Query"));
+
 		adminLogin.getCCQueryFieldValues(base.Dictionary.get(invoicestatus.trim().toUpperCase() + "cc_Query"), new String[] { "cc_type", "cc_exp", "data_mask" }, invoicestatus);
 		token = invoice.getCsrfToken(cookies);
 		invoiceNew.paymentsInvoiceAPI(invoiceId, cookies, token, base.Dictionary.get("member_id"), invoicestatus);
@@ -999,20 +1093,30 @@ public class InvoiceNewSteps {
 		pass = (String) base.getGDValue(pass);	    
 		accountId = accessToken.getAccountId(base.Dictionary.get("AccessToken"));	    
 	    String invoiceId = Integer.toString(adminLogin.getSingleInoviceId(accountId));
-	  //  System.out.println("cvfv    "+invoiceId);
+	     System.out.println("Invoice ID:   "+invoiceId);
 	    if (adminLogin.getSingleInoviceId(accountId)==-1) {
 	    	System.out.println("No Invoice Id Found for the user");
 	    	utils.navigateTo("/invoice#/");
 	    	Assert.assertEquals(invoiceNew.getInvoicePlaceholder(),"There is no invoice to pay at the moment.","No Invoices present for the user");
 	    }
 	    else {
-	    dashboard.clickViewAllInvoice();
-	    invoiceNew.isInvoiceListDisplayed();
-		Assert.assertTrue(base.getDriver().getCurrentUrl().contains("/invoice"));
-		utils.navigateTo("/invoice#/"+invoiceId+"/1");
-		Assert.assertTrue(invoiceNew.IsInvoiceButtonDisplayed(), "Invoice Details are getting displayed");		
-	    }
+        	dashboard.clickViewAllInvoice();
+		    invoiceNew.isInvoiceListDisplayed();
+			Assert.assertTrue(base.getDriver().getCurrentUrl().contains("/invoice"));
+			utils.navigateTo("/invoice#/"+invoiceId+"/1");
+		
 				
+			try {
+			Assert.assertTrue(invoiceNew.IsInvoiceSummaryDisplayed(), "Invoice Summary Details are getting displayed");
+			}
+			catch(Exception e) {
+				if(invoiceNew.IsInvoicePrintButtonDisplayed())
+					Assert.assertTrue(invoiceNew.IsInvoicePrintButtonDisplayed(), "Invoice Print Details are getting displayed");	
+						else
+							throw new Exception();
+					}
+			}
+			    		
 	}
 	
 	@When("^Amount Due should be updated with Add on amount and service charge$")
@@ -1056,5 +1160,16 @@ public class InvoiceNewSteps {
 	@Then("^User Click on Cancel button$")
 	public void ClickCancebuttonAddPaymentPage() throws Exception {
 	    invoiceNew.clickcancelbutton();
+	}
+	
+	@Then("^Click on Updated Invoice button that is displayed$")
+	public void click_on_Updated_Invoice_button_that_is_displayed() throws Exception {
+	    invoiceNew.clickOnViewUpdatedInvoiceButton();
+	}
+	
+	@When("^User Enters cvv and accept Terms and Conditions$")
+	public void user_Enters_cvv_and_accept_Terms_and_Conditions() throws Exception {
+		invoiceNew.enterCVVinConfirmPopUp();
+		invoiceNew.acceptTermsAndConditions();
 	}
 }

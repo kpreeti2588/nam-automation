@@ -6,13 +6,16 @@ import java.util.Set;
 
 import cucumber.api.java.en.And;
 import org.iomedia.common.BaseUtil;
+import org.iomedia.framework.SoftAssert;
 import org.iomedia.galen.common.ManageticketsAPI;
 import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.common.ManageticketsAPI.Event;
 import org.iomedia.galen.pages.DashboardHeader;
 import org.iomedia.galen.pages.DashboardSection;
 import org.iomedia.galen.pages.Hamburger;
+import org.iomedia.galen.pages.ManageTicket;
 import org.iomedia.galen.pages.MobileSectionTabs;
+import org.testng.SkipException;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -29,8 +32,9 @@ public class DashboardSteps {
 	BaseUtil base;
 	MobileSectionTabs tabs;
 	ManageticketsAPI api;
+    ManageTicket managetickets;
 	
-	public DashboardSteps(DashboardSection section, DashboardHeader header, org.iomedia.framework.Assert Assert, Hamburger hamburger, Utils utils, BaseUtil base, MobileSectionTabs tabs, ManageticketsAPI api) {
+	public DashboardSteps(DashboardSection section, ManageTicket managetickets, DashboardHeader header, org.iomedia.framework.Assert Assert, Hamburger hamburger, Utils utils, BaseUtil base, MobileSectionTabs tabs, ManageticketsAPI api) {
 		this.section = section;
 		this.header = header;
 		this.Assert = Assert;
@@ -40,13 +44,15 @@ public class DashboardSteps {
 		this.tabs = tabs;
 		this.api = api;
 		this.driverType = section.driverFactory.getDriverType().get();
+		this.managetickets = managetickets;
 	}
 	
 	@Then("^User logged in successfully$")
 	public void user_logged_in_successfully() {
-	//Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
-    //Assert.assertTrue(section.waitForDasboardSection(null), "Verify dashboard section is displayed");
-		utils.sync(500l);
+		utils.sync(200l);
+		utils.getDriver().navigate().to(base.Environment.get("APP_URL")+"/dashboard");
+		//Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
+		//Assert.assertTrue(section.waitForDasboardSection(null), "Verify dashboard section is displayed");
 	}
 	
 	@When("^User clicks your account$")
@@ -88,6 +94,7 @@ public class DashboardSteps {
 			tabs.clickQuickLinks();
 		}
 		Assert.assertEquals(header.getSwitchedAccountName(name), name);
+		
 	}
 	
 	@Then("^SSO done successfully to NAM with correct (.+) and (.+)$")
@@ -96,6 +103,9 @@ public class DashboardSteps {
 		accountName = (String) base.getGDValue(accountName);
 		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
 			tabs.clickQuickLinks();
+		}
+		if(!utils.getDriver().getCurrentUrl().contains("dashboard")) {
+			utils.getDriver().navigate().to(utils.Environment.get("APP_URL")+"/dashboard");
 		}
 		Assert.assertEquals(header.getAccountName(), accountName , "Account Name is matching. SSO is successful");
 	    Assert.assertEquals(header.getAccountId(), accountId, "Account ID is matching. SSO is successful");
@@ -168,14 +178,22 @@ public class DashboardSteps {
 
 	@Then("Transferred tickets are seen")
 	public void verifyTransferredTickets() {
-		section.verifyTransferredTickets(base.Dictionary.get("TicketNumberSectionTransfer"),base.Dictionary.get("EventNameSectionTransfer"));
+		if (managetickets.checkenableEDP()==true) {
+			section.verifyTransferredTicketsEDP(base.Dictionary.get("TicketNumberSectionTransfer"),base.Dictionary.get("EventNameSectionTransfer"));
+		}else {
+			section.verifyTransferredTickets(base.Dictionary.get("TicketNumberSectionTransfer"),base.Dictionary.get("EventNameSectionTransfer"));
+		}
 	}
 
 	@Then("Tickets transferred are seen for two events")
 	public void verifyTransferredTicketstwoevents() {
 		int num = Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer1"))+Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer2"));
 		base.Dictionary.put("TicketNumberTwoEvents", String.valueOf(num));
-		section.verifyTransferredTicketsTwoEvents(num, base.Dictionary.get("EventNameSectionTransfer1"),base.Dictionary.get("EventNameSectionTransfer2"));
+		if (managetickets.checkenableEDP()==true) {
+			section.verifyTransferredTicketsTwoEventsEDP(num, base.Dictionary.get("EventNameSectionTransfer1"),base.Dictionary.get("EventNameSectionTransfer2"));
+		}else {
+			section.verifyTransferredTicketsTwoEvents(num, base.Dictionary.get("EventNameSectionTransfer1"),base.Dictionary.get("EventNameSectionTransfer2"));
+		}
 	}
 
 	@And("User Accepts Tickets Transfer")
@@ -185,13 +203,21 @@ public class DashboardSteps {
 
 	@And("User Declines Tickets Transfer")
 	public void declineTransfer() {
-		section.declineTransfer();
+		if (managetickets.checkenableEDP()==true) {
+			throw new SkipException("Decline Features is not implemented on EDP Phase3");
+		}else {
+			section.declineTransfer();	
+		}
+		
 	}
 
 	@Then("Success Message is Seen with Go to Event Button")
 	public void successMsg() {
-		section.successMsg();
-
+		if (managetickets.checkenableEDP()==true) {
+			section.successMsgEDP();
+		}else {
+			section.successMsg();
+		}
 	}
 
 
@@ -203,7 +229,11 @@ public class DashboardSteps {
 
 	@And("User is navigated to events page by clicking Go to Event Button")
 	public void eventPage() {
+		if (managetickets.checkenableEDP()==true) {
+			//not present in EDP Phase 3
+		}else {
 		section.verifyEventPage(base.Dictionary.get("EventNameSectionTransfer"));
+		}
 	}
 
 	@Then("Transfer Tickets info bar disappears")

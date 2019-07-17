@@ -57,6 +57,8 @@ public class Dashboard extends Driver {
 	@Test(groups={"smoke","dashboardUi","regression","prod"}, dataProvider="devices", priority = 1)
 	public void verifyDashboardPage(TestDevice device) throws Exception{
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", device, true);
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDasboardSection(device), "Verify dashboard section is displayed");
@@ -73,6 +75,8 @@ public class Dashboard extends Driver {
 	public void verifyDashboardPageOnClickingTicketsSectionOnDevices(TestDevice device) throws Exception{
 		if(device.getName().trim().equalsIgnoreCase("mini-tablet") || device.getName().trim().equalsIgnoreCase("mobile")) {
 			load("/dashboard");
+			//If User Pass credentails from Jenkins
+			utils.credentials_jenkins();
 			homepage.login("", "", device, true);
 			Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 			Assert.assertTrue(dashboardSection.waitForDasboardSection(device), "Verify dashboard section is displayed");
@@ -87,6 +91,8 @@ public class Dashboard extends Driver {
 	public void verifyDashboardPageOnClickingInvoicesSectionOnDevices(TestDevice device) throws Exception{
 		if(device.getName().trim().equalsIgnoreCase("mini-tablet") || device.getName().trim().equalsIgnoreCase("mobile")) {
 			load("/dashboard");
+			//If User Pass credentails from Jenkins
+			utils.credentials_jenkins();
 			homepage.login("", "", device, true);
 			Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 			Assert.assertTrue(dashboardSection.waitForDasboardSection(device), "Verify dashboard section is displayed");
@@ -102,6 +108,8 @@ public class Dashboard extends Driver {
 		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))
 			throw new SkipException("Skipped");
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDasboardSection(null), "Verify dashboard section is displayed");
@@ -114,6 +122,8 @@ public class Dashboard extends Driver {
 		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))
 			throw new SkipException("Skipped");
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDasboardSection(null), "Verify dashboard section is displayed");
@@ -127,6 +137,8 @@ public class Dashboard extends Driver {
 		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS") || driverType.trim().toUpperCase().contains("SAFARI"))
 			throw new SkipException("Skipped");
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);		
 		List<WebElement> links=dashboardSection.getAllLinks();
 		System.out.println(links.size());
@@ -158,6 +170,8 @@ public class Dashboard extends Driver {
 			throw new SkipException("Skipped");
 		
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		Assert.assertTrue(getDriver().getCurrentUrl().contains("/dashboard"));
 		boolean can_edit_password = api.canUserEditPassword();
@@ -182,6 +196,8 @@ public class Dashboard extends Driver {
 	@Test(groups={"smoke","dashboardFunctional","regression","prod"})
 	public void verifyEventInvoicefromDashboard() throws Exception {	
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDasboardSection(null), "Verify dashboard section is displayed");
@@ -221,6 +237,8 @@ public class Dashboard extends Driver {
 	@Test(groups={"smoke","dashboardFunctional","regression","prod", "invoiceNew"})
 	public void verifyEventInvoicefromDashboardNew() throws Exception {	
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
 		Assert.assertTrue(dashboardSection.waitForDasboardSection(null), "Verify dashboard section is displayed");
@@ -229,7 +247,11 @@ public class Dashboard extends Driver {
 		/**------------------------------- Check Events-------------------------------- **/
 		String ticketname = dashboardSection.clickDashboardEvent();
 		ManageTicket managetickets = new ManageTicket(driverFactory, Dictionary, Environment, Reporter, Assert, SoftAssert, sTestDetails);
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+		if (managetickets.checkenableEDP()==true) {
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null) , "Verify tickets listing page is displayed");
+		}else {
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+		}
 		Assert.assertTrue(getDriver().getCurrentUrl().contains("/tickets") || getDriver().getCurrentUrl().contains("/myevents"));	
 		Assert.assertTrue(ticketname.contains(header.getEventName()), "Event Link is landing to correct page");
 		if(driverType.trim().toUpperCase().contains("SAFARI")) {
@@ -249,6 +271,7 @@ public class Dashboard extends Driver {
 		String name = dashboardSection.getInvoiceText();
 		String InvoiceLink = dashboardSection.getInvoiceLink();
 		dashboardSection.clickInvoice();
+		utils.sync(9000L);
 		Assert.assertTrue(invoiceNew.isInvoiceDetailDisplayed(null), "Verify invoice detail block is displayed");
 		Assert.assertTrue(getDriver().getCurrentUrl().trim().contains(InvoiceLink.trim()), "Invoice Link is landing to correct page");
 		if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
@@ -260,6 +283,8 @@ public class Dashboard extends Driver {
 	@Test(groups={"smoke","dashboardUi","regression","prod"}, dataProvider="devices")
 	public void verifyChangePasswordDesign(TestDevice device) throws Exception {
 		load("/dashboard");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", device, true);
 		boolean can_edit_password = api.canUserEditPassword();
 		if(!can_edit_password)

@@ -728,8 +728,9 @@ public class SwitchAccount extends Driver {
 		nickname = dashboardSection.getTypedName();
 		dashboardSection.clickSaveNickName();
 		dashboardSection.clickSwitchAccount();
+		BaseUtil.sync(2000L);
 		accessToken.getMemberResponse(Dictionary.get("SWITCH_ACC_EMAIL_ADDRESS"),
-				Dictionary.get("SWITCH_ACC_PASSWORD"));
+		Dictionary.get("SWITCH_ACC_PASSWORD"));
 		Assert.assertEquals(Dictionary.get("name_" + accountId), nickname);
 		if (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
 			Assert.assertTrue(header.waitForDasboardHeader(), "Verify dashboard header is displayed");
@@ -737,8 +738,12 @@ public class SwitchAccount extends Driver {
 			section.clickQuickLinks();
 		}
 		BaseUtil.sync(2000L);
+		if(!getDriver().getCurrentUrl().contains("dashboard")) {
+			getDriver().navigate().to(Environment.get("APP_URL")+"/dashboard");
+		}
 		Assert.assertEquals(header.getAccountName(), nickname);
 		Assert.assertEquals(header.getAccountId(), accountId);
+		
 	}
 
 	@Test(groups = { "smoke", "dashboardUi", "regression", "prod", "switchAccount" })
@@ -990,7 +995,7 @@ public class SwitchAccount extends Driver {
 			invoicestatus = "PARTIALLY PAID";
 			invoiceId = adminlogin.getInvoiceListAndId(accountId, invoicestatus);
 			if (invoiceId == -1) {
-				invoicestatus = "PLAN";
+				invoicestatus = "PAYMENT PLAN";
 				invoiceId = adminlogin.getInvoiceListAndId(accountId, invoicestatus);
 			}
 		}
@@ -1022,14 +1027,18 @@ public class SwitchAccount extends Driver {
 		}
 		dashboardSection.selectAccount(accountId);
 		dashboardSection.clickSwitchAccount();
+		utils.sync(5000l);
 		if (driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
 			section.clickQuickLinks();
 		}
+		
+		if(!getDriver().getCurrentUrl().contains("dashboard")) {
+			getDriver().navigate().to(Environment.get("APP_URL")+"/dashboard");
+		utils.sync(5000l);
 		Assert.assertEquals(header.getSwitchedAccountName(Dictionary.get("name2")), Dictionary.get("name2"));
+	    }
 		utils.navigateTo("/invoice");
-
-		Assert.assertTrue(invoice.verifyInvoiceStatus(invoiceId, invoicestatus),
-				"Verify " + invoicestatus.trim().toLowerCase() + " invoice is displayed");
+		Assert.assertTrue(invoice.verifyInvoiceStatus(invoiceId, invoicestatus),"Verify " + invoicestatus.trim().toLowerCase() + " invoice is displayed");
 		invoice.clickInvoiceLink(invoiceId, null);
 
 		Assert.assertTrue(invoiceNew.isInvoiceDetailDisplayed(null), "Verify invoice detail block is displayed");
@@ -1038,9 +1047,6 @@ public class SwitchAccount extends Driver {
 
 		invoiceNew.clickSelectOrAddPaymentLink();
 
-		Assert.assertTrue(
-				invoiceNew.verifyAllCardDetails(Dictionary.get(invoicestatus.trim().toUpperCase() + "cc_Query")),
-				"Verify all cards last digits matches with the result from TM Api");
-
+		Assert.assertTrue(invoiceNew.verifyAllCardDetails(Dictionary.get(invoicestatus.trim().toUpperCase() + "cc_Query")),"Verify all cards last digits matches with the result from TM Api");
 	}
 }

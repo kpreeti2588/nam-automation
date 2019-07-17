@@ -2,7 +2,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="GENESIS">
   <suite-files>
-    <suite-file path="testng/GENESIS-PROD_SANITY-testng-customsuite.xml"/>
+    <suite-file path="testng/GENESIS-AMGR_BUILD_SANITY-testng-customsuite.xml"/>
   </suite-files>
 </suite> <!-- GENESIS -->
 

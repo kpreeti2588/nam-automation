@@ -476,4 +476,9 @@ public class CMS extends Driver {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 	
+	
+	@Test(groups={"smoke","regression", "cmsFunctional"})
+	public void verifyCMSVersion() throws Throwable{
+		runScenario(Dictionary.get("SCENARIO"));
+	}
 }

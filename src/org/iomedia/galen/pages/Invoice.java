@@ -437,7 +437,7 @@ public class Invoice extends BaseUtil {
 		} else {
 			if(checkIfElementPresent(selectedInvoice)) {
 				String selectedInvoiceXpath = getXpath(selectedInvoice, "Selected invoice", "", -1);
-				WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+				WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//div[contains(@class,'invoice-balancesList')]/div/span"), "", "Invoice balance");		
 				String selInvoiceBalance = selectedInvoiceBalance.getText();
 				try{
 					getElementWhenRefreshed(amount_Due, "innerHTML", selInvoiceBalance);
@@ -472,6 +472,12 @@ public class Invoice extends BaseUtil {
 	public String isSurveyDisplay() {
 		System.out.println("invoice class : survey value"+ getText(surveyText));
 		return getText(surveyText);
+	}
+	
+	public boolean isTypeformPresent() {
+		boolean isTypeformPresent = getDriver().findElement(Iframe_xpath).isDisplayed();
+		System.out.println("Typeform Is Present On Page "+isTypeformPresent);
+		return isTypeformPresent;
 	}
 	
 	public void clickFirstInvoiceLink(TestDevice device) {
@@ -1029,7 +1035,7 @@ public class Invoice extends BaseUtil {
    public String getInvoiceBal(int invoiceId){
 	   By invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "')]/..");
 	   String selectedInvoiceXpath = getXpath(invoice, "Invoice", "", -1);
-	   WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+	   WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//div//div[2]/div[1]/span"), "", "Invoice balance");
 	   return selectedInvoiceBalance.getText().replaceAll("[$A-Za-z" + Environment.get("currency") + ",]", "").trim();
    }
    
@@ -1101,11 +1107,11 @@ public class Invoice extends BaseUtil {
    public String getInvoiceBalWhenRefreshed(int invoiceId, double expectedBalance){
 	   By invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "')]/..");
 	   String selectedInvoiceXpath = getXpath(invoice, "Invoice", "", -1);
-	   getSingleChildObject(selectedInvoiceXpath, By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+	   getSingleChildObject(selectedInvoiceXpath, By.xpath("//div[contains(@class,'invoice-balancesList')]/div/span"), "", "Invoice balance");
 	   NumberFormat in=NumberFormat.getCurrencyInstance(Locale.US);
 	   double payment = expectedBalance;
 	   String newamt = in.format(payment).replace("$", Environment.get("currency"));
-	   WebElement selectedInvoiceBalance = getElementWhenRefreshed(By.xpath(selectedInvoiceXpath + "//ul/li[1]/span"), "innerHTML", newamt);
+	   WebElement selectedInvoiceBalance = getElementWhenRefreshed(By.xpath(selectedInvoiceXpath + "//div[contains(@class,'invoice-balancesList')]/div/span"), "innerHTML", newamt);
 	   return selectedInvoiceBalance.getText().replaceAll("[$A-Za-z" + Environment.get("currency") + ",]", "").trim();
    }
    
@@ -1126,7 +1132,7 @@ public class Invoice extends BaseUtil {
    public String getInvoiceDueDt(int invoiceId){
 	   By invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "')]/..");
 	   String selectedInvoiceXpath = getXpath(invoice, "Invoice", "", -1);
-	   WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//ul/li[2]/span"), "", "Invoice due date");
+	   WebElement selectedInvoiceBalance = getSingleChildObject(selectedInvoiceXpath, By.xpath("//div[contains(@class,'invoice-dueDateContainer')]//span"), "", "Invoice due date");
 	   @SuppressWarnings("deprecation")
 	   Date date = new Date(selectedInvoiceBalance.getText());
 	   SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
@@ -1135,22 +1141,27 @@ public class Invoice extends BaseUtil {
    }
    
    public boolean verifyInvoiceStatus(int invoiceId, String invoicestatus){
-	   isInvoiceListDisplayed();
+	     isInvoiceListDisplayed();
 	   By invoice = null;
 	   switch(invoicestatus.trim().toUpperCase()){
-	   	case "PAID":
-	   		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and (text()='PAID' or text()='Paid')])]/..");
+	    case "PLAN":
+		 //invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and (text()='Payment Plan' or text()='Paid')])]/..");
+	   		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li/a[contains(@href,'" + invoiceId + "') and (descendant::span[contains(@class,'invoice-paid')  and (descendant::span[contains(text(),'Payment Plan')])])]");
+	 		break;
+	   	case "PAYMENT PLAN":
+	   		//invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and (text()='Payment Plan' or text()='Paid')])]/..");
+	   		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li/a[contains(@href,'" + invoiceId + "') and (descendant::span[contains(@class,'invoice-paid')  and (descendant::span[contains(text(),'Payment Plan')])])]");
 	 		break;
 	 	case "UNPAID":
-	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (not (descendant::span[contains(@class, 'invoice-paid')]))]/..");
+	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and ((descendant::span[contains(@class, 'invoice-paid')]))]/..");
 			break;
 	 	case "PARTIALLY PAID":
-	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (not (descendant::span[contains(@class, 'invoice-paid')]))]/..");
+	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and ((descendant::span[contains(@class, 'invoice-paid')]))]/..");
 	 		break;
 	 	default:
-	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and (text()='PLAN' or text()='Plan')])]/.. | .//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and descendant::span[text()='PLAN' or text()='Plan']])]/..");
+	 		invoice = By.xpath(".//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class,'invoice-paid')  and (descendant::span[contains(text(),'Payment Plan')] | .//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and (text()='Payment Plan' or text()='Plan')])]/.. | .//div[@class='react-root-invoice']//ul[contains(@class, 'react-listing')]//li//a[contains(@href, '" + invoiceId + "') and (descendant::span[contains(@class, 'invoice-paid') and descendant::span[text()='PAYMENT PLAN' or text()='Plan']])]/..");
 	   }
-	   
+	  
 	   return checkIfElementPresent(invoice);
    }
    
@@ -1191,7 +1202,7 @@ public class Invoice extends BaseUtil {
 	   for(int i = 0; i < invs.size(); i++) {
 		   String xpath = getXpath(firstInvoiceLink, "Invoice", "", -1);
 		   WebElement invoiceDesc = getSingleChildObject("(" + xpath + ")[" + (i+1) + "]", By.tagName("em"), "", "Invoice description");
-		   WebElement invoiceBal = getSingleChildObject("(" + xpath + ")[" + (i+1) + "]", By.xpath("//ul/li[1]/span"), "", "Invoice balance");
+		   WebElement invoiceBal = getSingleChildObject("(" + xpath + ")[" + (i+1) + "]", By.xpath("//div/div[2]//span"), "", "Invoice balance");
 //		   WebElement invoiceDueDate = getSingleChildObject("(" + xpath + ")[" + (i+1) + "]", By.xpath("//ul/li[2]/span"), "", "Invoice due date");
 		   List<String> _invoice = new ArrayList<String>();
 		   _invoice.add(invoiceDesc.getText());

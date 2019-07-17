@@ -1,6 +1,7 @@
 Feature: Internationalization
 	Background: User landed on CMS
 			Given User is on / Page
+			Given User credentials passed from Jenkins
 		
 	Scenario: Verify langauge installation from CMS
 		And User navigates to /user/login from NAM
@@ -28,4 +29,8 @@ Feature: Internationalization
 		And User is on Add Language Page
 		But Delete %{GD_LANGUAGE} language if already installed
 		When Select Language from Add language Dropdown %{GD_LANGUAGE} and Click Add
-		Then Switch to %{GD_LANGUAGE} langauge from language Switcher
+		Then Switch to %{GD_LANGUAGE} langauge from Language Switcher
+		
+		
+		
+		

@@ -8,6 +8,7 @@ import org.iomedia.galen.common.Utils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
 import java.awt.AWTException;
@@ -262,8 +263,10 @@ public class Homepage extends BaseUtil {
 	}
 
 	public void clickSignInReactLink() {
+
 		if(checkIfElementPresent(signInReactLink))
 			click(signInReactLink, "Sign in",10);
+
 	}
 
 	public void clickForgotPasswordLink(){
@@ -526,8 +529,9 @@ public class Homepage extends BaseUtil {
 		}
 		else
 		{
+			if(checkEventmangerTakeOver() || checkUpgardedTakeover()  || checkNammeTakeover() )
 			try
-			{
+			{	
 				if(driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) {
 					getElementWhenClickable(popUpEventsComingUpWeb,15);
 					click(popUpEventsComingUpWeb, "Events Coming Up",15);
@@ -632,6 +636,9 @@ public class Homepage extends BaseUtil {
 		Assert.assertTrue(hamburger.waitforLoggedInPage(device), "Verify user get logged in");
 		Dictionary.put("NEW_EMAIL_ADDRESS", emailaddress);
 		Dictionary.put("NEW_PASSWORD", password);
+		
+		
+		
 //                            if(!driverType.trim().toUpperCase().contains("ANDROID") && !driverType.trim().toUpperCase().contains("IOS")) {
 		try {
 			((JavascriptExecutor) getDriver()).executeScript("$('#doorbell-button').remove()");
@@ -734,6 +741,50 @@ public class Homepage extends BaseUtil {
 		}else {
 
 		}
+	}
+	
+	/**
+	 * This method will check checkEventmangerTakeOver takeover setting and return true when takeover is on 
+	 * @return
+	 */
+	private boolean checkEventmangerTakeOver() {
+		try {
+			long value =  (long)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.componentConfigData.takeover.event_takeover.enabled");
+			if(value==1)
+				return true;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+	/**
+	 * This method will check upgraded takeover setting and return true when takeover is on 
+	 * @return
+	 */
+	private boolean checkUpgardedTakeover() {
+		try {
+			boolean value =  (boolean)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.contentManagerConfigData.enable_takeover");
+			return value;
+		} catch (WebDriverException var5) {
+			var5.getMessage();
+		}
+		return false;
+	}
+	
+	/**
+	 * This method will check namme takeover setting and return true when takeover is on 
+	 * @return
+	 */
+	private boolean checkNammeTakeover() {
+		try {
+			String value =  (String)((JavascriptExecutor)this.getDriver()).executeScript("return drupalSettings.contentManagerConfigData.takeover_json_url");
+			if(!value.equalsIgnoreCase("false"))
+				return true;
+		} catch (Exception var5) {
+			//This feature will available on 4.8.0 release
+			var5.getMessage();
+		}
+		return false;
 	}
 
 

@@ -1,6 +1,7 @@
 Feature: Menu Manager
   Background: User landed on CMS
   		Given User is on / Page
+  		Given User credentials passed from Jenkins
   
   Scenario: Create and verify a Public Menu under Page Settings and on frontend for End User
   	And User navigates to /user/login from NAM

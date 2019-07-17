@@ -10,7 +10,7 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<framework.version>19.1</framework.version>
+		<framework.version>19.2</framework.version>
 		<sauce_username>iomedia</sauce_username>
 		<sauce_access_key>b27203b4-7132-4eca-b282-f81159feb957</sauce_access_key>
 		<jackson.version>2.9.3</jackson.version>
@@ -57,6 +57,9 @@
 									<parking.unpaid>${parking.unpaid}</parking.unpaid>
 									<handling.paid>${handling.paid}</handling.paid>
 									<handling.unpaid>${handling.unpaid}</handling.unpaid>
+									<appUserName>${appUserName}</appUserName>
+									<appPassword>${appPassword}</appPassword>
+									<EventId>${EventId}</EventId>
 									<adminUserName>${adminUserName}</adminUserName>
 									<adminPassword>${adminPassword}</adminPassword>
 									<sessions>${sessions}</sessions>
@@ -103,6 +106,9 @@
 									<envConfig>${envConfig}</envConfig>
 									<adminUserName>${adminUserName}</adminUserName>
 									<adminPassword>${adminPassword}</adminPassword>
+									<appUserName>${appUserName}</appUserName>
+									<appPassword>${appPassword}</appPassword>
+									<EventId>${EventId}</EventId>
 									<setSession>${setSession}</setSession>
 									<seleniumURI>${seleniumURI}</seleniumURI>
 									<runLocally>true</runLocally>
@@ -162,6 +168,9 @@
 								<deviceConf>${deviceConf}</deviceConf>
 								<envConfig>${envConfig}</envConfig>
 								<jenkinsIp>${jenkinsIp}</jenkinsIp>
+								<appUserName>${appUserName}</appUserName>
+								<appPassword>${appPassword}</appPassword>
+								<EventId>${EventId}</EventId>
 								<zaleniumURI>${zaleniumURI}</zaleniumURI>
 								<accountStatus>${accountStatus}</accountStatus>
 								<deviceList>${deviceList}</deviceList>
@@ -273,6 +282,9 @@
 								<envConfig>${envConfig}</envConfig>
 								<jenkinsIp>${jenkinsIp}</jenkinsIp>
 								<zaleniumURI>${zaleniumURI}</zaleniumURI>
+								<appUserName>${appUserName}</appUserName>
+								<appPassword>${appPassword}</appPassword>
+								<EventId>${EventId}</EventId>
 								<accountStatus>${accountStatus}</accountStatus>
 								<deviceList>${deviceList}</deviceList>
 								<attachLogFile>${attachLogFile}</attachLogFile>
@@ -480,7 +492,6 @@
 			<artifactId>json-path</artifactId>
 			<version>2.4.0</version>
 		</dependency>
-
 	<dependency>
 		<groupId>io.appium</groupId>
 		<artifactId>java-client</artifactId>

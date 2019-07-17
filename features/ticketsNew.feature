@@ -2,6 +2,7 @@ Feature: Tickets New
 
   Background: User landed on homepage
     Given User is on / Page
+    Given User credentials passed from Jenkins
 
   Scenario: Send ticket NEW after Email ID change in CAM
     Given User creates account using ats with events
@@ -322,7 +323,7 @@ Feature: Tickets New
     And User navigates to "/tickets#/%{GD_EventId}" from NAM
     When User clicks on Send tickets
     And User selects the seat using %{GD_TransferTicketID}
-    And User clicks on continue
+    And User clicks on Transfer to continue
     Then Verify Event Detail using %{GD_TransferTicketID},NEW TICKETS
     And User enter blank space and verify send button remains disabled %{GD_EMAIL_ADDRESS}
 
@@ -600,3 +601,125 @@ Feature: Tickets New
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
     #Then User navigates to Manage tickets pages by clicking event name one by one  and Transferred tickets for two events are shown as Completed and  CANCEL TRANSFER link disappears
+    
+   
+Scenario: Verify Send ticket functionality for EDP new design with existing user
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User logged in successfully
+    Given EDP is enabled on Site
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User logged in successfully
+    And Get transfer ticket ID for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And User navigates to "/tickets#/%{GD_EventId}" from NAM
+    When User clicks on Send tickets
+    And User selects the seat using %{GD_TransferTicketID}
+    And User clicks on continue
+    Then Verify Event Detail using %{GD_TransferTicketID},NEW TICKETS
+    When User enters recipient details %{GD_EMAIL_ADDRESS}
+    When User clicks on Send
+    Then Confirmation page is displayed with Recipient details %{GD_EMAIL_ADDRESS}
+    When User clicks on Done
+    Then Verify ticket listing page display
+    And Save the state of ticket for %{GD_TransferTicketID}
+    And Verify and Save the Status and Expiry of ticket using %{GD_TransferTicketID}
+    And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    When User Logout and login again using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then Verify the status and expiry of Send ticket after logout and login %{GD_Status} %{GD_Expiry} %{GD_TransferTicketID}
+    And Verify the state of the ticket %{GD_State}
+    And Verify ticket flags for %{GD_TransferTicketID}, %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+   
+    
+    Scenario: Provide automatic comparison of seats data in Archtics DB with the data returned as a result of GetSeatsBySectionId call
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User logged in successfully
+    And Get transfer ticket ID for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And User navigates to "/tickets#/%{GD_EventId}" from NAM
+    And User save the seatSectionRow using %{GD_TransferTicketID}
+    Then User verify Section Row and Seats In UI 
+    When User clicks on Send tickets
+    And User selects the seat using %{GD_TransferTicketID}
+    And User clicks on continue
+    Then Verify Event Detail using %{GD_TransferTicketID},NEW TICKETS
+    When User enters recipient details %{GD_EMAIL_ADDRESS}
+    When User clicks on Send
+    Then Confirmation page is displayed with Recipient details %{GD_EMAIL_ADDRESS}
+    When User clicks on Done
+    Then Verify ticket listing page display
+    #And Save the state of ticket for %{GD_TransferTicketID}
+    
+      
+    Scenario: Enabled secure barcode toggle from CMS
+    When User enters %{GD_TRANSFEREE_EMAIL_ADDRESS} and %{GD_TRANSFEREE_PASSWORD}
+    Then User logged in successfully
+    And Verify secure barcode toggle status
+    And Secure Barcode is enabled on Site
+    And Verify secure barcode toggle status
+    
+    Scenario: Verify secure barcode should appear when secure barcode toggle is enabled in CMS and RET flag is enabled for an event 
+    Given User is enabled on mobile
+    When User fetch render ticket Ids
+    Given User navigates to "/tickets#/%{GD_EventID}" from NAM
+    When User landed on interstitial page and enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    And Clicks on Scan Barcode for %{GD_RenderBarcodeID} and 0
+    Then User Accept the Education Information POP Up if present
+    Then Secure Barcode gets displayed for %{GD_RenderBarcodeID} and 0
+    Given User saves Secure Barcode frontend attribute for %{GD_RenderBarcodeID} and 0
+    And Verify the secure barcode for %{GD_RenderBarcodeID} and 0 with %{GD_SecureBarcodeAttribute}
+    
+    Scenario: Verify Cancel ticket functionality for EDP Update Phase 3 new design with existing user
+     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     Then User logged in successfully
+     And Get transfer ticket ID for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     And User navigates to "/tickets#/%{GD_EventId}" from NAM
+     When User clicks on Send tickets
+     And User selects the seat using %{GD_TransferTicketID}
+     And User clicks on continue
+     Then Verify Event Detail using %{GD_TransferTicketID},NEW TICKETS
+     When User enters recipient details %{GD_EMAIL_ADDRESS}
+     When User clicks on Send
+     Then Confirmation page is displayed with Recipient details %{GD_EMAIL_ADDRESS}
+     When User clicks on Done
+     Then Verify ticket listing page display
+     And User click on cancel transfer link on event details page 
+     Then Verify ticket listing page display
+     
+    Scenario: Verify Decline ticket functionality for EDP Update Phase 3 new desgin with existing user 
+     And Save "jitendra.roy@ticketmaster.com" into NEW_EMAIL_ADDRESS
+     And Save "jitendra1" into NEW_PASSWORD
+     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     Then User logged in successfully
+     And User declines all pending transfers if any
+     And Get transfer ticket ID for %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     And Save ticket flags for ticket Id %{GD_TransferTicketID} using %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+     And User navigates to "/tickets#/%{GD_EventId}" from NAM
+     When User clicks on Send tickets
+     And User selects the seat using %{GD_TransferTicketID}
+     And User clicks on continue
+     Then Verify Event Detail using %{GD_TransferTicketID},NEW TICKETS
+     When User enters recipient details %{GD_NEW_EMAIL_ADDRESS}
+     When User clicks on Send
+     Then Confirmation page is displayed with Recipient details %{GD_NEW_EMAIL_ADDRESS}
+     When User clicks on Done
+     Then User Logout and login again using %{GD_NEW_EMAIL_ADDRESS} and %{GD_NEW_PASSWORD}
+     And User navigates to "/dashboard" from NAM
+     And User is able to see tickets transferred info bar on Dashboard with Decline and Accept Button
+     And User clicks See Details Link
+     And User Declines Tickets Transfer
+     Then Decline Message is Seen with Go to Event Button
+     And User is navigated to My Events page by clicking Go to Event Button
+     And User navigates to "/dashboard" from NAM
+     Then Transfer Tickets info bar disappears
+     And User navigates to "/user/LOGOUT" from NAM
+     
+Scenario: Verify transfer tickets needs to be sorted in Bulk Transfer when EDP is on
+  	When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User logged in successfully
+    Given EDP is enabled on Site
+    When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
+    Then User logged in successfully
+    And Get Event Id with Maximum Tickets
+    Then User navigates to "/tickets#/%{GD_EventId}" from NAM
+    And Verify that tickets displayed are in sorted order

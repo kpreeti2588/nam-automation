@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.iomedia.framework.Driver;
+import org.iomedia.galen.pages.CMS;
 import org.iomedia.galen.pages.Hamburger;
 import org.iomedia.galen.pages.Homepage;
 import org.iomedia.galen.pages.Invoice;
@@ -36,12 +37,14 @@ import org.iomedia.galen.common.ManageticketsAPI.Event;
 @CucumberOptions(plugin = "json:target/cucumber-report-feature-composite.json", format = "pretty", features = {"features/userJourneys.feature", "features/ticketsNew.feature"}, glue = {"org.iomedia.galen.steps"}, monochrome = true, strict = true)
 public class ManageTickets extends Driver {
 	
+	
 	private Homepage homepage;
 	private ManageTicket managetickets;
 	private ManageticketsAPI manageticketsapi;
 	private Hamburger hamburger;
 	private Utils utils;
 	private Invoice invoice;
+	private CMS cms;
 	private TicketsNew ticketsNew;
 	boolean CAN_TRANSFER, CAN_RESALE, CAN_RENDER, CAN_RENDER_FILE, CAN_RENDER_BARCODE, CAN_RENDER_PASSBOOK, CAN_DONATE_CHARITY; 
 	String host;
@@ -67,150 +70,296 @@ public class ManageTickets extends Driver {
 	public void verifyDownloadTickets() throws Exception {
 		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))
 			throw new SkipException("Skipped");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getRenderDetails(true, "event", false);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
+		
 		homepage.login("", "", null, true);
-		managetickets.clickDownloadTickets();
-		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
-		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
-		SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
-		managetickets.clickContinue();
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickDownloadTicketsEDP();
+			managetickets.selectEventSectionAvailable(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.clickContinueEDP();
+			System.out.println(Dictionary.get("eventName"));
+			System.out.println(managetickets.getPopUpEventDetailsforMultiple());
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsforMultiple()),"Event Name are getting dispalyed");
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+			managetickets.clickPrintEDP();
+			managetickets.clickDoneEDP();
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+		}else {
+			managetickets.clickDownloadTickets();
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.clickContinue();
+			Assert.assertEquals(managetickets.getPopUpEventDetailsforMultiple(), Dictionary.get("eventName"));
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		}
 		manageticketsapi.renderFile(new String[]{Tkt[0]});
 	}
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","sendFunctional","prod","criticalbusiness"}, priority=2)
 	public void verifySendTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getTransferDetails(true, "event", false, false, false);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
-		homepage.login("", "", null, true);
 		
-		managetickets.clickSendTickets(null);
-		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
-		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
-		SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
-//		Assert.assertTrue(managetickets.getRow().contains(ticket[2]));
-//		Assert.assertTrue(managetickets.getSeat().contains(ticket[3]));
-		managetickets.clickContinue();
-		String claimLink = managetickets.getClaimLink();
-		String transferName="TestAuto";
-		managetickets.typeTransferTag(transferName);
-		managetickets.clickTransferDone();
-		try{
+		homepage.login("", "", null, true);
+		String state="";
+	    String status ="";
+	    String fname="Auto";
+		String lname="test";
+		System.out.println("EDP Feature is Enabled "+managetickets.checkenableEDP());
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickSendTicketsEDP(null);
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);	
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsEDP()), "Event Details are matching");
+			managetickets.clickContinueTransferEDP();		
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+
+			managetickets.typeRecipeintFirstName(fname);
+			managetickets.typeRecipeintLastName(lname);
+			managetickets.typeRecipientEmailAddress("jitendra.roy@ticketmaster.com");	
+			managetickets.typeRecipientMessage("Send Ticket");
+				
+			managetickets.clickContinuepopUpTransferEDP();
+		
+			Assert.assertEquals(managetickets.getRecipientDetailEDP(), "Recipient Details", "Recipient Details are getting displayed");
+		//	String transferName="TestAuto";
+//			managetickets.typeTransferTag(transferName);
+			managetickets.clickTransferDoneEDP();
+			
+				Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+			    state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
+				managetickets.logoutNLogin("", "");
+				status = managetickets.getTicketStatusEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);	
+				Assert.assertTrue(status.trim().contains("Transfer Pending"));
+			 
+		}else{
+			Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
+			managetickets.clickSendTickets(null);
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);			
+			managetickets.clickContinue();			
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+//			Assert.assertTrue(managetickets.getRow().contains(ticket[2]));
+//			Assert.assertTrue(managetickets.getSeat().contains(ticket[3]));
+			
+			managetickets.typeRecipeintFirstName(fname);
+			managetickets.typeRecipeintLastName(lname);
+			managetickets.typeRecipientEmailAddress("jitendra.roy@ticketmaster.com");	
+			managetickets.typeRecipientMessage("Send Ticket");
+			managetickets.clickContinuepopUpTransferEDP();
+			Assert.assertEquals(managetickets.getRecipientDetailEDP(), "Recipient Details", "Recipient Details are getting displayed");
+//			String claimLink = managetickets.getClaimLink();
+//			String transferName="TestAuto";
+//			managetickets.typeTransferTag(transferName);
+			managetickets.clickTransferDone();
+			
 			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-			String state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
+			state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
 			managetickets.logoutNLogin("", "");
-			String status = managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);
-			Assert.assertTrue(status.trim().contains(transferName));
-			Assert.assertEquals(state, "pending");
-			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
-		} finally {
-			String transferId = claimLink.trim().split("\\?")[1];
-			manageticketsapi.deleteTransfer(transferId);
-		}
+			status = managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);			
+			Assert.assertTrue(status.trim().contains(fname+" "+lname));			
+		} 
+		
+		Assert.assertEquals(state, "pending");
+		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
 	}
+	
 
 	@Test(groups = {"regression","ticketsFunctional","sendFunctional"}, priority = 3)
 	public void verifyMultipleSendTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getTransferDetails(true, "event", true, false, false);
 		System.out.println("Tkt:" + Tkt);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
 		homepage.login("", "", null, true);
+		String state, state2 = "";
+	    String status, status2 = "";
+	    String fname="Auto";
+		String lname="test";
+		System.out.println("EDP Feature is Enabled "+managetickets.checkenableEDP());
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickSendTicketsEDP(null);
+			String[] ticket2 = Tkt[1].split("\\.");
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsEDP()), "Event Details are matching");
+			managetickets.clickContinueTransferEDP();		
+				
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket2[1].replaceAll("%20", " ")));
+			
+			managetickets.typeRecipeintFirstName(fname);
+			managetickets.typeRecipeintLastName(lname);
+			managetickets.typeRecipientEmailAddress("jitendra.roy@ticketmaster.com");	
+			managetickets.typeRecipientMessage("Send Ticket");
+				
+			managetickets.clickContinuepopUpTransferEDP();
+			
+			Assert.assertEquals(managetickets.getRecipientDetailEDP(), "Recipient Details", "Recipient Details are getting displayed");
+
+			managetickets.clickTransferDoneEDP();
+		
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+			state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
+			state2 = manageticketsapi.waitForTicketState(Tkt[1], "pending");
+			managetickets.logoutNLogin("", "");
+			status = managetickets.getTicketStatusEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);
+			status2 = managetickets.getTicketStatusEDP(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]);
+			Assert.assertTrue(status.trim().contains("Transfer Pending"));		
+			Assert.assertTrue(status2.trim().contains("Transfer Pending"));							
+		}
+		else {
+		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
 		managetickets.clickSendTickets(null);
 		String[] ticket2 = Tkt[1].split("\\.");
 		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
 		managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
 		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
 		SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
 		SoftAssert.assertTrue(managetickets.getSection().contains(ticket2[1].replaceAll("%20", " ")));
+		
+		managetickets.typeRecipeintFirstName(fname);
+		managetickets.typeRecipeintLastName(lname);
+		managetickets.typeRecipientEmailAddress("jitendra.roy@ticketmaster.com");	
+		managetickets.typeRecipientMessage("Send Ticket");
+		managetickets.clickContinuepopUpTransferEDP();
+		Assert.assertEquals(managetickets.getRecipientDetailEDP(), "Recipient Details", "Recipient Details are getting displayed");
 //		Assert.assertTrue(managetickets.getRow().contains(ticket[2]));
 //		Assert.assertTrue(managetickets.getSeat().contains(ticket[3]));
 //		Assert.assertTrue(managetickets.getRow().contains(ticket2[2]));
 //		Assert.assertEquals(managetickets.getMultipleSeat(), ticket2[3]);
-		managetickets.clickContinue();
-		String claimLink = managetickets.getClaimLink();
-		String transferName="TestAuto";
-		managetickets.typeTransferTag(transferName);
+//		String claimLink = managetickets.getClaimLink();
+//		String transferName="TestAuto";
+//		managetickets.typeTransferTag(transferName);
 		managetickets.clickTransferDone();
-		try {
+		
 			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-			String state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
-			String state2 = manageticketsapi.waitForTicketState(Tkt[1], "pending");
+			state = manageticketsapi.waitForTicketState(Tkt[0], "pending");
+			state2 = manageticketsapi.waitForTicketState(Tkt[1], "pending");
 			managetickets.logoutNLogin("", "");
-			String status = managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);
-			String status2 = managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]);
-			Assert.assertTrue(status.trim().contains(transferName));
-			Assert.assertEquals(state, "pending");
-			Assert.assertTrue(status2.trim().contains(transferName));
-			Assert.assertEquals(state2, "pending");
-			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
-			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[1], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the second ticket flags");
-		} finally {
-			String transferId = claimLink.trim().split("\\?")[1];
-			manageticketsapi.deleteTransfer(transferId);
+			status = managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]);
+			status2 = managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]);
+			Assert.assertTrue(status.trim().contains(fname+" "+lname));			
+			Assert.assertTrue(status2.trim().contains(fname+" "+lname));
+			
 		}
+		Assert.assertEquals(state, "pending");
+		Assert.assertEquals(state2, "pending");
+		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
+		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[1], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the second ticket flags");	
 	}
 
 	@Test(groups = {"smoke","regression","ticketsFunctional","donateFunctional"}, priority = 4)
-	public void verifyDonateTickets() throws Exception {
+	public void verifyDonateTickets() throws Exception {		
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getDonateDetails(true, "event", false, false);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
+		
 		homepage.login("", "", null, true);
-		managetickets.clickDonateTickets(null);
-		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
-		managetickets.clickContinue();
-		managetickets.selectCharity();
-		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
-		managetickets.clickContinue();
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-		String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
-		managetickets.logoutNLogin("", "");
-		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
-		//Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
-		Assert.assertEquals(state, "donated");
-		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickDonateTicketsEDP(null);
+			managetickets.selectEventSectionAvailable(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.clickDonate();
+			managetickets.selectCharity();
+			managetickets.clickContinue();
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsEDP()));
+			managetickets.donatecharityConfirmButton();
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+			String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
+			managetickets.logoutNLogin("", "");
+			Assert.assertEquals(managetickets.getTicketStatusEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+			Assert.assertEquals(state, "donated");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
+		}else {
+			managetickets.clickDonateTickets(null);	
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.clickContinue();
+			managetickets.selectCharity();
+			managetickets.clickContinue();
+			Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+			String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
+			managetickets.logoutNLogin("", "");
+			Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+			Assert.assertEquals(state, "donated");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");
+		}
 	}
 
 	@Test(groups = {"regression","ticketsFunctional","donateFunctional"}, priority = 5)
 	public void verifyMultipleDonateTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getDonateDetails(true, "event", true, false, false);
 		System.out.println("Tkt:" + Tkt);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
+		
 		homepage.login("", "", null, true);
-		managetickets.clickDonateTickets(null);
-		String[] ticket2 = Tkt[1].split("\\.");
-		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
-		managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
-		managetickets.clickContinue();
-		managetickets.selectCharity();
-		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
-		managetickets.clickContinue();
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
-		String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
-		String state2 = manageticketsapi.waitForTicketState(Tkt[1], "donated");
-		managetickets.logoutNLogin("", "");
-		//Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]), "Donated");
-		//Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]), "Donated");
-		Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
-		Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]).contains("Donated"), true);
-		Assert.assertEquals(state, "donated");
-		Assert.assertEquals(state2, "donated");
-		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the ticket flags");
-		Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[1], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the second  ticket flags");
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickDonateTicketsEDP(null);
+			String[] ticket2 = Tkt[1].split("\\.");
+			managetickets.selectEventSectionAvailable(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
+			managetickets.clickDonate();
+			managetickets.selectCharity();
+			managetickets.clickContinue();
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsEDP()));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+			String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
+			String state2 = manageticketsapi.waitForTicketState(Tkt[1], "donated");
+			managetickets.logoutNLogin("", "");
+			managetickets.selectEventSectionAvailable(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			//Assert.assertEquals(managetickets.getTicketStatusEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+			//Assert.assertEquals(managetickets.getTicketStatusEDP(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]).contains("Donated"), true);
+			Assert.assertEquals(state, "donated");
+			Assert.assertEquals(state2, "donated");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the ticket flags");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[1], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the second  ticket flags");
+
+		}else {
+			managetickets.clickDonateTickets(null);
+			String[] ticket2 = Tkt[1].split("\\.");
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
+			managetickets.clickContinue();
+			managetickets.selectCharity();
+			managetickets.clickContinue();
+			Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+			String state = manageticketsapi.waitForTicketState(Tkt[0], "donated");
+			String state2 = manageticketsapi.waitForTicketState(Tkt[1], "donated");
+			managetickets.logoutNLogin("", "");
+			Assert.assertEquals(managetickets.getTicketStatus(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt[0]).contains("Donated"),true);
+			Assert.assertEquals(managetickets.getTicketStatus(ticket2[0], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3], Tkt[1]).contains("Donated"), true);
+			Assert.assertEquals(state, "donated");
+			Assert.assertEquals(state2, "donated");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[0], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the ticket flags");
+			Assert.assertEquals(manageticketsapi.getTicketFlags(Tkt[1], "", ""), new Boolean[] { false, false, false, false, false, false, false }, "Verify the second  ticket flags");
+		}
 	}
 
 	@Test(groups = {"smoke","regression","ticketsFunctional","sendFunctional","prod","criticalbusiness"}, priority = 6)
 	public void verifyReclaimTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkt = manageticketsapi.getTransferDetails(true, "event", false, false, false);
 		String[] ticket = Tkt[0].split("\\.");
 		
@@ -246,9 +395,12 @@ public class ManageTickets extends Driver {
 
 	@Test(groups = {"smoke","regression","ticketsFunctional","prod"}, priority = 7)
 	public void verifySortingOfManageTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		HashMap<Integer, ManageticketsAPI.Event> events = manageticketsapi.getEventIdWithTktsDetails();
 		Assert.assertNotNull(events);
-	
+
 		int eventId = -1;
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))
 			eventId = manageticketsapi.getEventIdWithMinTktsHavingRenderBarcode(events);
@@ -257,25 +409,42 @@ public class ManageTickets extends Driver {
 
 		Assert.assertNotEquals(eventId, -1);
 		load("/tickets#/" + eventId);
+		
 		homepage.login("", "", null, true);
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		
+		if (managetickets.checkenableEDP()==true) {
+			
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+			List<List<String>> expectedsections = manageticketsapi.getTickets(eventId, events);
+			if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+				List<List<String>> actualsections = managetickets.getMobileTicketsDetail();
+				Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
+			} else {
+				List<List<String>> actualsections = managetickets.getTicketsDetailEDP();
+				Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
+			}
 
-		List<List<String>> expectedsections = manageticketsapi.getTickets(eventId, events);
-
-		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
-			List<List<String>> actualsections = managetickets.getMobileTicketsDetail();
-			Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
 		} else {
-			List<List<String>> actualsections = managetickets.getTicketsDetail();
-			Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+			List<List<String>> expectedsections = manageticketsapi.getTickets(eventId, events);
+			if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+				List<List<String>> actualsections = managetickets.getMobileTicketsDetail();
+				Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
+			} else {
+				List<List<String>> actualsections = managetickets.getTicketsDetail();
+				Assert.assertEquals(actualsections, expectedsections, "Verify manage tickets are sorted");
+			}
 		}
 	}
 
 	@Test(groups = {"smoke","regression","ticketsFunctional","prod"}, priority = 8, enabled = false)
 	public void verifyEventsSummary() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		HashMap<Integer, ManageticketsAPI.Event> events = manageticketsapi.getEventIdWithTktsDetails();
 		Assert.assertNotNull(events);
 		load("/tickets");
+		
 		homepage.login("", "", null, true);
 		Assert.assertTrue(managetickets.isManageTicketsListDisplayed(), "Verify manage tickets list is displayed");
 		HashMap<Integer, String> levents = managetickets.getListOfEvents();
@@ -300,22 +469,33 @@ public class ManageTickets extends Driver {
 	public void verifyTicketsCountBasedOnStatus() throws Exception {
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))
 			throw new SkipException("Skipped");
-		
+
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		HashMap<Integer,ManageticketsAPI.Event> events = manageticketsapi.getEventIdWithTktsDetails();
 		Assert.assertNotNull(events);
-		
+
 		int eventId = -1;
 		eventId = manageticketsapi.getEventIdWithMaxTkts(events);
-		
+
 		Assert.assertNotEquals(eventId, -1);
 		load("/tickets#/" + eventId);
+		
 		homepage.login("", "", null, true);
-		int ticketsCount = managetickets.getTotalTicketsCount();
+
+		if (managetickets.checkenableEDP()==true) {
+			int ticketsCountEDP = managetickets.getTotalTicketsCountEDP();	
+			Assert.assertEquals(managetickets.getTotalTicketsCountTextEDP(), ticketsCountEDP > 1 ? ticketsCountEDP : ticketsCountEDP + " Tickets", "Verify total tickets count");	
+		} else {
+			int ticketsCount = managetickets.getTotalTicketsCount();
+			Assert.assertEquals(managetickets.getTotalTicketsCountText(), ticketsCount > 1 ? ticketsCount + " Tickets" : ticketsCount + " Tickets", "Verify total tickets count");
+		}
 		int sentTicketsCount = managetickets.getSentTicketsCount();
 		int listedTicketsCount = managetickets.getListedTicketsCount();
 		int claimedTicketsCount = managetickets.getClaimedTicketsCount();
 		int donatedTicketsCount = managetickets.getDonatedTicketsCount();
-		Assert.assertEquals(managetickets.getTotalTicketsCountText(), ticketsCount > 1 ? ticketsCount + " Tickets" : ticketsCount + " Tickets", "Verify total tickets count");
+		int donateTicketsCountEDP = managetickets.getDonatedTicketsCountEDP();
+
 		if(sentTicketsCount > 0)
 			Assert.assertEquals(managetickets.getSentTicketsCountText(), sentTicketsCount + " Sent", "Verify sent tickets count");
 		if(listedTicketsCount > 0)
@@ -324,16 +504,21 @@ public class ManageTickets extends Driver {
 			Assert.assertEquals(managetickets.getClaimedTicketsCountText(), claimedTicketsCount + " Claimed", "Verify claimed tickets count");
 		if(donatedTicketsCount > 0)
 			Assert.assertEquals(managetickets.getDonatedTicketsCountText(), donatedTicketsCount + " Donated", "Verify donated tickets count");
+		if(donateTicketsCountEDP > 0)
+			Assert.assertEquals(managetickets.getDonatedTicketsCountTextEDP(), donateTicketsCountEDP + " Donated", "Verify donated tickets count");
+		
 	}
 
 	@Test(groups = {"smoke","regression","ticketsFunctional","sendFunctional","prod"}, priority = 10)
 	public void sendTicketWithParkingPass() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] tickets = manageticketsapi.getTransferDetails(true, "event", false, false, true);
 		String Tkt = tickets[0];
 		String[] ticket = Tkt.split("\\.");
 		load("/tickets#/" + ticket[0]);
-		homepage.login("", "", null, true);
 		
+		homepage.login("", "", null, true);
 		managetickets.clickSendTickets(null);
 		managetickets.selectSeatInPopUp(Tkt, ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
 		managetickets.clickBundleParking();
@@ -386,10 +571,14 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","sellFunctional","prod","criticalbusiness"}, priority=11)
 	public void verifySellTicketsSellerProfile() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] tickets = manageticketsapi.getResaleDetails(true, "event", false, false);
 		String Tkt = tickets[0];
 		String[] ticket=Tkt.split("\\.");
 		load("/tickets#/"+ticket[0]);
+		
 		homepage.login("", "", null, true);
 		managetickets.clickSellTickets(null);
 		managetickets.selectSeatInPopUp(Tkt, ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
@@ -435,10 +624,14 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","sellFunctional","prod"}, priority=12)
 	public void verifySellTicketsBankAccount() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] tickets = manageticketsapi.getResaleDetails(true, "event", false, false);
 		String Tkt = tickets[0];
 		String[] ticket=Tkt.split("\\.");
 		load("/tickets#/"+ticket[0]);
+		
 		homepage.login("", "", null, true);
 		managetickets.clickSellTickets(null);
 		managetickets.selectSeatInPopUp(Tkt, ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
@@ -489,6 +682,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional","prod","criticalbusiness"}, priority=13)
 	public void verifySellTicketsEditBankAccount() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] tickets = manageticketsapi.getResaleDetails(true, "event", false, false);
 		String Tkt = tickets[0];
 		String[] ticket=Tkt.split("\\.");
@@ -506,6 +701,7 @@ public class ManageTickets extends Driver {
 
 		try {
 			load("/tickets#/"+ticket[0]);
+			
 			homepage.login("", "", null, true);
 			managetickets.clickEditCancelTicket(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
 			managetickets.clickEditPosting();
@@ -555,6 +751,9 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional","prod","criticalbusiness"}, priority=14)
 	public void verifySellTicketsEditSellerCredit() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "event", false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
@@ -571,6 +770,7 @@ public class ManageTickets extends Driver {
 		manageticketsapi.selltickets(new String[]{Tkt});
 		try {
 			load("/tickets#/"+ticket[0]);
+			
 			homepage.login("", "", null, true);
 			managetickets.clickEditCancelTicket(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
 			managetickets.clickEditPosting();
@@ -611,6 +811,9 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","sellFunctional","prod","criticalbusiness"}, priority=15)
 	public void verifyCancelPosting() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "event", false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
@@ -663,11 +866,26 @@ public class ManageTickets extends Driver {
 		if(Environment.get("deviceType").trim().equalsIgnoreCase("tablet")) {
 			throw new SkipException("Skipped");
 		}
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getBarcodeRenderMobileEnabledTickets(true, "event", false, false, false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
 		load("/tickets#/"+ticket[0]);
 		homepage.login("", "", null, true);
+		
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickScanBarcodeEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
+			Assert.assertEquals(Dictionary.get("eventName").contains(managetickets.getMobileScanEventDetails()),true);
+			//Assert.assertEquals(managetickets.getMobileScanEventDetails(), Dictionary.get("eventName"));
+			Assert.assertEquals(managetickets.getMobileScanSectionName(), ticket[1].replaceAll("%20", " "));
+			Assert.assertEquals(managetickets.getMobileScanRowName(),ticket[2]);
+			Assert.assertEquals(managetickets.getMobileScanSeatName(), ticket[3]);
+			//SoftAssert.assertEquals(managetickets.getMobileScanGateNumber(), "Enter Gate: " + Dictionary.get("entryGate").trim());
+			manageticketsapi.renderBarcode(Tkt);
+			Assert.assertTrue(managetickets.isBarcodeDisplayed(), "Verify bar code is displayed");
+		}
+		else {
 		
 		managetickets.clickScanBarcode(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
 		Assert.assertEquals(managetickets.getMobileScanEventDetails(), Dictionary.get("eventName"));
@@ -677,10 +895,13 @@ public class ManageTickets extends Driver {
 		SoftAssert.assertEquals(managetickets.getMobileScanGateNumber(), "Enter Gate: " + Dictionary.get("entryGate").trim());
 		manageticketsapi.renderBarcode(Tkt);
 		Assert.assertTrue(managetickets.isBarcodeDisplayed(), "Verify bar code is displayed");
+		}
 	}
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional"}, priority=17)
 	public void verifySellMultipleTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "event", true, false);
 		List<String> Tkt = Arrays.asList(Tkts);
 		String[] ticket1=Tkt.get(0).split("\\.");
@@ -746,6 +967,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional"}, priority=18)
 	public void verifyEditMultipleSellTickets() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "event", true, false);
 		List<String> Tkt = Arrays.asList(Tkts);
 		Tkt = manageticketsapi.selltickets(new String[]{Tkt.get(0), Tkt.get(1)});
@@ -806,6 +1029,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional"}, priority=19)
 	public void verifyCancelMultipleSellTickets() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "event", true, false);
 		List<String> Tkt = Arrays.asList(Tkts);
 		Tkt = manageticketsapi.selltickets(new String[]{Tkt.get(0), Tkt.get(1)});
@@ -853,23 +1078,39 @@ public class ManageTickets extends Driver {
 			throw new SkipException("Skipped");
 		if(Environment.get("deviceType").trim().equalsIgnoreCase("tablet"))
 			throw new SkipException("Skipped");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getBarcodeRenderMobileEnabledTickets(true, "event", false, false, false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
 		load("/tickets#/"+ticket[0]);
 		homepage.login("", "", null, true);
-		managetickets.clickScanBarcode(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
-		Assert.assertEquals(managetickets.getMobileScanEventDetails(), Dictionary.get("eventName"));
-		Assert.assertEquals(managetickets.getMobileScanSectionName(), ticket[1].replaceAll("%20", " "));
-		Assert.assertEquals(managetickets.getMobileScanRowName(),ticket[2]);
-		Assert.assertEquals(managetickets.getMobileScanSeatName(), ticket[3]);
-		SoftAssert.assertEquals(managetickets.getMobileScanGateNumber(), "Enter Gate: " + Dictionary.get("entryGate").trim());
-		manageticketsapi.renderPassbook(Tkt);
-		Assert.assertTrue(managetickets.isAddToAppletWalletDisplayed(), "Verify add to apple wallet button is displayed");
+ 		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickScanBarcodeEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
+			SoftAssert.assertEquals(managetickets.getMobileScanEventDetails(), Dictionary.get("eventName"));
+			Assert.assertEquals(managetickets.getMobileScanSectionName(), ticket[1].replaceAll("%20", " "));
+			Assert.assertEquals(managetickets.getMobileScanRowName(),ticket[2]);
+			Assert.assertEquals(managetickets.getMobileScanSeatName(), ticket[3]);
+			SoftAssert.assertEquals(managetickets.getMobileScanGateNumber(), "Enter Gate: " + Dictionary.get("entryGate").trim());
+			manageticketsapi.renderPassbook(Tkt);
+			Assert.assertTrue(managetickets.isAddToAppletWalletDisplayed(), "Verify add to apple wallet button is displayed");
+		}else {
+			managetickets.clickScanBarcode(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], Tkt);
+			Assert.assertEquals(managetickets.getMobileScanEventDetails(), Dictionary.get("eventName"));
+			Assert.assertEquals(managetickets.getMobileScanSectionName(), ticket[1].replaceAll("%20", " "));
+			Assert.assertEquals(managetickets.getMobileScanRowName(),ticket[2]);
+			Assert.assertEquals(managetickets.getMobileScanSeatName(), ticket[3]);
+			SoftAssert.assertEquals(managetickets.getMobileScanGateNumber(), "Enter Gate: " + Dictionary.get("entryGate").trim());
+			manageticketsapi.renderPassbook(Tkt);
+			Assert.assertTrue(managetickets.isAddToAppletWalletDisplayed(), "Verify add to apple wallet button is displayed");
+		}
 	}
 
 	@Test(groups = {"regression","ticketsFunctional","sendFunctional" }, priority = 21)
 	public void sendMultipleTicketsWithMultipleParkingPass() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkts = manageticketsapi.getTransferDetails(true, "event", true, true, true);
 		List<String> Tkt = Arrays.asList(Tkts);
 		String[] ticket = Tkt.get(0).split("\\.");
@@ -940,10 +1181,14 @@ public class ManageTickets extends Driver {
 
 	@Test(groups = {"regression","ticketsFunctional","sendFunctional"}, priority = 22)
 	public void sendTicketWithMultipleParkingPass() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkts = manageticketsapi.getTransferDetails(true, "event", false, true, true);
 		List<String> Tkt = Arrays.asList(Tkts);
 		String[] ticket = Tkt.get(0).split("\\.");
 		load("/tickets#/" + ticket[0]);
+		
 		homepage.login("", "", null, true);
 		managetickets.clickSendTickets(null);
 		managetickets.selectSeatInPopUp(Tkt.get(0), ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
@@ -1007,60 +1252,97 @@ public class ManageTickets extends Driver {
 		if(Environment.get("deviceType").trim().equalsIgnoreCase("tablet")) {
 			throw new SkipException("Skipped");
 		}
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] renderTkts = manageticketsapi.getRenderDetailsFiles(true, "event", false);
 		String[] cannotRenderTkts = manageticketsapi.getCannotRenderDetailsFiles(true, "event", false);
 		if(renderTkts == null && cannotRenderTkts == null)
-			  throw new SkipException("no tickets found");
-		
+			throw new SkipException("no tickets found");
+
 		load("/tickets");
 		homepage.login("", "", null, true);
-		
+
 		if(renderTkts != null) {
 			String renderTkt = renderTkts[0];
 			String[] ticket = renderTkt.split("\\.");
 			utils.navigateTo("/tickets#/" + ticket[0]);
-			managetickets.clickTicketDetails(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], renderTkt);
-			String[] expected = manageticketsapi.renderTicketDetails(renderTkt);
-			String[] actual = managetickets.getTicketDetails();
-			Assert.assertEquals(actual, expected, "Verify ticket details for rendered ticket");
-                  
+
+			if (managetickets.checkenableEDP()==true) {
+				managetickets.clickTicketDetailsEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], renderTkt);
+				String[] expected = manageticketsapi.renderTicketDetails(renderTkt);
+				String[] actual = managetickets.getTicketDetails();
+				Assert.assertEquals(actual, expected, "Verify ticket details for rendered ticket");
+			}else {
+				managetickets.clickTicketDetails(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], renderTkt);
+				String[] expected = manageticketsapi.renderTicketDetails(renderTkt);
+				String[] actual = managetickets.getTicketDetails();
+				Assert.assertEquals(actual, expected, "Verify ticket details for rendered ticket");
+			}        
 		}
-		
-		if(cannotRenderTkts != null) {
+
+		/*if(cannotRenderTkts != null) {
 			String cannotrenderTkt = cannotRenderTkts[0];
 			String[] ticket = cannotrenderTkt.split("\\.");
 			utils.navigateTo("/tickets");
-			Assert.assertTrue(managetickets.isManageTicketsListDisplayed() , "Verify manage tickets list is displayed");
-			utils.navigateTo("/tickets#/" + ticket[0]);
-			managetickets.clickTicketDetails(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], cannotrenderTkt);
-			String[] expected = manageticketsapi.renderTicketDetails(cannotrenderTkt);
-			String[] actual = managetickets.getTicketDetails();
-			Assert.assertEquals(actual, expected, "Verify ticket details for not rendered ticket");
-		}
+			if (managetickets.checkenableEDP()==true) {
+				Assert.assertTrue(managetickets.isManageTicketsListDisplayed() , "Verify manage tickets list is displayed");
+				utils.navigateTo("/tickets#/" + ticket[0]);
+				managetickets.clickTicketDetailsEDP(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], cannotrenderTkt);
+				String[] expected = manageticketsapi.renderTicketDetails(cannotrenderTkt);
+				String[] actual = managetickets.getTicketDetails();
+				Assert.assertEquals(actual, expected, "Verify ticket details for not rendered ticket");
+			}else {
+
+				Assert.assertTrue(managetickets.isManageTicketsListDisplayed() , "Verify manage tickets list is displayed");
+				utils.navigateTo("/tickets#/" + ticket[0]);
+				managetickets.clickTicketDetails(ticket[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3], cannotrenderTkt);
+				String[] expected = manageticketsapi.renderTicketDetails(cannotrenderTkt);
+				String[] actual = managetickets.getTicketDetails();
+				Assert.assertEquals(actual, expected, "Verify ticket details for not rendered ticket");
+			}
+		}*/
 	}
 	
 	@Test(groups={"regression","ticketsFunctional","viewFunctional"}, priority=24)
 	public void verifyMultipleDownloadTickets() throws Exception {
 		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone"))
 			throw new SkipException("Skipped");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getRenderDetails(true, "event", true);
 		String[] ticket = Tkt[0].split("\\.");
+		String[] ticket2= Tkt[1].split("\\.");
 		load("/tickets#/" + ticket[0]);
 		homepage.login("", "", null, true);
-		managetickets.clickDownloadTickets();
-		String[] ticket2 = Tkt[1].split("\\.");
-		managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
-		managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
-		managetickets.clickContinue();
-		Assert.assertEquals(managetickets.getPopUpEventDetails(), Dictionary.get("eventName"));
-		managetickets.clickContinue();
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		System.out.println("EDP Feature is Enabled "+managetickets.checkenableEDP());
+		if (managetickets.checkenableEDP()==true) {
+			managetickets.clickDownloadTicketsEDP();
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
+			managetickets.clickContinueEDP();
+			Assert.assertTrue(Dictionary.get("eventName").contains(managetickets.getPopUpEventDetailsforMultiple()),"Event Name are getting dispalyed");
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+		}else {
+			managetickets.clickDownloadTickets();
+			managetickets.selectSeatInPopUp(Tkt[0], ticket[1].replaceAll("%20", " "), ticket[2], ticket[3]);
+			managetickets.selectSeatInPopUp(Tkt[1], ticket2[1].replaceAll("%20", " "), ticket2[2], ticket2[3]);
+			managetickets.clickContinue();
+			Assert.assertEquals(managetickets.getPopUpEventDetailsforMultiple(), Dictionary.get("eventName"));
+			SoftAssert.assertTrue(managetickets.getSection().contains(ticket[1].replaceAll("%20", " ")));
+			managetickets.clickContinue();
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		}
 		manageticketsapi.renderFile(Tkt);
+		
 	}
 	
 	@Test(groups={"smoke","regression","ticketsFunctional"}, priority=25, enabled = false)
 	public void verifyBuyMoreTickets() throws Exception{
 		load("/");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, false);
 		Assert.assertTrue(getDriver().getCurrentUrl().contains("/dashboard"));
 		load("/tickets");
@@ -1070,6 +1352,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","prod"}, priority=26)
 	public void verifyButtonsonTicketPage() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		HashMap<Integer,ManageticketsAPI.Event> events = manageticketsapi.getEventIdWithTktsDetails();
 		Assert.assertNotNull(events);
 		int eventId = -1;
@@ -1078,40 +1362,59 @@ public class ManageTickets extends Driver {
 		else 
 			eventId = manageticketsapi.getEventIdWithMaxTkts(events);
 		Assert.assertNotEquals(eventId, -1);
-//		System.out.println(eventId);
+		
 		load("/tickets#/" + eventId);
 		homepage.login("", "", null, true);
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+
+		if (managetickets.checkenableEDP()==true) {
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null) , "Verify tickets listing page is displayed");	
+		}else {
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+		}
+
 		ManageticketsAPI.Event _event = events.get(eventId);
-		
+
 		if((!driverType.trim().toUpperCase().contains("IOS") && !driverType.trim().toUpperCase().contains("ANDROID")) || Environment.get("deviceType").trim().equalsIgnoreCase("tablet")) {
 			if(_event.canrenderfiletktcount > 0)
 				Assert.assertTrue(managetickets.isViewButtonEnable(), "Verify view button is enabled");
 			else
 				Assert.assertFalse(managetickets.isViewButtonEnable(), "Verify view button is disabled");
 		}
-		
+
 		if(_event.cantransfertktcount > 0) {
 			Assert.assertTrue(managetickets.isSendButtonEnable(null), "Verify send button is enabled");
 		} else {
 			Assert.assertFalse(managetickets.isSendButtonEnable(null), "Verify send button is disabled");
 		}
-		
+
 		if(_event.canresaletktcount > 0) {
 			Assert.assertTrue(managetickets.isSellButtonEnable(null), "Verify sell button is enabled");
 		} else {
 			Assert.assertFalse(managetickets.isSellButtonEnable(null), "Verify sell button is disabled");
 		}
-		
-		if(_event.candonatecharitytktcount > 0) {
-			Assert.assertTrue(managetickets.isDonateButtonEnable(null), "Verify donate button is enabled");
-		} else {
-			Assert.assertFalse(managetickets.isDonateButtonEnable(null), "Verify donate button is disabled");
+
+
+		if (managetickets.checkenableEDP()==true) {
+			if(_event.candonatecharitytktcount > 0) {
+				Assert.assertTrue(managetickets.isDonateButtonEnableEDP(null), "Verify donate button is enabled");
+			} else {
+				Assert.assertFalse(managetickets.isDonateButtonEnableEDP(null), "Verify donate button is disabled");
+			}
+		}
+		else {
+			if(_event.candonatecharitytktcount > 0) {
+				Assert.assertTrue(managetickets.isDonateButtonEnable(null), "Verify donate button is enabled");
+			} else {
+				Assert.assertFalse(managetickets.isDonateButtonEnable(null), "Verify donate button is disabled");
+			}
 		}
 	}
 	
 	@Test(groups = {"smoke","regression","ticketsFunctional","sendFunctional"}, priority = 27)
 	public void verifySendParkingTicket() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
+		
 		String[] Tkt = manageticketsapi.getTransferDetails(true, "parking", false, false, false);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
@@ -1145,6 +1448,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","sellFunctional"}, priority=28)
 	public void verifySellParkingTicket() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] tickets = manageticketsapi.getResaleDetails(true, "parking", false, false);
 		String Tkt = tickets[0];
 		String[] ticket=Tkt.split("\\.");
@@ -1199,6 +1504,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional"}, priority=29)
 	public void verifyEditParkingTicket() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] tickets = manageticketsapi.getResaleDetails(true, "parking", false, false);
 		String Tkt = tickets[0];
 		String[] ticket=Tkt.split("\\.");
@@ -1265,6 +1572,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"regression","ticketsFunctional","sellFunctional"}, priority=30)
 	public void verifyCancelParkingPosting() throws Exception{
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getResaleDetails(true, "parking", false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
@@ -1310,6 +1619,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups = {"smoke","regression","ticketsFunctional","donateFunctional"}, priority = 31)
 	public void verifyDonateParkingTickets() throws Exception {
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt = manageticketsapi.getDonateDetails(true, "parking", false, false);
 		String[] ticket = Tkt[0].split("\\.");
 		load("/tickets#/" + ticket[0]);
@@ -1390,6 +1701,7 @@ public class ManageTickets extends Driver {
 		String[] transferIds = manageticketsapi.getTransferID(new String[]{ticketId});
 		load("/ticket/claim?"+transferIds[0]);
 		
+		
 		try {
 			Assert.assertTrue(homepage.getLoginMessage().contains("Congratulations") || homepage.getLoginMessage().contains("To view your offer"));
 			homepage.createaccount(null, true);
@@ -1459,6 +1771,8 @@ public class ManageTickets extends Driver {
 	@Test(groups={"smoke","regression","ticketsFunctional","prod"}, priority = 35)
 	public void verifySearchFunctionalityEventName() throws Exception {
 		load("/tickets");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", null, true);
 		if(managetickets.verifySearchableValue("park")){
 			managetickets.clickSearch();
@@ -1565,20 +1879,30 @@ public class ManageTickets extends Driver {
             eventId = manageticketsapi.getEventIdWithMaxTkts(events);
         
         Assert.assertNotEquals(eventId, -1);
-        System.out.println(eventId);
+       // System.out.println(eventId);
         
 		load("/tickets#/" + eventId);
 		homepage.login("", "", null, true);
-		Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+		
+		if (managetickets.checkenableEDP()==true) {
+			Assert.assertTrue(managetickets.isTicketsListDisplayedEDP(null) , "Verify tickets listing page is displayed");
+		}
+		else {
+			Assert.assertTrue(managetickets.isTicketsListDisplayed(null) , "Verify tickets listing page is displayed");
+		}
 		
 		boolean donate = utils.getManageTicketConfiguration("donate");
 		boolean sell = utils.getManageTicketConfiguration("sell");
 		boolean send = utils.getManageTicketConfiguration("send");
 		boolean view;
 		
-		if(tkt != null)
-			ticketsNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], tkt[0]);
-	
+		if (managetickets.checkenableEDP()==true) {
+			//scroll functionality is not present in the EDP
+		}else {
+			if(tkt != null)
+				ticketsNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], tkt[0]);
+		}
+		
 		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
 			view = utils.getManageTicketConfiguration("mobile_enabled");
 		} else
@@ -1586,15 +1910,23 @@ public class ManageTickets extends Driver {
 		
 		Assert.assertEquals(managetickets.isSellButtonVisible(null), sell, "Verify sell button is visible");
 		Assert.assertEquals(managetickets.isSendButtonVisible(null), send, "Verify send button is visible");
-		Assert.assertEquals(managetickets.isDonateButtonVisible(null), donate, "Verify donate button is visible");
-		
-		if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
-			WebElement ele=	getDriver().findElement(By.xpath("(//span[contains(@class,'viewBarcode')])"));
-		    JavascriptExecutor obj = (JavascriptExecutor)getDriver();
-		    obj.executeScript("arguments[0].click();", ele);
-			Assert.assertEquals(managetickets.isScanBarcodeVisible(), view, "Verify scan barcode is visible");
-		} else
-			Assert.assertEquals(managetickets.isViewButtonVisible(), view, "Verify view button is visible");
+		if (managetickets.checkenableEDP()==true) {
+			Assert.assertEquals(managetickets.isDonateButtonVisibleEDP(null), donate, "Verify donate button is visible");
+		}else {
+			Assert.assertEquals(managetickets.isDonateButtonVisible(null), donate, "Verify donate button is visible");
+		}
+
+		if (managetickets.checkenableEDP()==true) {
+			//this functionality is allready tested in other test case 
+		}else {
+			if((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")) && Environment.get("deviceType").trim().equalsIgnoreCase("phone")) {
+				WebElement ele=	getDriver().findElement(By.xpath("(//span[contains(@class,'viewBarcode')])"));
+				JavascriptExecutor obj = (JavascriptExecutor)getDriver();
+				obj.executeScript("arguments[0].click();", ele);
+				Assert.assertEquals(managetickets.isScanBarcodeVisible(), view, "Verify scan barcode is visible");
+			} else
+				Assert.assertEquals(managetickets.isViewButtonVisible(), view, "Verify view button is visible");
+		}
 	}
 	
 	@Test(groups={"smoke","regression","ticketsFunctional","prod"}, priority=43, enabled = false)
@@ -1811,6 +2143,8 @@ public class ManageTickets extends Driver {
 	@Test(groups={"smoke","regression","ticketsUi","prod"}, dataProvider="devices", priority = 2)
 	public void verifyTicketsListingPage(TestDevice device) throws Exception{
 		load("/tickets");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", device, true);
 		hamburger.clickManageTickets();
 		
@@ -1822,12 +2156,8 @@ public class ManageTickets extends Driver {
 	@Test(groups={"smoke","regression","ticketsUi"}, dataProvider="devices", priority = 3)
 	public void verifyDownloadTicket(TestDevice device) throws Exception{
 		if(!device.getName().trim().equalsIgnoreCase("mobile")){
-			/*load("/");
-			homepage.login(device, false);
-			
-			if(Environment.get("env").trim().equalsIgnoreCase("STAGING"))
-				load("/tickets");
-			else{ */
+			//If User Pass credentails from Jenkins
+			utils.credentials_jenkins();
 			String[] Tkt= manageticketsapi.getRenderDetails(false, "all", false, false);
 			String[] ticket = Tkt[0].split("\\.");
 			load("/tickets#/"+ticket[0]);
@@ -1842,12 +2172,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsUi"}, dataProvider="devices", priority = 4)
 	public void verifySendTicket(TestDevice device) throws Exception{
-		/*	load("/");
-		homepage.login(device, false);
-		
-		if(Environment.get("env").trim().equalsIgnoreCase("STAGING"))
-			load("/tickets");
-		else{ */
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt= manageticketsapi.getTransferDetails(false, "all", false, false, false, false);
 		String[] ticket=Tkt[0].split("\\.");
 		load("/tickets#/"+ticket[0]);
@@ -1859,12 +2185,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsUi"}, dataProvider="devices", priority = 5)
 	public void verifySellTicket(TestDevice device) throws Exception{
-		/*load("/");
-		homepage.login(device, false);
-		
-		if(Environment.get("env").trim().equalsIgnoreCase("STAGING"))
-			load("/tickets"); 
-		else{ */
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt= manageticketsapi.getResaleDetails(false, "all", false, false, false);
 		String[] ticket=Tkt[0].split("\\.");
 		load("/tickets#/"+ticket[0]);
@@ -1877,12 +2199,8 @@ public class ManageTickets extends Driver {
 	
 	@Test(groups={"smoke","regression","ticketsUi"}, dataProvider="devices", priority = 6)
 	public void verifyDonateTicket(TestDevice device) throws Exception{
-		/*load("/");
-		homepage.login(device, false);
-		
-		if(Environment.get("env").trim().equalsIgnoreCase("STAGING"))
-			load("/tickets"); 
-		else{ */
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkt= manageticketsapi.getDonateDetails(false, "all", false, false, false);
 		String[] ticket=Tkt[0].split("\\.");
 		load("/tickets#/"+ticket[0]);
@@ -1896,6 +2214,8 @@ public class ManageTickets extends Driver {
 	@Test(groups={"smoke","regression","ticketsUi","prod"}, dataProvider="devices", priority = 1)
 	public void verifyManageTicketsGridPage(TestDevice device) throws Exception{
 		load("/tickets");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		homepage.login("", "", device, true);
 //		hamburger.clickManageTickets();
 		Assert.assertTrue(managetickets.isManageTicketsListDisplayed() , "Verify manage tickets list is displayed");
@@ -1985,6 +2305,8 @@ public class ManageTickets extends Driver {
 	public void verifyTicketDeferredDelivery() throws Exception {
 		if(!utils.getManageTicketConfiguration("mobile_enabled"))
 			  throw new SkipException("Mobile_Enabled is not enabled in CMS");
+		//If User Pass credentails from Jenkins
+		utils.credentials_jenkins();
 		String[] Tkts = manageticketsapi.getRenderDeferredDelivery(true, "event", false, false);
 		String Tkt = Tkts[0];
 		String[] ticket=Tkt.split("\\.");
@@ -2048,22 +2370,23 @@ public class ManageTickets extends Driver {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 
-	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 12, dependsOnMethods="verifyClaimTicketNewUser")
+	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 12, dependsOnMethods="verifyClaimTicketNewUser",enabled=false)
 	public void verifyClaimTicketAnotherUser() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 
-	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 13, dependsOnMethods="verifyClaimTicketNewUser")
+	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 13, dependsOnMethods="verifyClaimTicketNewUser",enabled=false)
 	public void verifyClaimParkingTicketNew() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 
-	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 1)
+	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 1,enabled=false)
 	public void verifyClaimTicketNewUser() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
+	//dependsOnMethods="verifyClaimTicketNewUser"
 
-	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 15, dependsOnMethods="verifyClaimTicketNewUser")
+	@Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 15, dependsOnMethods="verifyClaimTicketNewUser", enabled=false)
     public void verifyUnableToClaimAfterReclaim() throws Throwable {
         runScenario(Dictionary.get("SCENARIO"));
     }
@@ -2143,5 +2466,43 @@ public class ManageTickets extends Driver {
     public void verifyBulkDecline() throws Throwable {
         runScenario(Dictionary.get("SCENARIO"));
     }
-
+    
+    @Test(groups = { "smoke", "regression", "ticketsFunctional", "sendNew" }, priority = 1)
+    public void verifyDonateTicketsEDP() throws Throwable {
+        runScenario(Dictionary.get("SCENARIO"));
+    }
+    
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional", "sendNew" }, priority = 2)
+	public void verifySendTicketwithExistingUserEDP() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	} 
+	
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional", "sendNew" }, priority = 2)
+	public void verifySeatsAndTransfer() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	} 
+	
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional" }, priority = 2)
+	public void enabledSecuredBarcodeCMS() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional" }, priority = 2)
+	public void verifySecureBarcode() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional" }, priority = 2)
+	public void verifySendFunctionalityEDPPhase3() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	
+	@Test(groups = { "smoke", "regression", "criticalbusiness", "prod", "ticketsFunctional" }, priority = 2)
+	public void verifyDeclineEDP() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
+	@Test
+	public void verifyTicketsAreSortedInBulkTransfer() throws Throwable {
+		runScenario(Dictionary.get("SCENARIO"));
+	}
 }

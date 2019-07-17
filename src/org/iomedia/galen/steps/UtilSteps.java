@@ -48,6 +48,11 @@ public class UtilSteps {
 		utils.saveFileFromUrl(Filepath+ OSValidator.delimiter + "fr-ca.po", URL);		
 	}
 	
+	@Given("^User credentials passed from Jenkins$")
+	public void credentials_pass_from_jenkins() {
+	utils.credentials_jenkins();	
+	}
+	
 	@Given("^Place JSON File in English and other language into (.+)$")
 	public void save_JSON_File_into(String Filepath) throws Exception, IOException {
 		if(base.Environment.get("FrenchJSONURL").trim().equalsIgnoreCase("") || base.Environment.get("EnglishJSONURL").trim().equalsIgnoreCase("") )

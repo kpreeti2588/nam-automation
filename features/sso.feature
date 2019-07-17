@@ -1,6 +1,7 @@
 Feature: SSO
 	Background: User landed on homepage
 		Given User is on / Page
+		Given User credentials passed from Jenkins
 	
 	Scenario: SSO from NAM to Classic AMGR for Existing User
 		When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}

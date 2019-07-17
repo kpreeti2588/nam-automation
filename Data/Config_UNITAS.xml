@@ -274,8 +274,8 @@
 				<ASSOCIATED_ACC_PASSWORD>123456</ASSOCIATED_ACC_PASSWORD>
 			</FIREFOX2>
 			<CHROME1>
-				<EMAIL_ADDRESS>iomediab1b363b81f@example.com</EMAIL_ADDRESS>
-				<PASSWORD>123456</PASSWORD>
+				<EMAIL_ADDRESS>ashish.tanwar@ticketmaster.com</EMAIL_ADDRESS>
+				<PASSWORD>ashish1</PASSWORD>
 				<PLAN_EMAIL_ADDRESS>iomediab1b363b81f@example.com</PLAN_EMAIL_ADDRESS>
 				<PLAN_PASSWORD>123456</PLAN_PASSWORD>
 				<PAID_EMAIL_ADDRESS>iomediab1b363b81f@example.com</PAID_EMAIL_ADDRESS>
@@ -327,7 +327,7 @@
 				<adminUserName>admin</adminUserName>
 				<adminPassword>Jl7%q1*K</adminPassword>
 				<cam_Event>EIOMED01</cam_Event>
-				<kibanaUrl>https://vpc-prd214-dev-nam-hvzmhkedkeig3chsiacyjyo6ba.us-east-1.es.amazonaws.com/_plugin/kibana/app/kibana#/discover?_g=</kibanaUrl>
+				<kibanaUrl>http://elk-nam-us-east-1qa.nonprod-tmaws.io:80/_plugin/kibana/app/kibana#/discover?_g=</kibanaUrl>
 	      	</COMMON>
 		</VER_JUNE_2017>
 	</UNITAS>

@@ -2,6 +2,7 @@ Feature: Tickets Resale
 
   Background: User landed on homepage
     Given User is on / Page
+    Given User credentials passed from Jenkins
 
   Scenario: Verify Resale flow and positive validations
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}

@@ -302,13 +302,12 @@ public class AdminLogin extends BaseUtil {
 		}
 
 	}
-
-	public int getInvoiceListAndId(String AccountId, String invoicestatus) throws JSONException, Exception {
+	
+	public int getInvoiceListAndIdNew(String AccountId, String invoicestatus) throws JSONException, Exception {
 		JSONObject obj = update(parseJsonFile(invoiceRequest), "acct_id", AccountId);
 		String payload = update(obj, "dsn", Environment.get("DSN").trim()).toString();
 		String jsonText = utils.waitForTMInvoiceResponse(payload);
 		Dictionary.put(invoicestatus.trim().toUpperCase() + "InvoiceListArray", jsonText);
-
 		int invoiceId = -1;
 		if (!invoicestatus.trim().equalsIgnoreCase("")) {
 			JSONObject jsonObj = new JSONObject(jsonText);
@@ -322,32 +321,84 @@ public class AdminLogin extends BaseUtil {
 				float balances = Float.valueOf(invoice.getString("balances"));
 				float invoice_amounts = Float.valueOf(invoice.getString("invoice_amounts"));
 				int payment_plan_id = invoice.has("payment_plan_id") ? Integer.valueOf(invoice.getString("payment_plan_id")) : -1;
-				// float current_due_amounts =
-				// Float.valueOf(invoice.getString("current_due_amounts"));
-
+			//	float current_due_amounts = Float.valueOf(invoice.getString("current_due_amounts"));
+				
 				switch (invoicestatus.trim().toUpperCase()) {
 				case "PAID":
 					if (next_payment_amounts == balances && balances == 0.00)
 						success = true;
 					break;
 				case "UNPAID":
-					if (next_payment_amounts == balances && balances > 0 && payment_plan_id == -1
-							&& invoice_amounts == balances)
+					if (next_payment_amounts < balances && balances > 0 && invoice_amounts >= balances)
 						success = true;
 					break;
 				case "PARTIALLY PAID":
-					if (next_payment_amounts == balances && balances > 0 && payment_plan_id == -1
-							&& invoice_amounts > balances)
+					if (payment_plan_id == -1 && invoice_amounts >= balances)
 						success = true;
 					break;
 				default:
-					if (next_payment_amounts <= balances && balances > 0 && payment_plan_id != -1) {
+					if (next_payment_amounts < balances && balances > 0 && payment_plan_id != -1) {
 						Dictionary.put(invoicestatus.trim().toUpperCase() + "planId", String.valueOf(payment_plan_id));
 						success = true;
 					}
 				}
 
-				if (success) {
+			       	if (success) {
+					Dictionary.put(invoicestatus.trim().toUpperCase() + "balances", String.valueOf(balances));
+					invoiceId = Integer.valueOf(invoice.getString("invoice_ids"));
+					break;
+				}
+			}
+		}
+		return invoiceId;
+	}
+
+	public int getInvoiceListAndId(String AccountId, String invoicestatus) throws JSONException, Exception {
+		JSONObject obj = update(parseJsonFile(invoiceRequest), "acct_id", AccountId);
+		String payload = update(obj, "dsn", Environment.get("DSN").trim()).toString();
+		String jsonText = utils.waitForTMInvoiceResponse(payload);
+		Dictionary.put(invoicestatus.trim().toUpperCase() + "InvoiceListArray", jsonText);
+		int invoiceId = -1;
+		if (!invoicestatus.trim().equalsIgnoreCase("")) {
+			JSONObject jsonObj = new JSONObject(jsonText);
+			if (!jsonObj.getJSONObject("command1").has("invoices"))
+				return invoiceId;
+			JSONArray invoices = jsonObj.getJSONObject("command1").getJSONArray("invoices");
+			boolean success = false;
+			for (int i = invoices.length() - 1; i >= 0; i--) {
+				JSONObject invoice = invoices.getJSONObject(i);
+				float next_payment_amounts = Float.valueOf(invoice.getString("next_payment_amounts"));
+				float balances = Float.valueOf(invoice.getString("balances"));
+				float invoice_amounts = Float.valueOf(invoice.getString("invoice_amounts"));
+				int payment_plan_id = invoice.has("payment_plan_id") ? Integer.valueOf(invoice.getString("payment_plan_id")) : -1;
+			//	float current_due_amounts = Float.valueOf(invoice.getString("current_due_amounts"));
+				
+				switch (invoicestatus.trim().toUpperCase()) {
+				case "PAID":
+					if (next_payment_amounts == balances && balances == 0.00)
+						success = true;
+					break;
+				case "UNPAID":
+					if(next_payment_amounts == balances && balances > 0 && payment_plan_id == -1
+                            && invoice_amounts == balances)
+			//		if (next_payment_amounts < balances && balances > 0 && invoice_amounts >= balances)
+						success = true;
+					break;
+				case "PARTIALLY PAID":
+					if(next_payment_amounts == balances && balances > 0 && payment_plan_id == -1
+                    && invoice_amounts > balances)
+				//	if (payment_plan_id == -1 && invoice_amounts >= balances)
+						success = true;
+					break;
+				default:
+					if(next_payment_amounts <= balances && balances > 0 && payment_plan_id != -1) {
+				//	if (next_payment_amounts < balances && balances > 0 && payment_plan_id != -1) {
+						Dictionary.put(invoicestatus.trim().toUpperCase() + "planId", String.valueOf(payment_plan_id));
+						success = true;
+					}
+				}
+
+			       	if (success) {
 					Dictionary.put(invoicestatus.trim().toUpperCase() + "balances", String.valueOf(balances));
 					invoiceId = Integer.valueOf(invoice.getString("invoice_ids"));
 					break;
@@ -878,6 +929,7 @@ public class AdminLogin extends BaseUtil {
 			Dictionary.put(invoicestatus.trim().toUpperCase() + "CardNumber" + j, cardNumber);
 			Dictionary.put(invoicestatus.trim().toUpperCase() + "CardType" + j, cardType);
 			Dictionary.put(invoicestatus.trim().toUpperCase() + "CardExpiry" + j, cardExpiry);
+			
 		}
 	}
 
@@ -1196,6 +1248,9 @@ public class AdminLogin extends BaseUtil {
 	}
 	
 	public void createAdduserCMS() throws Exception {
+	  //filter the username for filtering 
+		type(filtername, Addusername, Addusername);
+		click(search, "Click on filter button");
 	  List<WebElement>  col = getDriver().findElements(By.xpath("//table/tbody/tr/td[2]"));
       Boolean flag = false; 
       

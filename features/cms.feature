@@ -2,6 +2,7 @@ Feature: CMS
 
   Background: User landed on CMS
     Given User is on / Page
+    Given User credentials passed from Jenkins
 
   Scenario: Add new invoice template and verify on front-end
     And User navigates to /user/login from NAM
@@ -92,3 +93,10 @@ Feature: CMS
     And user select page type under add new page section
     Then user verify Ticket Sales page
     And User navigates to "/user/LOGOUT" from NAM
+    
+    
+  Scenario: Verify Provide NAM version in CMS
+    And User navigates to /user/login from NAM
+    When User login into CMS
+    Then User verify version from CMS UI and Drupal API
+  

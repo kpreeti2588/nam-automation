@@ -2,19 +2,21 @@ package org.iomedia.galen.tests;
 
 import org.iomedia.framework.Driver;
 import org.testng.annotations.Test;
-
 import cucumber.api.CucumberOptions;
+
+
 
 @CucumberOptions(plugin = "json:target/cucumber-report-feature-composite.json", format = "pretty", features = {"features/prodsanity.feature", "features/userJourneys.feature"}, glue = {"org.iomedia.galen.steps"}, monochrome = true, strict = true)
 public class ProdSanity extends Driver {
 	
-	@Test(groups={"smoke","regression","sso", "prod"}, priority = 1)
+
+	@Test(groups={"smoke","regression","sso", "prod"}, priority = 2)
 	public void prodSanityVerificationPart1() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 	
-	@Test(groups={"smoke","regression","sso", "prod"}, priority = 2)
-	public void prodSanityVerificationPart2() throws Throwable {
+	@Test(groups={"smoke","regression","sso", "prod"}, priority = 1)
+	public void prodSanityVerification() throws Throwable {
 		runScenario(Dictionary.get("SCENARIO"));
 	}
 	

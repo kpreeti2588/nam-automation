@@ -43,12 +43,13 @@ public class TicketNewSteps {
 	SuperAdminPanel superAdminPanel;
 	HashMap<String,String> ticketDetails;
 	Utils utils;
+	
 	boolean CAN_TRANSFER_1, CAN_RESALE_1, CAN_RENDER_1, CAN_RENDER_FILE_1, CAN_RENDER_BARCODE_1, CAN_RENDER_PASSBOOK_1, CAN_DONATE_CHARITY_1;
 	boolean CAN_TRANSFER_2, CAN_RESALE_2, CAN_RENDER_2, CAN_RENDER_FILE_2, CAN_RENDER_BARCODE_2, CAN_RENDER_PASSBOOK_2, CAN_DONATE_CHARITY_2;
 	String ftname;
 	String fttime;
 
-	public TicketNewSteps(ManageTicket ticket, TicketsNew ticketNew, Invoice invoice, Homepage homepage, SuperAdminPanel superAdminPanel, org.iomedia.framework.Assert Assert, ManageticketsAPI api, ManageticketsAAPI aapi, BaseUtil base, AccessToken accessToken, org.iomedia.framework.SoftAssert SoftAssert, org.iomedia.framework.Reporting Reporter, Utils utils) {
+	public TicketNewSteps(ManageTicket ticket, TicketsNew ticketNew, Invoice invoice, Homepage homepage,SuperAdminPanel superAdminPanel, org.iomedia.framework.Assert Assert, ManageticketsAPI api, ManageticketsAAPI aapi, BaseUtil base, AccessToken accessToken, org.iomedia.framework.SoftAssert SoftAssert, org.iomedia.framework.Reporting Reporter, Utils utils) {
 		this.ticket = ticket;
 		this.ticketNew = ticketNew;
 		this.invoice = invoice;
@@ -70,12 +71,11 @@ public class TicketNewSteps {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
 		System.out.println(ticketId);
-		// Assert.assertEquals(ticket.getPopUpEventDetails(),
-		// base.Dictionary.get("eventName"));
+		if(ticket.checkenableEDP()==true) {
+			//popup remove from edp phase3
+		}else {
 		SoftAssert.assertTrue(ticketNew.getSection().contains(tkt[1].replaceAll("%20", " ")));
-
-		// Assert.assertTrue(ticket.getRow().contains(tkt[2]));
-		// Assert.assertTrue(ticket.getSeat().contains(tkt[3]));
+		}
 	}
 
 	@Then("^Verify Event Detail for both tickets using (.+) (.+)")
@@ -153,7 +153,11 @@ public class TicketNewSteps {
 	@Then("^Confirmation page is displayed with Recipient details (.+)$")
 	public void confirmationPage(String email) throws Exception {
 		email = (String) base.getGDValue(email);
+		if(ticket.checkenableEDP()==true) {
+		 ticketNew.verifyRecipientEmailAddressIsSameAsEnteredEDP(email);	
+		}else {
 		ticketNew.verifyRecipientEmailAddressIsSameAsEntered(email);
+		}
 	}
 
 	@Then("^Verify the status and expiry of Send ticket after logout and login (.+) (.+) (.+)$")
@@ -173,15 +177,16 @@ public class TicketNewSteps {
 		String[] tkt = ticketId.split("\\.");
 		String statusNew = ticketNew.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
 
-		String xpath = ticketNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
-		String expiryNew = ticketNew.getTicketExpiry(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId,
+		String xpath = ticketNew.scrollToTicketEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		String expiryNew = ticketNew.getTicketExpiryEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId,
 				xpath);
-
+		String expiryDate = expiryNew.split("Expires")[1].split("\\.")[0].trim();
+		
 		System.out.println(status + "STATUS");
 		System.out.println(expiry);
 
 		Assert.assertEquals(statusNew, status, "Status is same");
-		Assert.assertEquals(expiryNew, expiry, "Expiry is same");
+		Assert.assertEquals(expiryDate, expiry, "Expiry is same");
 		// Assert.assertTrue(status.trim().contains(transferName));
 	}
 
@@ -234,25 +239,45 @@ public class TicketNewSteps {
 
 	@Then("^Verify and Save the Status and Expiry of ticket using (.+)$")
 	public void save_status_of_ticket(String ticketId) {
-		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))) {
-			try {
-				ticketNew.selectByValueUsingInput("Pending");
-			} catch (Exception e) {
-				// no filter present
+		if (ticket.checkenableEDP()) {
+			ticketId = (String) base.getGDValue(ticketId);
+			String[] tkt = ticketId.split("\\.");
+			String status = ticketNew.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+			String xpath = ticketNew.scrollToTicketEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+			String expiry = ticketNew.getTicketExpiryEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3],
+					ticketId, xpath);
+			String expiryDate = expiry.split("Expires")[1].split("\\.")[0].trim();
+			
+			System.out.println("TICKET STATUS" + status);
+			
+			ticketNew.verifyStatusAndExpiryEDP(expiry, expiryDate);
+
+			base.Dictionary.put("Status", status);
+			base.Dictionary.put("Expiry", expiryDate);
+			
+		} else {
+
+			if ((driverType.trim().toUpperCase().contains("ANDROID")
+					|| driverType.trim().toUpperCase().contains("IOS"))) {
+				try {
+					ticketNew.selectByValueUsingInput("Pending");
+				} catch (Exception e) {
+					// no filter present
+				}
 			}
+			ticketId = (String) base.getGDValue(ticketId);
+			String[] tkt = ticketId.split("\\.");
+			String status = ticketNew.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+			String xpath = ticketNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+			String expiry = ticketNew.getTicketExpiry(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId,
+					xpath);
+
+			System.out.println("TICKET STATUS" + status);
+
+			ticketNew.verifyStatusAndExpiry(status, expiry);
+			base.Dictionary.put("Status", status);
+			base.Dictionary.put("Expiry", expiry);
 		}
-		ticketId = (String) base.getGDValue(ticketId);
-		String[] tkt = ticketId.split("\\.");
-		String status = ticketNew.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
-		String xpath = ticketNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
-		String expiry = ticketNew.getTicketExpiry(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId, xpath);
-
-		System.out.println("TICKET STATUS" + status);
-
-		ticketNew.verifyStatusAndExpiry(status, expiry);
-
-		base.Dictionary.put("Status", status);
-		base.Dictionary.put("Expiry", expiry);
 	}
 
 	@Then("^Verify and Save the Status and Expiry of both the tickets using (.+) (.+)$")
@@ -341,11 +366,12 @@ public class TicketNewSteps {
 	@Given("^Get transfer ticket ID with parking$")
 	public void get_transfer_ticket_IDs_parking() throws Exception {
 		String[] Tkt = api.getTransferDetails(true, "parking", false, false, false);
-		System.out.println("EVent id is " + Tkt[0].split("\\.")[0]);
+		System.out.println("Event id is " + Tkt[0].split("\\.")[0]);
 		System.out.println(Tkt[0]);
 		base.Dictionary.put("TransferTicketID", Tkt[0]);
 		base.Dictionary.put("EventId", Tkt[0].split("\\.")[0]);
 	}
+	
 
 	@Given("^Save ticket flags for ticket Ids (.+) (.+) using (.+) and (.+)$")
 	public void save_ticket_flags(String tick, String tick2, String emailaddress, String password) throws Exception {
@@ -438,7 +464,11 @@ public class TicketNewSteps {
 
 	@Then("^User click on Claim link$")
 	public void user_click_on_claim_link() throws Exception {
-		ticket.clickClaim();
+		if(ticket.checkenableEDP()==true) {
+			ticket.clickClaimEDP();	
+		}else {
+			ticket.clickClaim();
+		}
 	}
 
 	@Then("^Claim Pop-up is displayed with Error Message$")
@@ -468,39 +498,75 @@ public class TicketNewSteps {
 	public void clickTicketDetails(String ticketId) throws Exception {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
-		String xpath = ticketNew.scrollToTicketAfterReload(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
-		System.out.println(xpath);
 		By ticketDetails;
 		By purchasePrice;
+		String price="";
 		By iosAppLocator = null;
+		
+        if (ticket.checkenableEDP()==true) {
+			ticketNew.getTicketPricePathEDP(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
+			
+			if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")))) {
+				String xpath = ticketNew.scrollToTicketAfterReloadEDP(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
+				iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS'] | //XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='Ticket Details']");
+				ticketDetails = By.xpath(xpath +"//*[contains(@class,'completed')]//span[contains(text(),'Ticket Details')]");
+				purchasePrice = By.xpath("(" + xpath + "/..//*[contains(@class,'ticket-back')]//span//span)[1]");
+				ticketNew.clickTickedDetailsAndValidatePriceOnUI(ticketDetails, purchasePrice, iosAppLocator);
+				
+			} else {
+				
+			price = ticketNew.getTicketPriceEDP();					
+			System.out.println(base.Dictionary.get("Price"));
+			Double priceAPI = Double.parseDouble(base.Dictionary.get("Price")) / 100;
+			String currencyApi = base.Dictionary.get("Currency");
 
-		if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")))) {
-			if(driverType.trim().toUpperCase().contains("IOS")) {
-				ticketDetails = By.xpath("(" + xpath + "//*[contains(@class, 'ticket-completedStatus')])[1]");
+			System.out.println(Double.parseDouble(price.replaceAll("[^0-9.]", "")));
+			System.out.println(priceAPI);
+
+			System.out.println(price.replaceAll("[0-9.]", ""));
+
+			Assert.assertEquals(Double.parseDouble(price.replaceAll("[^0-9.]", "")), priceAPI, "Price on UI is Price in API divided by 100");
+			
+			if(currencyApi.equalsIgnoreCase(base.Environment.get("currency"))) {
+				Assert.assertEquals(price.replaceAll("[0-9.]", "").trim(), currencyApi, "Currency on UI is same as in API");
+			} else 
+			    Assert.assertEquals(price.replaceAll("[0-9.]", "").trim(), currencyApi, "Currency on UI is same as in API");
+			}
+			
+		} else {
+			
+			
+			String xpath = ticketNew.scrollToTicketAfterReload(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
+					
+			if (((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS")))) {
+				if(driverType.trim().toUpperCase().contains("IOS")) {
+					ticketDetails = By.xpath("(" + xpath + "//*[contains(@class, 'ticket-completedStatus')])[1]");
+				} else {
+					try {
+						base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]"));
+						ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]");
+					}
+					catch(Exception E) {
+						base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]"));
+						ticketDetails = By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]");
+					}
+				}
+				iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS'] | //XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='Ticket Details']");
+				purchasePrice = By.xpath("(" + xpath + "/..//*[contains(@class,'ticket-back')]//*[text()='Purchase Price']/..//span//span)[1]");
 			} else {
 				try {
-					base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]"));
-					ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'TICKET')]");
+					base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]"));
+					ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]");
 				}
 				catch(Exception E) {
 					base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]"));
 					ticketDetails = By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]");
 				}
-			}
-			iosAppLocator = By.xpath("//XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='TICKET DETAILS'] | //XCUIElementTypeStaticText[@value='" + tkt[1] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[2] + "']/../../..//XCUIElementTypeStaticText[@value='" + tkt[3] + "']/../../..//XCUIElementTypeStaticText[@value='Ticket Details']");
-			purchasePrice = By.xpath("(" + xpath + "/..//*[contains(@class,'ticket-back')]//*[text()='Purchase Price']/..//span//span)[1]");
-		} else {
-			try {
-				base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]"));
-				ticketDetails = By.xpath(xpath + "//*[contains(@class,'detailTicket') and contains(text(),'Ticket Details')]");
-			}
-			catch(Exception E) {
-				base.getElementWhenVisible(By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]"));
-				ticketDetails = By.xpath(xpath + "//*[contains(@class,'completed')]//span[contains(text(),'TICKET')]");
-			}
-			purchasePrice = By.xpath(xpath + "/..//*[contains(@class,'ticket-back')]//*[text()='Purchase Price']/..//span");
-		}
-		ticketNew.clickTickedDetailsAndValidatePriceOnUI(ticketDetails, purchasePrice, iosAppLocator);
+				purchasePrice = By.xpath(xpath + "/..//*[contains(@class,'ticket-back')]//*[text()='Adult']/..//span");
+				ticketNew.clickTickedDetailsAndValidatePriceOnUI(ticketDetails, purchasePrice, iosAppLocator);
+			}			
+		}		
+		
 	}
 
 	@Given("^Get ticket with Pending Invoice for (.+) (.+)$")
@@ -518,6 +584,11 @@ public class TicketNewSteps {
 	public void clickMakePayment(String ticketId) throws Exception {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
+		
+		if (ticket.checkenableEDP()==true) {
+			throw new SkipException("Flip Window Functionality Is Not Present In EDP");
+		}
+		
 		String xpath = ticketNew.scrollToTicketAfterReload(tkt[0], tkt[1], tkt[2], tkt[3], ticketId);
 		By makePayment;
 		By iosAppLocator = null;
@@ -678,7 +749,6 @@ public class TicketNewSteps {
 			ticketNew.verifyBarcode(xpath, true);
 		} else
 			ticketNew.verifyBarcode(xpath, false);
-
 	}
 
 	@Given("^Get all events sorted and verify with name, date and time with UI (.+) (.+)$")
@@ -737,7 +807,7 @@ public class TicketNewSteps {
 
 		Assert.assertNotEquals(eventId, -1);
 
-		System.out.println(eventId);
+		System.out.println("Event Id With MAximum Tickets "+eventId);
 
 		base.Dictionary.put("EventId", String.valueOf(eventId));
 
@@ -745,46 +815,50 @@ public class TicketNewSteps {
 
 	@Then("^Verify filtering of tickets for (.+) (.+) (.+)$")
 	public void verifyFiltering(String emailaddress, String password, String eventIdString) throws Exception {
-		emailaddress = (String) base.getGDValue(emailaddress);
-		password = (String) base.getGDValue(password);
-		eventIdString = (String) base.getGDValue(eventIdString);
-		int eventId = Integer.parseInt(eventIdString);
+		if(ticket.checkenableEDP()==true) {
+			throw new SkipException("This feature is not implemented in EDP");
+		}else {
+			emailaddress = (String) base.getGDValue(emailaddress);
+			password = (String) base.getGDValue(password);
+			eventIdString = (String) base.getGDValue(eventIdString);
+			int eventId = Integer.parseInt(eventIdString);
 
-		String access = accessToken.getAccessToken(emailaddress, password);
-		String host = base.Environment.get("TM_HOST").trim();
-		JSONObject jsonObject = api.get(host + "/api/v1/member/" + base.Dictionary.get("member_id") + "/inventory/search?event_id=" + eventId, access);
-		int activeTickets = api.getTicketIdCount(jsonObject, null, "Active");
-		int pendingTickets = api.getTicketIdCount(jsonObject, "pending", "Pending");
-		int completedTickets = api.getTicketIdCount(jsonObject, "donated", "Completed") + api.getTicketIdCount(jsonObject, "sold", "Completed") + api.getTicketIdCount(jsonObject, "accepted", "Completed");
+			String access = accessToken.getAccessToken(emailaddress, password);
+			String host = base.Environment.get("TM_HOST").trim();
+			JSONObject jsonObject = api.get(host + "/api/v1/member/" + base.Dictionary.get("member_id") + "/inventory/search?event_id=" + eventId, access);
+			int activeTickets = api.getTicketIdCount(jsonObject, null, "Active");
+			int pendingTickets = api.getTicketIdCount(jsonObject, "pending", "Pending");
+			int completedTickets = api.getTicketIdCount(jsonObject, "donated", "Completed") + api.getTicketIdCount(jsonObject, "sold", "Completed") + api.getTicketIdCount(jsonObject, "accepted", "Completed");
 
-		int totalTickets = activeTickets + pendingTickets + completedTickets;
+			int totalTickets = activeTickets + pendingTickets + completedTickets;
 
-		System.out.println(activeTickets);
-		System.out.println(pendingTickets);
-		System.out.println(completedTickets);
+			System.out.println(activeTickets);
+			System.out.println(pendingTickets);
+			System.out.println(completedTickets);
 
-		boolean filterPresent = ticketNew.verifyDropDownFilter(activeTickets, pendingTickets, completedTickets);
+			boolean filterPresent = ticketNew.verifyDropDownFilter(activeTickets, pendingTickets, completedTickets);
 
-		if (filterPresent) {
-			int ticketsCount = ticketNew.getTicketCountText();
-			Assert.assertEquals(ticketsCount, totalTickets);
-			if (activeTickets != 0) {
-				ticketNew.selectByValueUsingInput("Active");
-				ticketsCount = ticketNew.getTicketCountText();
-				Assert.assertEquals(ticketsCount, activeTickets, "Active Tickets are correclty filtered");
+			if (filterPresent) {
+				int ticketsCount = ticketNew.getTicketCountText();
+				Assert.assertEquals(ticketsCount, totalTickets);
+				if (activeTickets != 0) {
+					ticketNew.selectByValueUsingInput("Active");
+					ticketsCount = ticketNew.getTicketCountText();
+					Assert.assertEquals(ticketsCount, activeTickets, "Active Tickets are correclty filtered");
+				}
+				if (completedTickets != 0) {
+					ticketNew.selectByValueUsingInput("Completed");
+					ticketsCount = ticketNew.getTicketCountText();
+					Assert.assertEquals(ticketsCount, completedTickets, "Completed Tickets are correclty filtered");
+				}
+				if (pendingTickets != 0) {
+					ticketNew.selectByValueUsingInput("Pending");
+					ticketsCount = ticketNew.getTicketCountText();
+					Assert.assertEquals(ticketsCount, pendingTickets, "Pending Tickets are correclty filtered");
+				}
 			}
-			if (completedTickets != 0) {
-				ticketNew.selectByValueUsingInput("Completed");
-				ticketsCount = ticketNew.getTicketCountText();
-				Assert.assertEquals(ticketsCount, completedTickets, "Completed Tickets are correclty filtered");
-			}
-			if (pendingTickets != 0) {
-				ticketNew.selectByValueUsingInput("Pending");
-				ticketsCount = ticketNew.getTicketCountText();
-				Assert.assertEquals(ticketsCount, pendingTickets, "Pending Tickets are correclty filtered");
-			}
+			System.out.println(filterPresent);
 		}
-		System.out.println(filterPresent);
 	}
 
 	@Then("^Get count of Pending and Active Tickets (.+) (.+) (.+)$")
@@ -811,9 +885,14 @@ public class TicketNewSteps {
 
 	@Then("^Verify count of Pending ticket reduced by one and count of Active tickets increased by one (.+) (.+) (.+)$")
 	public void verifyCountOfFilterUpdated(String activeCount, String pendingCount, String completedCount) throws Exception {
+		if(ticket.checkenableEDP()==true) {
+			System.out.println("This Feature is not implemented on EDP");
+		}else {
+			
 		activeCount = (String) base.getGDValue(activeCount);
 		pendingCount = (String) base.getGDValue(pendingCount);
 		completedCount = (String) base.getGDValue(completedCount);
+		int ticketsCount = 0;
 
 		boolean filterPresent = ticketNew.verifyDropDownFilter(Integer.parseInt(activeCount)+1, Integer.parseInt(pendingCount)-1, Integer.parseInt(completedCount));
 
@@ -821,7 +900,7 @@ public class TicketNewSteps {
 		System.out.println(pendingCount);
 
 		if (filterPresent) {
-			int ticketsCount = ticketNew.getTicketCountText();
+			ticketsCount = ticketNew.getTicketCountText();
 
 			ticketNew.selectByValueUsingInput("Active");
 			ticketsCount = ticketNew.getTicketCountText();
@@ -839,17 +918,30 @@ public class TicketNewSteps {
 				Assert.assertEquals(0, Integer.parseInt(pendingCount) - 1, "Pending Tickets counts decreased by 1 as expected");
 		}
 		else {
-			int ticketsCount = ticketNew.getTicketCountText();
+			 if(ticket.checkenableEDP()==true) {
+				 ticketsCount = ticket.getTotalTicketsCountTextEDP();
+				 Assert.assertEquals(ticketsCount, Integer.parseInt(activeCount) + 1,"Active Tickets counts increased by 1 as expected");
+				 Assert.assertEquals(0, Integer.parseInt(pendingCount) - 1,"Pending Tickets counts decreased by 1 as expected");
+			 }
+			 else {
+		    ticketsCount = ticketNew.getTicketCountText();
 			Assert.assertEquals(ticketsCount, Integer.parseInt(activeCount) + 1,"Active Tickets counts increased by 1 as expected");
 			Assert.assertEquals(0, Integer.parseInt(pendingCount) - 1,"Pending Tickets counts decreased by 1 as expected");
+			 }
+		}
+		
 		}
 	}
 
 	@When("^User clicks on Edit or Cancel ticket, new ticket, for (.+)$")
 	public void user_click_edit_cancel_ticket(String ticketId) {
 		ticketId = (String) base.getGDValue(ticketId);
+		String xpath ="";
 		String[] tkt = ticketId.split("\\.");
 		if ((driverType.trim().toUpperCase().contains("ANDROID") || driverType.trim().toUpperCase().contains("IOS"))) {
+			if(ticket.checkenableEDP()==true) {
+				throw  new SkipException("This Feature is removed in EDP");
+			}
 			try {
 				ticketNew.selectByValueUsingInput("Pending");
 			} catch (Exception e) {
@@ -857,8 +949,15 @@ public class TicketNewSteps {
 			}
 		}
 
-		String xpath = ticketNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+     if(ticket.checkenableEDP()==true) {
+    	 xpath = ticketNew.scrollToTicketEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId); 
+    	 ticketNew.clickEditCancelTicketEDP(xpath);
+     }
+     else {
+		xpath = ticketNew.scrollToTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
 		ticketNew.clickEditCancelTicket(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId, xpath);
+     }
+     
 	}
 
 	@When("^User clicks on \"(.+)\" link in Email (.+)$")
@@ -1087,8 +1186,12 @@ public class TicketNewSteps {
     }
 
     @Then("Transferred tickets are shown as Pending with CANCEL TRANSFER link and proper Firstname and LastName of Transferee")
-	public void verifyPendingandCancelLink() {
-        ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+    public void verifyPendingandCancelLink() {
+    	if (ticket.checkenableEDP()==true) {
+    		ticket.verifyPendingandCancelLinkEDP(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+    	}else {
+    		ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+    	}
     }
 
 
@@ -1104,15 +1207,28 @@ public class TicketNewSteps {
 		ticket.verifyMyEventsPage();
     }
 
-	@Then("User navigates to Manage tickets pages by clicking event names one by one and Transferred tickets are shown for two events as Pending with CANCEL TRANSFER")
-	public void navigateManageTicketsTwoEvents() {
-		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer1"));
-		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer1"));
-		ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer1"), base.Dictionary.get("EventIdSectionTransfer1"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer1")));
-		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer2"));
-		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer2"));
-		ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer2"), base.Dictionary.get("EventIdSectionTransfer2"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer2")));
-	}
+    @Then("User navigates to Manage tickets pages by clicking event names one by one and Transferred tickets are shown for two events as Pending with CANCEL TRANSFER")
+    public void navigateManageTicketsTwoEvents() {
+    	if (ticket.checkenableEDP()==true) {
+    		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer1"));
+    		base.getDriver().navigate().refresh();
+    		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer1"));
+    		ticket.verifyPendingandCancelLinkEDP(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer1"), base.Dictionary.get("EventIdSectionTransfer1"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer1")));
+    		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer2"));
+    		base.getDriver().navigate().refresh();
+    		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer2"));
+    		ticket.verifyPendingandCancelLinkEDP(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer2"), base.Dictionary.get("EventIdSectionTransfer2"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer2")));
+    	}else {
+    		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer1"));
+    		base.getDriver().navigate().refresh();
+    		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer1"));
+    		ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer1"), base.Dictionary.get("EventIdSectionTransfer1"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer1")));
+    		utils.navigateTo("/myevents#/"+base.Dictionary.get("EventIdSectionTransfer2"));
+    		base.getDriver().navigate().refresh();
+    		//ticketNew.selectEventByName(base.Dictionary.get("EventNameSectionTransfer2"));
+    		ticket.verifyPendingandCancelLink(base.Dictionary.get("RecipientName"),base.Dictionary.get("SeatsSectionTransfer2"), base.Dictionary.get("EventIdSectionTransfer2"), Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer2")));
+    	}
+    }
 
 	@And("User clicks Transfer Button")
 	public void transferButton() {
@@ -1137,7 +1253,12 @@ public class TicketNewSteps {
 
 	@And("Transferred tickets are shown as Active")
 	public void verifyActive() {
-		ticket.verifyActive(base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"));
+		if(ticket.checkenableEDP()==true)
+		{
+			ticket.verifyActiveEDP(base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"));
+		}else {
+			ticket.verifyActive(base.Dictionary.get("SeatsSectionTransfer"), base.Dictionary.get("EventIdSectionTransfer"));
+		}
 	}
 
 	@And("^User is navigated to My Events page by clicking Go to Event Button$")
@@ -1147,6 +1268,56 @@ public class TicketNewSteps {
 
 	@And("Reclaim is successful")
 	public void reclaim() {
-		ticket.reclaimTickets(base.Dictionary.get("RecipientName"), base.Dictionary.get("SeatsSectionTransfer"),Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+		if(ticket.checkenableEDP()==true) {
+			ticket.reclaimTicketsEDP(base.Dictionary.get("RecipientName"), base.Dictionary.get("SeatsSectionTransfer"),Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+		}else {
+			ticket.reclaimTickets(base.Dictionary.get("RecipientName"), base.Dictionary.get("SeatsSectionTransfer"),Integer.parseInt(base.Dictionary.get("TicketNumberSectionTransfer")));
+		}
 	}
+	
+	
+	@Then("^User select one events with donate capabilities and Select one Tickets from the list$")
+	public void oneEventsDonatecapblities() throws Exception {
+	//	String uname = (String) base.getGDValue("tm73812e3f88@example.com");
+		//String password = (String) base.getGDValue("123456");
+		//HashMap<String, String> availability = aapi.getTransfrableSection(uname, password);
+		//System.out.println(availability);
+		String[] Tkt = aapi.getDonateDetails(true, "event", false, false);
+		String[] ticket1 = Tkt[0].split("\\.");
+		base.load("/tickets#/" + ticket1[0]); 
+		ticket.clickDonateTicketsEDP(null);
+		ticket.selectSeatInPopUp(Tkt[0], ticket1[1].replaceAll("%20", " "), ticket1[2], ticket1[3]);
+		ticket.clickDonate();
+		ticket.selectCharity();
+		ticket.clickContinue();
+		ticket.clickContinue();
+		String state = api.waitForTicketState(Tkt[0], "donated");
+		ticket.logoutNLogin("", "");
+	//	Assert.assertEquals(ticket.getTicketStatusEDP().contains("Donated"),true);
+		Assert.assertEquals(state, "donated");
+		Assert.assertEquals(api.getTicketFlagsEDP(Tkt[0], "", ""), new Boolean[] {false, false, false, false, false, false, false}, "Verify the ticket flags");	
+		Assert.assertEquals(ticket.getPopUpEventDetails(), base.Dictionary.get("eventName"));
+	}
+	
+	
+	@Then("^User verify Section Row and Seats In UI$")
+    public void user_verify_Section_Row_and_Seats_In_UI() throws Exception {
+
+        
+        
+      
+    }
+
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

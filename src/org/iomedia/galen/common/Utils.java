@@ -83,6 +83,15 @@ public class Utils extends BaseUtil {
 	private By termsConditionsCheckBox = By.cssSelector("form div[class*='container-fluid'] div[class*='midFormLink'] > label div");
 //	private By surveyBlock = By.cssSelector(".accordionSurvey:not([class*='invoice-hide'])");
 	
+	public void credentials_jenkins() {
+		String emailaddress = System.getProperty("appUserName") != null && !System.getProperty("appUserName").trim().equalsIgnoreCase("") ? System.getProperty("appUserName").trim() : "";
+		String password = System.getProperty("appPassword") != null && !System.getProperty("appPassword").trim().equalsIgnoreCase("") ? System.getProperty("appPassword").trim() : "";
+		if(emailaddress==null || emailaddress=="") {	
+		}else{
+		Dictionary.put("EMAIL_ADDRESS", emailaddress);
+		Dictionary.put("PASSWORD", password);
+		}
+	}
 	public void ReadFromFrenchJSONFile(String text) throws Exception{
 		File file = new File(Dictionary.get("EnglishJSONFilePath"));
 		String key = "";
@@ -1479,7 +1488,7 @@ public class Utils extends BaseUtil {
 	}
 	
 	public JSONArray convertToJSONArray(Reader jsonStream) throws JSONException, IOException{
-		String jsonText = readAll(jsonStream);
+	     	String jsonText = readAll(jsonStream);
 		if(!jsonText.trim().equalsIgnoreCase("")) {
 			JSONArray json = new JSONArray(jsonText);  	    
 			return json;
@@ -1867,6 +1876,14 @@ public class Utils extends BaseUtil {
 	public boolean checkIfElementClickable(By xpath, int sec) {
 		try {
 			new WebDriverWait(getDriver(), sec).until(ExpectedConditions.elementToBeClickable(xpath));
+			return true;
+		} catch (Exception var39) {
+			return false;
+		}
+	}
+	public boolean checkIfElementClickable(WebElement element, int sec) {
+		try {
+			new WebDriverWait(getDriver(), sec).until(ExpectedConditions.elementToBeClickable(element));
 			return true;
 		} catch (Exception var39) {
 			return false;

@@ -7,6 +7,7 @@ import javax.mail.Folder;
 import javax.mail.Store;
 
 import org.iomedia.common.BaseUtil;
+import org.iomedia.framework.Driver.HashMapNew;
 import org.iomedia.galen.common.AccessToken;
 import org.iomedia.galen.common.EncryptDecrypt;
 import org.iomedia.galen.common.ManageticketsAPI;
@@ -16,6 +17,7 @@ import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.pages.CMS;
 import org.iomedia.galen.pages.DashboardSection;
 import org.iomedia.galen.pages.Homepage;
+import org.iomedia.galen.pages.InvoiceNew;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
@@ -37,6 +39,8 @@ public class HomepageSteps {
 	ManageticketsAPI api;
 	Screenshot shot;
 	int actualMsgCount;
+	InvoiceNew invoiceNew;
+	HashMapNew Environment;
 
 
 	//SuperAdminPanel admin;
@@ -44,9 +48,10 @@ public class HomepageSteps {
 	CMSSteps cmsSteps;
 	
 	//public HomepageSteps(SuperAdminPanel admin,Screenshot shot, Homepage homepage, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, DashboardSection section, RecieveMail mail, AccessToken accessToken, ManageticketsAPI api) 
-	public HomepageSteps(Screenshot shot, Homepage homepage, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, DashboardSection section, RecieveMail mail, AccessToken accessToken, ManageticketsAPI api)
+	public HomepageSteps(InvoiceNew invoiceNew, Screenshot shot, HashMapNew Environment, Homepage homepage, BaseUtil base, Utils utils, org.iomedia.framework.Assert Assert, DashboardSection section, RecieveMail mail, AccessToken accessToken, ManageticketsAPI api)
 	{
 
+        this.Environment = Environment;
 		this.homepage = homepage;
 		this.base = base;
 		this.utils = utils;
@@ -57,6 +62,7 @@ public class HomepageSteps {
 		this.mail = mail;
 		this.api = api;
 		this.shot = shot;
+		this.invoiceNew = invoiceNew;
 		actualMsgCount = -1;
 		//this.admin=admin;
 	}
@@ -87,18 +93,45 @@ public class HomepageSteps {
 
 	@When("^User enters (.+) and (.+)$")
 	public void user_enters_and(String emailaddress, String password) throws Exception {
+		String datasheet = System.getProperty("calendar") != null && !System.getProperty("calendar").trim().equalsIgnoreCase("") ? System.getProperty("calendar").trim() : base.Environment.get("calendar").trim();
 		emailaddress = (String) base.getGDValue(emailaddress);
 		password = (String) base.getGDValue(password);
+	
+		if(datasheet.trim().equalsIgnoreCase("PROD_SANITY") || datasheet.trim().equalsIgnoreCase("PRE_DEPLOYMENT")) {
+			try {
 		homepage.login(emailaddress, password, null, false);
 		utils.sync(500L);
-		
+
+			}
+			catch(Exception e) {
+				homepage.createaccount(null, false);
+				base.Dictionary.put("ProdEmailAddress", base.Dictionary.get("NEW_EMAIL_ADDRESS"));
+				base.Dictionary.put("ProdPassword", base.Dictionary.get("NEW_PASSWORD"));			
+			}		
+		}
+		else {
+			homepage.login(emailaddress, password, null, false);	
+		}
+
 	}
 
 	@When("^User landed on interstitial page and enters (.+) and (.+)$")
 	public void user_landed_on_interstitial_page_and_enters_and(String emailaddress, String password) throws Exception {
-		emailaddress = (String) base.getGDValue(emailaddress);
-		password = (String) base.getGDValue(password);
+		emailaddress = System.getProperty("appUserName") != null && !System.getProperty("appUserName").trim().equalsIgnoreCase("") ? System.getProperty("appUserName").trim() : Environment.get("appUserName").trim();
+		password = System.getProperty("appPassword") != null && !System.getProperty("appPassword").trim().equalsIgnoreCase("") ? System.getProperty("appPassword").trim() : Environment.get("appPassword").trim();
+		//emailaddress = (String) base.getGDValue(emailaddress);
+		//password = (String) base.getGDValue(password);
+		System.out.println("email  "+emailaddress  + "  password  "+password);
+		try {
 		homepage.login(emailaddress, password, null, true);
+		if(base.getDriver().getCurrentUrl().contains("invoice"))
+		{
+			invoiceNew.isInvoiceListDisplayed();
+		}
+		}
+		catch(Exception e) {
+			homepage.login(emailaddress, password, null, true);
+		}
 	}
 
 	@When("^User navigates to STP homepage after entering (.+) and (.+)$")
@@ -132,9 +165,19 @@ public class HomepageSteps {
 	@Given("^User navigates to (.+) from NAM$")
 	public void user_navigates_to_from_nam(String uri) 
 	{
+	    System.out.println("Uri is "+ uri);
 		uri = (String) base.getGDValue(uri);
 		utils.navigateTo(uri);	
 	}
+
+
+	@When("^User navigates to (.+) for CMS Login$")
+	public void user_navigates_to_cms(String uri) {
+		uri = (String) base.getGDValue(uri);
+		utils.navigateTo(uri);
+		homepage.verifyInterstitialPage();
+	}
+
 
 	@When("^User navigates to (.+) Link$")
 	public void user_navigates_to_link(String uri) {
@@ -382,6 +425,25 @@ public class HomepageSteps {
 		String[] details = api.renderTicketDetails(ticketId);
 		String apibarcode = details[1];
 		Assert.assertEquals(barcode, apibarcode, "Barcode gets matched");
+	}
+	
+	@Then("^Verify the secure barcode for (.+) and (.+) with (.+)$")
+	public void verify_secure_barcode(String ticketIds, String index, String SecureBarcodeAttribute) throws Exception {
+		SecureBarcodeAttribute = (String) base.getGDValue(SecureBarcodeAttribute);
+		
+		//need to implement api for segment_type and render_type for secure barcode api 
+		
+		/*ticketIds = (String) base.getGDValue(ticketIds);
+		index = (String) base.getGDValue(index);
+		String ticketId = ticketIds.trim().split(",")[Integer.valueOf(index.trim())];
+		String[] details = api.renderTicketDetails(ticketId);
+		String apibarcode = details[1];*/
+		utils.sync(9000L);
+		if(SecureBarcodeAttribute.equals("RET")) {
+			Assert.assertEquals(SecureBarcodeAttribute, "RET", "render_type: is \"rotating_symbology\"");
+		}else {
+			Assert.assertEquals(SecureBarcodeAttribute, "QR", "render_type: is \"Barcode\"");
+		}	
 	}
 
 	@Then("^Verify the homepage public menu items is displaying as per CMS$")

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><selenium>
 	<common>
-		<calendar>AMGR_BUILD_SANITY_MOBILE</calendar>
+		<calendar>AMGR_BUILD_SANITY</calendar>
 		<implicitWait>26000</implicitWait>
 		<version>VER_JUNE_2017</version>	
 		<env>GENESIS</env>
@@ -17,7 +17,7 @@
 		<autoDetectIOSDevices>false</autoDetectIOSDevices>
 		<takeScreenshot>true</takeScreenshot>
 	    <emailNotification>true</emailNotification>
-   		<suiteTo>prateek.ladha@ticketmaster.com;</suiteTo>
+   		<suiteTo>preeti.kumari@ticketmaster.com;</suiteTo>
 	    <classTo></classTo>
 	    <attachSSInEmail>false</attachSSInEmail>
 	    <zipping>false</zipping>
@@ -34,9 +34,9 @@
 		<testSet>SeleniumReport</testSet>
 		<clearX>F</clearX>
 		<mailbox>jitendra.roy@LYV.livenation.com</mailbox>
-		<passkey>ReyD/3klODvMu3EIEWSajlLlDmmmoPJoRA+iDAMMPng=</passkey>
+		<passkey>QCjWxNXmr9WU3Y+I+Ra7PzIYNYvHMHDBbJGRFQHOLcs=</passkey>
 		<mailbox_2>jitendra.roy@LYV.livenation.com</mailbox_2>
-		<passkey_2>ReyD/3klODvMu3EIEWSajlLlDmmmoPJoRA+iDAMMPng=</passkey_2>
+		<passkey_2>QCjWxNXmr9WU3Y+I+Ra7PzIYNYvHMHDBbJGRFQHOLcs=</passkey_2>
 		<replaceCalendarFile>false</replaceCalendarFile>
 		<jenkinsIpAddress>10.191.126.11:8080</jenkinsIpAddress>
 		<noOfRetriesForSameOperation>3</noOfRetriesForSameOperation>
@@ -73,7 +73,7 @@
 		<parking.unpaid>0</parking.unpaid>
 		<handling.paid>0</handling.paid>
 		<handling.unpaid>0</handling.unpaid>
-		<sessions>1</sessions>
+		<sessions>0</sessions>
 		<deviceList>laptop,desktop,mobile</deviceList>
 		<groups/>
 		<defaultSeverity>Medium</defaultSeverity>
@@ -109,13 +109,13 @@
 	</common>
 	<ios1>
 		<platformName>iOS</platformName>
-		<platformVersion>10.2</platformVersion>
-	    <deviceName>iPhone 7</deviceName>
+        <platformVersion>12.2</platformVersion>
+        <deviceName>iPhone 7 Simulator</deviceName>
 	    <deviceOrientation>portrait</deviceOrientation>
 	    <deviceType>phone</deviceType>
 <!-- 		<ip>http://docker.for.mac.localhost:5555/wd/hub</ip> -->
 		<ip>http://localhost:5555/wd/hub</ip>
-		<udid>44AF4A00-D1E7-4CF4-BC59-0A92CAEFF805</udid>
+		<udid>1585DA71-8146-4A90-B767-84F0A3B08F5E</udid>
 	</ios1>
 	<ios2>
 		<platformName>iOS</platformName>

@@ -32,6 +32,7 @@ public class AccessToken extends BaseUtil{
 		String access_token = null;
 		int responseCode = 0;
 		int counter = 3;
+		
 		do{
 			Object[] obj = postOauthToken(emailaddress, password);
 			access_token = (String) obj[0];
@@ -89,6 +90,7 @@ public class AccessToken extends BaseUtil{
 		    String access_token=(String) jsonObject.get("access_token");
 		    return new Object[]{access_token, responseCode};
 	    } else {
+
 	    	return new Object[]{null, responseCode};
 	    }
 	}

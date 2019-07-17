@@ -31,7 +31,7 @@ public class DashboardHeader extends BaseUtil {
 	private By reenter_AMGRnewpswd = By.cssSelector("input#iPIN2");
 	private By AMGRsave = By.cssSelector("a#btn-save");
 	private By AMGRLogout = By.cssSelector("a#menu-logout");
-	private By EventName = By.cssSelector("div [class*=ticket-subHeader] h3");
+	private By EventName = By.cssSelector("div [class*=ticket-subHeader] h3 , div [class*=event-card-eventText] h4");
 //	private By client_logo = By.cssSelector(".navbar-brand-logo");
 	
 	public boolean waitForNAM(){
@@ -118,6 +118,7 @@ public class DashboardHeader extends BaseUtil {
 	}
 	
 	public String getSwitchedAccountName(String newText){
+		sync(900l);
 		return getElementWhenRefreshed(accountName, "innerHTML", newText).getText();
 	}
 	

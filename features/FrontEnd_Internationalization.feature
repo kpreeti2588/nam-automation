@@ -4,6 +4,7 @@ Feature: Internationalization Feature
 	  And Place latest POFile into %{GD_POFilePath}
     And Place JSON File in English and other language into %{GD_POFilePath}
 		Given User is on / Page	
+		Given User credentials passed from Jenkins
 		
 	Scenario: Verify Internationalization enable on Frontend from backend
     And User navigates to /user/login from NAM

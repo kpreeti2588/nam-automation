@@ -18,7 +18,7 @@
 	    		<ASSOCIATED_ACC_PASSWORD>123456</ASSOCIATED_ACC_PASSWORD>
         	</ANDROID1>
         	<IOS1>
-        		<EMAIL_ADDRESS>iomediae62d96a479@example.com</EMAIL_ADDRESS>
+        		<EMAIL_ADDRESS>tmdae17987a1@example.com</EMAIL_ADDRESS>
         		<PASSWORD>123456</PASSWORD>
         		<PLAN_EMAIL_ADDRESS>iomedia8faf95694d@example.com</PLAN_EMAIL_ADDRESS>
         		<PLAN_PASSWORD>123456</PLAN_PASSWORD>
@@ -98,7 +98,7 @@
 	    		<ASSOCIATED_ACC_PASSWORD>123456</ASSOCIATED_ACC_PASSWORD>
         	</FIREFOX1>
         	<CHROME1>
-        		<EMAIL_ADDRESS>iomediae62d96a479@example.com</EMAIL_ADDRESS>
+        		<EMAIL_ADDRESS>tma28769ba87@example.com</EMAIL_ADDRESS>
         		<PASSWORD>123456</PASSWORD>
         		<cmsAdminUserName>siteadmin</cmsAdminUserName>
         		<cmsAdminPassword>123456</cmsAdminPassword>

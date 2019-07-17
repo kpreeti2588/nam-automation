@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -22,6 +23,7 @@ import org.iomedia.galen.common.Utils;
 import org.iomedia.galen.common.ManageticketsAPI.Event;
 import org.iomedia.galen.pages.ManageTicket;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testng.SkipException;
 
 import cucumber.api.java.en.Given;
@@ -99,7 +101,11 @@ public class TicketSteps {
 	
 	@When("^Tickets page is displayed$")
 	public void tickets_page_is_displayed() {
-		Assert.assertTrue(ticket.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		if(ticket.checkenableEDP()==true) {
+			Assert.assertTrue(ticket.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+		}else {
+			Assert.assertTrue(ticket.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		}
 		String currenturl = base.driverFactory.getDriver().get().getCurrentUrl();
 		String eventId = currenturl.trim().substring(currenturl.trim().lastIndexOf("/") + 1);
 		base.Dictionary.put("EVENT_ID", eventId.trim());
@@ -131,7 +137,22 @@ public class TicketSteps {
 	}
 	
 	@Then("^Verify event (.+) ticket - (.+) is displayed$")
-	public void verify_ticket_is_displayed(String eventId, String ticket) {
+	public void verify_ticket_is_displayed(String eventId, String ticket) {		
+		
+		if(this.ticket.checkenableEDP()==true){
+			eventId = (String) base.getGDValue(eventId);
+			ticket = (String) base.getGDValue(ticket);
+			String[] val = ticket.trim().split("\n");
+			if(val.length > 2) {
+				String section = val[0].trim().substring(val[0].trim().lastIndexOf(" ") + 1);
+				String row = val[1].trim().substring(val[1].trim().lastIndexOf(" ") + 1);
+				String seat = val[2].trim().substring(val[2].trim().lastIndexOf(" ") + 1);
+				//Assert.assertTrue(this.ticket.isTicketDisplayedEDP(eventId, section, row, seat, null), "Verify ticket is displayed - " + ticket);
+			} else {
+				Assert.assertTrue(this.ticket.isTicketsListDisplayedEDP(null), "Verify ticket is displayed - " + ticket);
+			}
+
+		}else {
 		eventId = (String) base.getGDValue(eventId);
 		ticket = (String) base.getGDValue(ticket);
 		String[] val = ticket.trim().split("\n");
@@ -143,6 +164,7 @@ public class TicketSteps {
 		} else {
 			Assert.assertTrue(this.ticket.isTicketsListDisplayed(null), "Verify ticket is displayed - " + ticket);
 		}
+		}	
 	}
 	
 	@When("^User clicks on manage tickets using (.+)$")
@@ -159,7 +181,11 @@ public class TicketSteps {
 	
 	@Then("^Verify success screen$")
 	public void verify_success_screen() {
+		if(ticket.checkenableEDP()==true) {
+			Assert.assertEquals(ticket.getSuccessEDP(), "You’re All Set");
+		}else {
 		Assert.assertEquals(ticket.getSuccess(), "Success!");
+		}
 	}
 	
 	@When("^User click on done$")
@@ -171,12 +197,22 @@ public class TicketSteps {
 	public void verify_reclaim_ticket_status(String status, String ticketId) throws Exception {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
-		Assert.assertEquals(ticket.getTicketStatus(tkt[0], tkt[1], tkt[2], tkt[3], ticketId), status);
+		
+		if (ticket.checkenableEDP()==true) {
+			utils.sync(9000l);
+			Assert.assertEquals(ticket.getTicketStatusEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId),status);
+		} else {
+			Assert.assertEquals(ticket.getTicketStatus(tkt[0], tkt[1], tkt[2], tkt[3], ticketId), status);
+		}
 	}
 	
 	@When("^User clicks on Send tickets$")
 	public void user_clicks_on_send() {
-		ticket.clickSendTickets(null);		
+		if (ticket.checkenableEDP()==true) {
+			ticket.clickSendTicketsEDP(null);
+		}else {
+			ticket.clickSendTickets(null);	
+		}
 	}
 	
 	@Given("^User clicked on event (.+)$")
@@ -190,22 +226,98 @@ public class TicketSteps {
 	public void user_select_seat(String ticketId) {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
-		ticket.selectSeatInPopUp(ticketId, tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);
+		System.out.println(tkt);
+		ticket.selectSeatInPopUp(ticketId, tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);	
+	} 
+	
+	@When("^User save the seatSectionRow using (.+)$")
+	public void seatSectionRow(String ticketId) {
+		ticketId = (String) base.getGDValue(ticketId);
+		String[] tkt = ticketId.split("\\.");
+		if (ticket.checkenableEDP()==true) {
+			ticket.seatSectionRowVerificationEDP(ticketId, tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);	
+		}else {
+			ticket.seatSectionRowVerification(ticketId, tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);		
+		}
+		
 	} 
 	
 	@When("^User clicks on continue$")
 	public void user_click_continue() {
-		ticket.clickContinue();
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickContinueEDP();
+		}else {
+			ticket.clickContinue();
+		}
+	}
+	
+	@When("^User clicks donate charity confirm Button$")
+	public void user_click_DonateCharityConfirmButton() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.donatecharityConfirmButton();
+		}else {
+			ticket.clickContinue();
+		}
+	}
+	
+	@When("^User clicks on Donate Button$")
+	public void user_click_Donate() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickDonateEDP();
+		}else {
+			ticket.clickContinue();
+		}
+		
+	}
+	
+	@When("^User clicks on Doante Ticktes continue$")
+	public void donate_tickets_Continue() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickDonateTicketsPageContiuneEDP();
+		}else {
+			ticket.clickContinue();
+		}
+	}
+	
+	
+	@When("^User clicks on Transfer to continue$")
+	public void user_click_transfer_continue() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickTransferEDP();
+		}else {
+			ticket.clickContinue();
+		}
+	}
+	
+	@When("^User clicks on Print Button$")
+	public void userclickprintButton() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickPrintEDP();
+		}else {
+			ticket.clickContinue();
+		}
+	}
+	
+	@When ("^User clicks on Done Button$")
+	public void userclickdoneButton() {
+		if (ticket.checkenableEDP()==true) {
+            ticket.clickDoneEDP();
+		}else {
+			ticket.clickContinue();
+		}
 	}
 	
 	@Then("^Verify Event Details using (.+)$")
 	public void verify_event_details(String ticketId) {
 		ticketId = (String) base.getGDValue(ticketId);
 		String[] tkt = ticketId.split("\\.");
-		Assert.assertEquals(ticket.getPopUpEventDetails(), base.Dictionary.get("eventName"));	
-		SoftAssert.assertTrue(ticket.getSection().contains(tkt[1].replaceAll("%20", " ")));
-//		Assert.assertTrue(ticket.getRow().contains(tkt[2]));
-//		Assert.assertTrue(ticket.getSeat().contains(tkt[3]));
+		if(ticket.checkenableEDP()==true) {
+			SoftAssert.assertEquals(ticket.getPopUpEventDetailsEDP(), base.Dictionary.get("eventName"));
+			SoftAssert.assertTrue(ticket.getSection().contains(tkt[1].replaceAll("%20", " ")));
+		}else {
+			SoftAssert.assertEquals(ticket.getPopUpEventDetails(), base.Dictionary.get("eventName"));
+			SoftAssert.assertTrue(ticket.getSection().contains(tkt[1].replaceAll("%20", " ")));
+		}		
 	}
 	
 	@When("^User enters transfer Name$")
@@ -220,16 +332,37 @@ public class TicketSteps {
 	
 	@Then("^Verify ticket listing page display$")
 	public void verify_ticket_listing_page_display() {
-		Assert.assertTrue(ticket.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		utils.sync(9000L);
+		if (ticket.checkenableEDP()) {
+			Assert.assertTrue(ticket.isTicketsListDisplayedEDP(null), "Verify tickets listing page is displayed");
+		} else {
+			Assert.assertTrue(ticket.isTicketsListDisplayed(null), "Verify tickets listing page is displayed");
+		}
+	}
+	
+	@Then("^User click on cancel transfer link on event details page$" )
+	public void clickCancelTransfer() {
+		if(ticket.checkenableEDP()) {
+			ticket.clickCancelTransferEDP();
+		}else {
+			ticket.clickCancelTransfer();
+		}
 	}
 	
 	@Then("^Save the state of ticket for (.+)$")
 	public void save_state_of_ticket(String ticketId) throws Exception {
 		ticketId = (String) base.getGDValue(ticketId);
 		System.out.println(ticketId);
-		String state = api.waitForTicketState(ticketId, "pending");
-		base.Dictionary.put("State", state);
+		if(ticket.checkenableEDP()) {
+			String state = api.waitForTicketStateEDP(ticketId, "pending");
+			base.Dictionary.put("State", state);	
+		}else {
+			String state = api.waitForTicketState(ticketId, "pending");
+			base.Dictionary.put("State", state);
+		}	
 	}
+	
+
 	
 	@Then("^Save State for ticketId (.+) using (.+) and (.+)$")
 	public void save_state_for_ticketId(String ticketId, String emailaddress, String password) throws Exception {
@@ -365,13 +498,17 @@ public class TicketSteps {
 	 public void verify_user_click_Scan_barcode(String ticketId) {
 		 ticketId = (String) base.getGDValue(ticketId);
 		 String[] tkt = ticketId.split("\\.");
-		 ticket.clickScanBarcode(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
 		
-		 Assert.assertEquals(ticket.getMobileScanEventDetails(), base.Dictionary.get("eventName"));
+		 if(ticket.checkenableEDP()==true) {
+			 ticket.clickScanBarcodeEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		 }else {
+			 ticket.clickScanBarcode(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		 }
+		// Assert.assertEquals(ticket.getMobileScanEventDetails(), base.Dictionary.get("eventName"));
 		 Assert.assertEquals(ticket.getMobileScanSectionName(), tkt[1].replaceAll("%20", " "));
 		 Assert.assertEquals(ticket.getMobileScanRowName(),tkt[2]);
 		 Assert.assertEquals(ticket.getMobileScanSeatName(), tkt[3]);
-		 SoftAssert.assertEquals(ticket.getMobileScanGateNumber(), "Enter Gate: " + base.Dictionary.get("entryGate").trim());
+		 //SoftAssert.assertEquals(ticket.getMobileScanGateNumber(), "Enter Gate: " + base.Dictionary.get("entryGate").trim());
 	 }
 	 
 	 @When("^Clicks on Scan Barcode for (.+) and (.+)$")
@@ -380,12 +517,17 @@ public class TicketSteps {
 		 index = (String) base.getGDValue(index);
 		 String ticketId = ticketIds.trim().split(",")[Integer.valueOf(index.trim())];
 		 String[] tkt=ticketId.split("\\.");
-		 ticket.clickScanBarcode(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
-//		 Assert.assertEquals(ticket.getMobileScanEventDetails(), base.Dictionary.get("eventName"));
+		 if(ticket.checkenableEDP()==true) {
+			 ticket.clickScanBarcodeEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		 }else {
+			 ticket.clickScanBarcode(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId);
+		 }
+		 //		 Assert.assertEquals(ticket.getMobileScanEventDetails(), base.Dictionary.get("eventName"));
 		 Assert.assertEquals(ticket.getMobileScanSectionName(), tkt[1].replaceAll("%20", " "));
 		 Assert.assertEquals(ticket.getMobileScanRowName(),tkt[2]);
 		 Assert.assertEquals(ticket.getMobileScanSeatName(), tkt[3]);
-//		 Assert.assertEquals(ticket.getMobileScanGateNumber(), "Enter Gate: " + base.Dictionary.get("entryGate").trim());
+		 //		 Assert.assertEquals(ticket.getMobileScanGateNumber(), "Enter Gate: " + base.Dictionary.get("entryGate").trim());
+		 
 	 }
 	 
 	 @Then("^Verify Barcode gets display$")
@@ -402,6 +544,20 @@ public class TicketSteps {
 		 Assert.assertTrue(ticket.isBarcodeDisplayed(tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]), "Verify bar code is displayed");
 	 }
 	 
+	 @Then("^Secure Barcode gets displayed for (.+) and (.+)$")
+	 public void verify_secure_barcode_display_for(String ticketIds, String index) {
+		 ticketIds = (String) base.getGDValue(ticketIds);
+		 index = (String) base.getGDValue(index);
+		 String ticketId = ticketIds.trim().split(",")[Integer.valueOf(index.trim())];
+		 String[] tkt=ticketId.split("\\.");
+		 Assert.assertTrue(ticket.isSecureBarcodeDisplayed(tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]), "Verify bar code is displayed");
+	 }
+	 
+	 @Then ("User Accept the Education Information POP Up if present")
+	 public void acceptEducationPopUp() {
+		 ticket.accepctEducationPopUp(); 
+	 }
+	 
 	 @Given("^User saves Barcode Image URL for (.+) and (.+)$")
 	 public void user_save_barcode_image_url(String ticketIds, String index) {
 		 ticketIds = (String) base.getGDValue(ticketIds);
@@ -411,6 +567,18 @@ public class TicketSteps {
 		 String URL = ticket.getBarcodeImageUrl(tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);
 		 base.Dictionary.put("BarcodeURL", URL);
 	 }
+	 
+	 @Given("^User saves Secure Barcode frontend attribute for (.+) and (.+)$")
+	 public void user_save_barcode_attribute(String ticketIds, String index) {
+		 ticketIds = (String) base.getGDValue(ticketIds);
+		 index = (String) base.getGDValue(index);
+		 String ticketId = ticketIds.trim().split(",")[Integer.valueOf(index.trim())];
+		 String[] tkt=ticketId.split("\\.");
+		 utils.sync(9000L);
+		 String attribute = ticket.secureBarcodeAttribute(tkt[1].replaceAll("%20", " "), tkt[2], tkt[3]);
+		 base.Dictionary.put("SecureBarcodeAttribute", attribute);
+	 }
+	 
 	 
 	 @Given("^Save Destination Folder$")
 	 public void save_destination_folder() {
@@ -479,7 +647,11 @@ public class TicketSteps {
 	 
 	 @When("^User clicks on Donate$")
 	 public void click_donate(){
-		ticket.clickDonateTickets(null);
+		 if(ticket.checkenableEDP()==true) {
+			 ticket.clickDonateTicketsEDP(null);
+		 }else {
+			 ticket.clickDonateTickets(null);
+		 }
 	 }
 	 
 	 @When("^User selects charity$")
@@ -548,7 +720,11 @@ public class TicketSteps {
 		 ticketId = (String) base.getGDValue(ticketId);
 		 transferId = (String) base.getGDValue(transferId);
 		 try{
-			 ticket.clickClaim();
+			 if(ticket.checkenableEDP()==true) {
+				 ticket.clickClaimEDP(); 
+			 }else {
+			     ticket.clickClaim();
+			 }
 			 String state = api.waitForTicketState(emailaddress, password, ticketId, "accepted");
 			 Assert.assertEquals(state, "accepted");
 		 } catch(Exception ex) {
@@ -562,8 +738,12 @@ public class TicketSteps {
 		 customer_name = (String) base.getGDValue(customer_name);
 		 ticketId = (String) base.getGDValue(ticketId);
 		 String[] tkt=ticketId.split("\\.");
-		 SoftAssert.assertEquals(ticket.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId), "Claimed By " + customer_name, "Verify claimed text on tickets");
-	 }
+		 if (ticket.checkenableEDP()==true) {
+			 SoftAssert.assertEquals(ticket.getTicketStatusEDP(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId),"Claimed By " + customer_name, "Verify claimed text on tickets"); 
+		 }else {
+		 SoftAssert.assertEquals(ticket.getTicketStatus(tkt[0], tkt[1].replaceAll("%20", " "), tkt[2], tkt[3], ticketId),"Claimed By " + customer_name, "Verify claimed text on tickets");
+		 }
+	}
 	 
 	 @Then("^Verify printTicket or Render Barcode for email (.+) pass (.+) and ticketID (.+)$")
 	 public void verify_print_download_ticket(String email, String pass, String ticketId) throws Exception{
@@ -592,8 +772,13 @@ public class TicketSteps {
 	 
 	 @Then("^User click on Print Button$")
 	 public void user_clicks_print_button() {
-		 ticket.clickDownloadTickets();
+		 if (ticket.checkenableEDP()==true) {
+			 ticket.clickDownloadTicketsEDP();
+		 }else {
+			 ticket.clickDownloadTickets();
+		 }
 	 }
+	 
 	 
 	 @Given("^User get barcode for (.+)$")
 	 public void get_barcode(String ticketId) throws Exception {
@@ -660,5 +845,11 @@ public class TicketSteps {
 		 email = (String) base.getGDValue(email);
 		 pass = (String) base.getGDValue(pass);
 		 ticket.logoutNLogin(email, pass);
+	 }
+	 
+	 @Then("^Verify that tickets displayed are in sorted order$")
+	 public void verify_that_tickets_displayed_are_in_sorted_order() throws Exception {
+		 boolean areTicketsInSortedOrder = ticket.verifyTicketsAreInSortedOrder();
+		 Assert.assertTrue(areTicketsInSortedOrder, "Verify Tickets Displayed Are In Sorted Order");
 	 }
 }

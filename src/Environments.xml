@@ -40,7 +40,7 @@
             <TM_UID>INET01</TM_UID>
         </VER_FEB_2017>
         <VER_MAY_2017>
-            <APP_URL>https://amgr.io-media.com/iomediaqaunitas</APP_URL>
+            <APP_URL>https://amgr.io-media.com/iomediauat</APP_URL>
             <TM_OAUTH_URL>https://qa1-oauth.acctmgr.us-east-1.nonprod-tmaws.io/oauth/token</TM_OAUTH_URL>
             <CLIENT_SECRET>cAyPhupq0wFh_Qzgni1fsomi7xUwfvTwdHhvO8o4s74</CLIENT_SECRET>
             <CLIENT_ID>iomediaqaunitas.integration</CLIENT_ID>
@@ -58,7 +58,7 @@
             <TM_UID>INET01</TM_UID>
         </VER_MAY_2017>
         <VER_JUNE_2017>
-            <APP_URL>https://qa.nam.prd214.nonprod3.us-east-1.tktm.io/uat743</APP_URL>
+            <APP_URL>https://qa.nam.prd214.nonprod3.us-east-1.tktm.io/iomediauat</APP_URL>
             <TM_OAUTH_URL>https://qa1-oauth.acctmgr.us-east-1.nonprod-tmaws.io/oauth/token</TM_OAUTH_URL>
             <CLIENT_SECRET>cAyPhupq0wFh_Qzgni1fsomi7xUwfvTwdHhvO8o4s74</CLIENT_SECRET>
             <CLIENT_ID>iomediaqaunitas.integration</CLIENT_ID>
@@ -139,7 +139,7 @@
             <TM_UID>INET01</TM_UID>
         </VER_FEB_2017>
         <VER_JUNE_2017>
-           <APP_URL>https://stg1-am.ticketmaster.com/namautomation</APP_URL>
+           <APP_URL>https://stg1-am.ticketmaster.com/stgpre1</APP_URL>
            <TM_OAUTH_URL>https://app.ticketmaster.com/acctmgr-oauth-preprod/token</TM_OAUTH_URL>
            <CLIENT_SECRET>fcfys1-5RjQe--Bj6W5QmQ6xjKisdiBfSnerJeaAI9k</CLIENT_SECRET>
            <CLIENT_ID>genesis.integration</CLIENT_ID>
@@ -149,6 +149,7 @@
            <AAPI_CLIENT_ID>genesis</AAPI_CLIENT_ID>
            <AAPI_AUTH>https://app.ticketmaster.com/aapi-public-stg/admin/v2</AAPI_AUTH>
            <AAPI_HOST>https://app.ticketmaster.com/aapi-public-stg/v2</AAPI_HOST>
+           <APPI_HOSTNEW>https://stg1-am.ticketmaster.com/eventdetail/en/api/v2</APPI_HOSTNEW>
            <TMPSCorrelationId>0987654321</TMPSCorrelationId>
            <TM_HOST>https://staging-oss.ticketmaster.com</TM_HOST>
            <TMPSCorrelationId>4444444444</TMPSCorrelationId>

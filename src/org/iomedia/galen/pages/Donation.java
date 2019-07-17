@@ -91,6 +91,7 @@ public class Donation extends BaseUtil {
         public void verifyFunds() {
             funds = ticket.getQDFunds();
             click(selectFund, "CLICK SELECT FUND DROPDOWN", 5);
+            sync(9000L);
             List<WebElement> fundNames = getWebElementsList(fundsElements);
             for(WebElement fund : fundNames) Assert.assertTrue(funds.containsKey(getText(fund)),"Listed fund is present in AAPI");
         }

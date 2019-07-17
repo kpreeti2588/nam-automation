@@ -263,7 +263,7 @@ public class Util {
 			System.out.println("Site is coming up");
 			response = get(url, key, value, true);
 			responseCode = (int)response[1];
-			sync(100L);
+			sync(1000L);
 			counter--;
 		} while(counter > 0 && (responseCode != 200 && responseCode != 204));
 		if(responseCode != 200 && responseCode != 204) {

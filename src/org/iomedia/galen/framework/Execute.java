@@ -150,7 +150,7 @@ public class Execute extends Driver {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void main(String[] args) throws JSONException, Exception{
+	public static void main(String[] args) throws JSONException, Exception{    
 		Execute exec = new Execute();
 		
 		String relatedEnv = null;
@@ -369,7 +369,8 @@ public class Execute extends Driver {
 			    } else {
 			    	String relatedEnvDataPath = exec.Environment.get("appCredentialsPath").trim();
 			    	relatedEnvDataPath = relatedEnvDataPath.substring(0, relatedEnvDataPath.lastIndexOf("_")) + "_" + exec.Environment.get("env").trim().toUpperCase() + ".xml";
-			    	System.out.println("else  ENV_PATH :: " + relatedEnvDataPath);
+			    	System.out.println("ENV_PATH :: " + relatedEnvDataPath);
+
 			    	saveAppCredentialsXmlFile(relatedEnvDataPath, exec.Environment.get("appCredentialsPath").trim(), appCredentials, exec.Environment.get("env"), exec.Environment.get("version"));
 			    }
 		    }
@@ -697,6 +698,8 @@ public class Execute extends Driver {
 	    	excep.printStackTrace();
 	    }
 	}
+	
+	
 	
 	public HashMapNew GetXMLNodeValueFromString(String str, String parentNode, int index){
 		str = CharMatcher.is('\'').trimFrom(str);

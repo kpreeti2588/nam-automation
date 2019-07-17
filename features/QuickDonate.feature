@@ -2,6 +2,7 @@ Feature: Quick Donation
 
   Background: User landed on homepage
     Given User is on / Page
+    Given User credentials passed from Jenkins
     When User enters %{GD_EMAIL_ADDRESS} and %{GD_PASSWORD}
     Then User logged in successfully
     Given Quick Donation is enabled on Site

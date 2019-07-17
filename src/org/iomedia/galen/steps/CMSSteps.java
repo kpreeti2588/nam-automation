@@ -55,7 +55,7 @@ public class CMSSteps {
 	public void user_login_into_cms_with_support_user() throws InterruptedException {
 		String username, password;
 		username = "automation_editor_manager";
-		password = "nam_editor_manager";
+		password = "123456";
 		adminPanel.login(username, password);
 	}
 	
@@ -338,6 +338,7 @@ public class CMSSteps {
 	@Then("^Verify user lands on Add Language Page$")
 	public void add_Language_header_text() {
 		//language = (String) base.getGDValue(language);
+		System.out.println(adminPanel.verifyAddLanguagePageHeaderText());
 		Assert.assertEquals(adminPanel.verifyAddLanguagePageHeaderText(), "Add language", "Verify Add language page is displayed");
 		//if(adminPanel.getLanguagTableText().contains(language))
 		//	throw new SkipException("Language already added");
@@ -601,6 +602,50 @@ public class CMSSteps {
     @Then("^user verify Ticket Sales page$")
     public void user_verify_Ticket_Sales_page() throws Exception {
         cms.verifyTicketsSalespage();
+    }
+    
+    
+    @Given("EDP is enabled on Site")
+    public void check_EDP_enabled() throws InterruptedException {
+        if(!cms.checkenableEDP()) {
+        	utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/logout");
+			utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/login");
+           // utils.navigateTo("/user/logout");
+            this.user_login_into_cms_with_support_user();
+            cms.enableEDP();    
+        }
+        utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/logout");
+       // utils.navigateTo("/user/logout/");
+    }
+    
+    
+    @Given("Secure Barcode is enabled on Site")
+	public void check_SecureBarcode_enabled() throws InterruptedException {
+		if(!cms.checkenableSecureBarcode()) {
+			utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/logout");
+			utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/login");
+			//utils.navigateTo("/user/logout");
+			this.user_login_into_cms_with_support_user();
+			cms.enableSecureBarcode();
+		}
+		utils.getDriver().navigate().to(utils.Environment.get("APP_URL").trim() + "/user/logout");
+		//utils.navigateTo("/user/logout/");
+	}
+    
+    @And("Verify secure barcode toggle status")
+    public void check_SecureBarcode_Default()throws InterruptedException {
+    	if(cms.checkenableSecureBarcode()==false) {
+    		Assert.assertEquals(cms.checkenableSecureBarcode(), false ,"Secure Barcode is disabled by default" );
+    	}else {
+    		Assert.assertEquals(cms.checkenableSecureBarcode(), true ,"Secure Barcode is enabled" );
+    	}
+    }
+    
+    @Then("^User verify version from CMS UI and Drupal API$")
+    public void versionVerification() {
+    String UICMSVersion=	cms.versionUI();
+    String APICMSVersion = cms.versionAPI();
+    Assert.assertEquals(UICMSVersion, APICMSVersion, "CMS UI and CMS API verison is same");
     }
     
 }
